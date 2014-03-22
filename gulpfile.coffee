@@ -4,10 +4,12 @@ coffee = require 'gulp-coffee'
 browserify = require 'gulp-browserify'
 rename = require 'gulp-rename'
 connect = require 'gulp-connect'
+cors = require 'cors'
 
 
 gulp.task 'watch', ->
   gulp.watch './src/**/*', ['build']
+  gulp.watch './test/**/*', ['build:tests']
 
 bump = (type) ->
   gulp.src ['./bower.json', './package.json']
@@ -39,13 +41,21 @@ gulp.task 'build:tests', ->
       transform: ['browserify-shim']
     .pipe gulp.dest('./test/')
 
-gulp.task 'test', ['build:tests'],
-  connect.server
-    root: [__dirname]
-    port: 1337
-    livereload: true
-    open:
-      file: 'test/index.html'
-      browser: 'Google Chrome'
+# A server for the test page
+gulp.task 'testserver', connect.server
+  root: [__dirname]
+  port: 1337
+  livereload: false
+  open:
+    file: 'test/index.html'
+    browser: 'Google Chrome'
 
+# A server with another port for testing CORS
+gulp.task 'xdomainserver', connect.server
+  root: [__dirname]
+  port: 1338
+  livereload: false
+  middleware: -> [cors()]
+
+gulp.task 'test', ['build:tests', 'xdomainserver', 'testserver']
 gulp.task 'build', ['build:node', 'build:browser']

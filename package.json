@@ -17,7 +17,8 @@
     "gulp-util": "~2.2.14",
     "gulp-browserify": "~0.5.0",
     "gulp-connect": "~1.0.9",
-    "gulp-rename": "~1.2.0"
+    "gulp-rename": "~1.2.0",
+    "cors": "~2.2.0"
   },
   "peerDependencies": {
     "react": "*"
@@ -41,8 +42,6 @@
     "url": "https://github.com/matthewwithanm/react-inlinesvg/issues"
   },
   "browserify-shim": {
-    "react": "global:React",
-    "chai": "global:chai",
-    "mocha": "global:mocha"
+    "react": "global:React"
   }
 }
