@@ -1,0 +1,8 @@
+/node_modules/
+/Gruntfile.coffee
+/test/
+/vendor/
+/bower.json
+/coffeelint.json
+/src/
+/standalone/

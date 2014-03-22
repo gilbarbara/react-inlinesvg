@@ -1,0 +1,1 @@
+React = require 'react'

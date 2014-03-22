@@ -1,0 +1,23 @@
+{
+  "name": "react-inlinesvg",
+  "version": "0.0.1",
+  "authors": [
+    "Matthew Dapena-Tretter <m@tthewwithanm.com>"
+  ],
+  "description": "An SVG loader for React",
+  "main": "./standalone/react-inlinesvg.js",
+  "keywords": [
+    "react",
+    "svg",
+    "component"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/matthewwithanm/react-inlinesvg",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
