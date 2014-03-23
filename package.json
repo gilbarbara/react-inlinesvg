@@ -26,8 +26,8 @@
     "react": "*"
   },
   "scripts": {
-    "prepublish": "grunt build",
-    "test": "grunt test"
+    "prepublish": "gulp build",
+    "test": "gulp test"
   },
   "repository": {
     "type": "git",
