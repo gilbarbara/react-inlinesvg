@@ -46,6 +46,7 @@ gulp.task 'testserver', connect.server
   root: [__dirname]
   port: 1337
   livereload: false
+  middleware: -> [cors()]
   open:
     file: 'test/index.html'
     browser: 'Google Chrome'
