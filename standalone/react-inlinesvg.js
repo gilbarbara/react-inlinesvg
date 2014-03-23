@@ -149,11 +149,11 @@ module.exports = me = React.createClass({
             case '2':
               return done();
             case '4':
-              return _this.fail(new Error("" + xhr.status + " Client Error"));
+              return done(new Error("" + xhr.status + " Client Error"));
             case '5':
-              return _this.fail(new Error("" + xhr.status + " Server Error"));
+              return done(new Error("" + xhr.status + " Server Error"));
             default:
-              return _this.fail(new Error("" + xhr.status + " HTTP Error"));
+              return done(new Error("" + xhr.status + " HTTP Error"));
           }
         }
       };

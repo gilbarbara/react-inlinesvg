@@ -67,9 +67,9 @@ module.exports = me =
         if xhr.readyState is 4
           switch xhr.status.toString()[...1]
             when '2' then done()
-            when '4' then @fail new Error "#{ xhr.status } Client Error"
-            when '5' then @fail new Error "#{ xhr.status } Server Error"
-            else @fail new Error "#{ xhr.status } HTTP Error"
+            when '4' then done new Error "#{ xhr.status } Client Error"
+            when '5' then done new Error "#{ xhr.status } Server Error"
+            else done new Error "#{ xhr.status } HTTP Error"
       xhr.onload = -> done()
       xhr.onerror = -> done new Error 'Internal XHR error'
       xhr.open 'GET', @props.src
