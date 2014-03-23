@@ -34,99 +34,12 @@ PropTypes = React.PropTypes;
 
 span = React.DOM.span;
 
-supportsInlineSVG = once(function() {
-  var div;
-  if (!document) {
-    return false;
-  }
-  div = document.createElement('div');
-  div.innerHTML = '<svg />';
-  return div.firstChild && div.firstChild.namespaceURI === 'http://www.w3.org/2000/svg';
-});
-
-XHR = (function() {
-  if (!window) {
-    return null;
-  }
-  if ((XHR = window.XMLHttpRequest) && 'withCredentials' in new XHR) {
-    return XHR;
-  }
-  return window.XDomainRequest;
-})();
-
-delay = function(fn) {
-  return function() {
-    var args, newFunc;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    newFunc = function() {
-      return fn.apply(null, args);
-    };
-    setTimeout(newFunc, 0);
-  };
-};
-
-isSupportedEnvironment = once(function() {
-  return XHR && supportsInlineSVG();
-});
-
 Status = {
   PENDING: 'pending',
   LOADING: 'loading',
   LOADED: 'loaded',
   FAILED: 'failed',
   UNSUPPORTED: 'unsupported'
-};
-
-InlineSVGError = (function(_super) {
-  __extends(InlineSVGError, _super);
-
-  InlineSVGError.prototype.name = 'InlineSVGError';
-
-  InlineSVGError.prototype.isHttpError = false;
-
-  InlineSVGError.prototype.isSupportedBrowser = true;
-
-  InlineSVGError.prototype.isConfigurationError = false;
-
-  function InlineSVGError(message) {
-    this.message = message;
-  }
-
-  return InlineSVGError;
-
-})(Error);
-
-createError = function(message, attrs) {
-  var err, k, v;
-  err = new InlineSVGError(message);
-  for (k in attrs) {
-    if (!__hasProp.call(attrs, k)) continue;
-    v = attrs[k];
-    err[k] = v;
-  }
-  return err;
-};
-
-httpError = function(message, statusCode) {
-  return createError(message, {
-    isHttpError: true,
-    statusCode: statusCode
-  });
-};
-
-unsupportedBrowserError = function(message) {
-  if (message == null) {
-    message = 'Unsupported Browser';
-  }
-  return createError(message, {
-    isSupportedBrowser: false
-  });
-};
-
-configurationError = function(message) {
-  return createError(message, {
-    isConfigurationError: true
-  });
 };
 
 module.exports = me = React.createClass({
@@ -267,6 +180,93 @@ module.exports = me = React.createClass({
     }
   }
 });
+
+supportsInlineSVG = once(function() {
+  var div;
+  if (!document) {
+    return false;
+  }
+  div = document.createElement('div');
+  div.innerHTML = '<svg />';
+  return div.firstChild && div.firstChild.namespaceURI === 'http://www.w3.org/2000/svg';
+});
+
+XHR = (function() {
+  if (!window) {
+    return null;
+  }
+  if ((XHR = window.XMLHttpRequest) && 'withCredentials' in new XHR) {
+    return XHR;
+  }
+  return window.XDomainRequest;
+})();
+
+delay = function(fn) {
+  return function() {
+    var args, newFunc;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    newFunc = function() {
+      return fn.apply(null, args);
+    };
+    setTimeout(newFunc, 0);
+  };
+};
+
+isSupportedEnvironment = once(function() {
+  return XHR && supportsInlineSVG();
+});
+
+InlineSVGError = (function(_super) {
+  __extends(InlineSVGError, _super);
+
+  InlineSVGError.prototype.name = 'InlineSVGError';
+
+  InlineSVGError.prototype.isHttpError = false;
+
+  InlineSVGError.prototype.isSupportedBrowser = true;
+
+  InlineSVGError.prototype.isConfigurationError = false;
+
+  function InlineSVGError(message) {
+    this.message = message;
+  }
+
+  return InlineSVGError;
+
+})(Error);
+
+createError = function(message, attrs) {
+  var err, k, v;
+  err = new InlineSVGError(message);
+  for (k in attrs) {
+    if (!__hasProp.call(attrs, k)) continue;
+    v = attrs[k];
+    err[k] = v;
+  }
+  return err;
+};
+
+httpError = function(message, statusCode) {
+  return createError(message, {
+    isHttpError: true,
+    statusCode: statusCode
+  });
+};
+
+unsupportedBrowserError = function(message) {
+  if (message == null) {
+    message = 'Unsupported Browser';
+  }
+  return createError(message, {
+    isSupportedBrowser: false
+  });
+};
+
+configurationError = function(message) {
+  return createError(message, {
+    isConfigurationError: true
+  });
+};
 
 },{"once":1}]},{},[2])
 (2)
