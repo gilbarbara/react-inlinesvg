@@ -5,6 +5,7 @@ browserify = require 'gulp-browserify'
 rename = require 'gulp-rename'
 connect = require 'gulp-connect'
 cors = require 'cors'
+gbump = require 'gulp-bump'
 
 
 gulp.task 'watch', ->
@@ -13,7 +14,7 @@ gulp.task 'watch', ->
 
 bump = (type) ->
   gulp.src ['./bower.json', './package.json']
-    .pipe bump {type}
+    .pipe gbump {type}
     .pipe gulp.dest './'
 
 gulp.task 'bump:major', -> bump 'major'
