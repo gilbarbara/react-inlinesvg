@@ -119,7 +119,7 @@ supportsInlineSVG = once ->
 # CORS via its proprietary `XDomainRequest` object.
 
 XHR = do ->
-  return null unless window
+  return null unless window?
   return XHR if (XHR = window.XMLHttpRequest) and 'withCredentials' of new XHR
   return window.XDomainRequest
 

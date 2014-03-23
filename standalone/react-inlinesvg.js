@@ -192,7 +192,7 @@ supportsInlineSVG = once(function() {
 });
 
 XHR = (function() {
-  if (!window) {
+  if (typeof window === "undefined" || window === null) {
     return null;
   }
   if ((XHR = window.XMLHttpRequest) && 'withCredentials' in new XHR) {
