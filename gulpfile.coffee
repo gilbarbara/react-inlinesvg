@@ -35,7 +35,7 @@ gulp.task 'build:browser', ->
     .pipe gulp.dest('./standalone/')
 
 gulp.task 'build:tests', ->
-  gulp.src './test/**/*.coffee'
+  gulp.src './test/**/*.?(lit)coffee'
     .pipe coffee().on('error', gutil.log)
     .pipe browserify
       transform: ['browserify-shim']
