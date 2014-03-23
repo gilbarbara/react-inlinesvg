@@ -16,6 +16,12 @@ XHR = do ->
   return XHR if (XHR = window.XMLHttpRequest) and 'withCredentials' of new XHR
   return window.XDomainRequest
 
+delay = (fn) ->
+  (args...) ->
+    newFunc = -> fn args...
+    setTimeout newFunc, 0
+    return
+
 isSupportedEnvironment = once -> XHR and supportsInlineSVG()
 
 Status =
@@ -23,6 +29,7 @@ Status =
   LOADING: 'loading'
   LOADED: 'loaded'
   FAILED: 'failed'
+  UNSUPPORTED: 'unsupported'
 
 module.exports = me =
   React.createClass
@@ -35,23 +42,21 @@ module.exports = me =
       preloader: PropTypes.func
       onLoad: PropTypes.func
       onError: PropTypes.func
+      supportTest: PropTypes.func
     getDefaultProps: ->
       wrapper: span
+      supportTest: isSupportedEnvironment
     getInitialState: ->
       status: Status.PENDING
     componentDidMount: ->
       return unless @state.status is Status.PENDING
-      unless @props.src and isSupportedEnvironment()
-        @fail new Error 'Unsupported Browser'
-        return
-      @setState status: Status.LOADING, @load
-    getContents: ->
-      switch @state.status
-        when Status.FAILED then @props.children
-        when Status.PENDING, Status.LOADING
-          new @props.preloader if @props.preloader
-    fail: (error) ->
-      @setState status: Status.FAILED, => @props.onError? error
+      if @props.supportTest()
+        if @props.src then @setState status: Status.LOADING, @load
+        else do delay => @fail new Error 'Missing source'
+      else
+        do delay => @fail new Error('Unsupported Browser'), Status.UNSUPPORTED
+    fail: (error, status = Status.FAILED) ->
+      @setState {status}, => @props.onError? error
     handleResponse: (txt) ->
       @setState
         loadedText: txt
@@ -59,7 +64,7 @@ module.exports = me =
         => @props.onLoad?()
     load: ->
       xhr = new XHR()
-      done = once (err) =>
+      done = once delay (err) =>
         xhr.onload = xhr.onerror = xhr.onreadystatechange = null
         if err then @fail err
         else @handleResponse xhr.responseText
@@ -77,17 +82,16 @@ module.exports = me =
 
     getClassName: ->
       className = "isvg #{ @state.status }"
-      className += @props.className if @props.className
-      className += 'unsupported-browser' unless isSupportedEnvironment()
+      className += " #{ @props.className }" if @props.className
       className
     render: ->
-      if @state.status is Status.LOADED
-        (@props.wrapper
-          className: @getClassName()
-          dangerouslySetInnerHTML: __html: @state.loadedText
-        )
-      else
-        (@props.wrapper
-          className: @getClassName()
-          @getContents()
-        )
+      (@props.wrapper
+        className: @getClassName()
+        dangerouslySetInnerHTML: __html: @state.loadedText if @state.loadedText
+        @renderContents()
+      )
+    renderContents: ->
+      switch @state.status
+        when Status.UNSUPPORTED then @props.children
+        when Status.PENDING, Status.LOADING
+          new @props.preloader if @props.preloader

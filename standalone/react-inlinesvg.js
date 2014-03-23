@@ -21,7 +21,8 @@ function once (fn) {
 }
 
 },{}],2:[function(_dereq_,module,exports){
-var PropTypes, React, Status, XHR, isSupportedEnvironment, me, once, span, supportsInlineSVG;
+var PropTypes, React, Status, XHR, delay, isSupportedEnvironment, me, once, span, supportsInlineSVG,
+  __slice = [].slice;
 
 React = (window.React);
 
@@ -51,6 +52,17 @@ XHR = (function() {
   return window.XDomainRequest;
 })();
 
+delay = function(fn) {
+  return function() {
+    var args, newFunc;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    newFunc = function() {
+      return fn.apply(null, args);
+    };
+    setTimeout(newFunc, 0);
+  };
+};
+
 isSupportedEnvironment = once(function() {
   return XHR && supportsInlineSVG();
 });
@@ -59,7 +71,8 @@ Status = {
   PENDING: 'pending',
   LOADING: 'loading',
   LOADED: 'loaded',
-  FAILED: 'failed'
+  FAILED: 'failed',
+  UNSUPPORTED: 'unsupported'
 };
 
 module.exports = me = React.createClass({
@@ -73,11 +86,13 @@ module.exports = me = React.createClass({
     className: PropTypes.string,
     preloader: PropTypes.func,
     onLoad: PropTypes.func,
-    onError: PropTypes.func
+    onError: PropTypes.func,
+    supportTest: PropTypes.func
   },
   getDefaultProps: function() {
     return {
-      wrapper: span
+      wrapper: span,
+      supportTest: isSupportedEnvironment
     };
   },
   getInitialState: function() {
@@ -89,28 +104,32 @@ module.exports = me = React.createClass({
     if (this.state.status !== Status.PENDING) {
       return;
     }
-    if (!(this.props.src && isSupportedEnvironment())) {
-      this.fail(new Error('Unsupported Browser'));
-      return;
+    if (this.props.supportTest()) {
+      if (this.props.src) {
+        return this.setState({
+          status: Status.LOADING
+        }, this.load);
+      } else {
+        return delay((function(_this) {
+          return function() {
+            return _this.fail(new Error('Missing source'));
+          };
+        })(this))();
+      }
+    } else {
+      return delay((function(_this) {
+        return function() {
+          return _this.fail(new Error('Unsupported Browser'), Status.UNSUPPORTED);
+        };
+      })(this))();
+    }
+  },
+  fail: function(error, status) {
+    if (status == null) {
+      status = Status.FAILED;
     }
     return this.setState({
-      status: Status.LOADING
-    }, this.load);
-  },
-  getContents: function() {
-    switch (this.state.status) {
-      case Status.FAILED:
-        return this.props.children;
-      case Status.PENDING:
-      case Status.LOADING:
-        if (this.props.preloader) {
-          return new this.props.preloader;
-        }
-    }
-  },
-  fail: function(error) {
-    return this.setState({
-      status: Status.FAILED
+      status: status
     }, (function(_this) {
       return function() {
         var _base;
@@ -132,7 +151,7 @@ module.exports = me = React.createClass({
   load: function() {
     var done, xhr;
     xhr = new XHR();
-    done = once((function(_this) {
+    done = once(delay((function(_this) {
       return function(err) {
         xhr.onload = xhr.onerror = xhr.onreadystatechange = null;
         if (err) {
@@ -141,7 +160,7 @@ module.exports = me = React.createClass({
           return _this.handleResponse(xhr.responseText);
         }
       };
-    })(this));
+    })(this)));
     xhr.onreadystatechange = (function(_this) {
       return function() {
         if (xhr.readyState === 4) {
@@ -171,25 +190,27 @@ module.exports = me = React.createClass({
     var className;
     className = "isvg " + this.state.status;
     if (this.props.className) {
-      className += this.props.className;
-    }
-    if (!isSupportedEnvironment()) {
-      className += 'unsupported-browser';
+      className += " " + this.props.className;
     }
     return className;
   },
   render: function() {
-    if (this.state.status === Status.LOADED) {
-      return this.props.wrapper({
-        className: this.getClassName(),
-        dangerouslySetInnerHTML: {
-          __html: this.state.loadedText
+    return this.props.wrapper({
+      className: this.getClassName(),
+      dangerouslySetInnerHTML: this.state.loadedText ? {
+        __html: this.state.loadedText
+      } : void 0
+    }, this.renderContents());
+  },
+  renderContents: function() {
+    switch (this.state.status) {
+      case Status.UNSUPPORTED:
+        return this.props.children;
+      case Status.PENDING:
+      case Status.LOADING:
+        if (this.props.preloader) {
+          return new this.props.preloader;
         }
-      });
-    } else {
-      return this.props.wrapper({
-        className: this.getClassName()
-      }, this.getContents());
     }
   }
 });
