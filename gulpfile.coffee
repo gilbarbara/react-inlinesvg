@@ -58,5 +58,5 @@ gulp.task 'xdomainserver', connect.server
   livereload: false
   middleware: -> [cors()]
 
-gulp.task 'test', ['build:tests', 'xdomainserver', 'testserver']
+gulp.task 'test', ['build:browser', 'build:tests', 'xdomainserver', 'testserver']
 gulp.task 'build', ['build:node', 'build:browser']
