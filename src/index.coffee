@@ -31,6 +31,28 @@ Status =
   FAILED: 'failed'
   UNSUPPORTED: 'unsupported'
 
+class InlineSVGError extends Error
+  name: 'InlineSVGError'
+  isHttpError: false
+  isSupportedBrowser: true
+  isConfigurationError: false
+  constructor: (@message) ->
+
+createError = (message, attrs) ->
+  err = new InlineSVGError message
+  for own k, v of attrs
+    err[k] = v
+  err
+
+httpError = (message, statusCode) ->
+  createError message, isHttpError: true, statusCode: statusCode
+
+unsupportedBrowserError = (message = 'Unsupported Browser') ->
+  createError message, isSupportedBrowser: false
+
+configurationError = (message) ->
+  createError message, isConfigurationError: true
+
 module.exports = me =
   React.createClass
     statics: {Status}
@@ -52,10 +74,11 @@ module.exports = me =
       return unless @state.status is Status.PENDING
       if @props.supportTest()
         if @props.src then @setState status: Status.LOADING, @load
-        else do delay => @fail new Error 'Missing source'
+        else do delay => @fail configurationError 'Missing source'
       else
-        do delay => @fail new Error('Unsupported Browser'), Status.UNSUPPORTED
-    fail: (error, status = Status.FAILED) ->
+        do delay => @fail unsupportedBrowserError()
+    fail: (error) ->
+      status = if not error.isSupportedBrowser then Status.UNSUPPORTED else Status.FAILED
       @setState {status}, => @props.onError? error
     handleResponse: (txt) ->
       @setState
@@ -72,11 +95,11 @@ module.exports = me =
         if xhr.readyState is 4
           switch xhr.status.toString()[...1]
             when '2' then done()
-            when '4' then done new Error "#{ xhr.status } Client Error"
-            when '5' then done new Error "#{ xhr.status } Server Error"
-            else done new Error "#{ xhr.status } HTTP Error"
+            when '4' then done httpError 'Client Error', xhr.status
+            when '5' then done httpError 'Server Error', xhr.status
+            else done httpError 'HTTP Error', xhr.status
       xhr.onload = -> done()
-      xhr.onerror = -> done new Error 'Internal XHR error'
+      xhr.onerror = -> done httpError 'Internal XHR Error', xhr.status or 0
       xhr.open 'GET', @props.src
       xhr.send()
 

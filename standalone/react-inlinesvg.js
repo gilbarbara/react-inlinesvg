@@ -21,8 +21,10 @@ function once (fn) {
 }
 
 },{}],2:[function(_dereq_,module,exports){
-var PropTypes, React, Status, XHR, delay, isSupportedEnvironment, me, once, span, supportsInlineSVG,
-  __slice = [].slice;
+var InlineSVGError, PropTypes, React, Status, XHR, configurationError, createError, delay, httpError, isSupportedEnvironment, me, once, span, supportsInlineSVG, unsupportedBrowserError,
+  __slice = [].slice,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 React = (window.React);
 
@@ -75,6 +77,58 @@ Status = {
   UNSUPPORTED: 'unsupported'
 };
 
+InlineSVGError = (function(_super) {
+  __extends(InlineSVGError, _super);
+
+  InlineSVGError.prototype.name = 'InlineSVGError';
+
+  InlineSVGError.prototype.isHttpError = false;
+
+  InlineSVGError.prototype.isSupportedBrowser = true;
+
+  InlineSVGError.prototype.isConfigurationError = false;
+
+  function InlineSVGError(message) {
+    this.message = message;
+  }
+
+  return InlineSVGError;
+
+})(Error);
+
+createError = function(message, attrs) {
+  var err, k, v;
+  err = new InlineSVGError(message);
+  for (k in attrs) {
+    if (!__hasProp.call(attrs, k)) continue;
+    v = attrs[k];
+    err[k] = v;
+  }
+  return err;
+};
+
+httpError = function(message, statusCode) {
+  return createError(message, {
+    isHttpError: true,
+    statusCode: statusCode
+  });
+};
+
+unsupportedBrowserError = function(message) {
+  if (message == null) {
+    message = 'Unsupported Browser';
+  }
+  return createError(message, {
+    isSupportedBrowser: false
+  });
+};
+
+configurationError = function(message) {
+  return createError(message, {
+    isConfigurationError: true
+  });
+};
+
 module.exports = me = React.createClass({
   statics: {
     Status: Status
@@ -112,22 +166,21 @@ module.exports = me = React.createClass({
       } else {
         return delay((function(_this) {
           return function() {
-            return _this.fail(new Error('Missing source'));
+            return _this.fail(configurationError('Missing source'));
           };
         })(this))();
       }
     } else {
       return delay((function(_this) {
         return function() {
-          return _this.fail(new Error('Unsupported Browser'), Status.UNSUPPORTED);
+          return _this.fail(unsupportedBrowserError());
         };
       })(this))();
     }
   },
-  fail: function(error, status) {
-    if (status == null) {
-      status = Status.FAILED;
-    }
+  fail: function(error) {
+    var status;
+    status = !error.isSupportedBrowser ? Status.UNSUPPORTED : Status.FAILED;
     return this.setState({
       status: status
     }, (function(_this) {
@@ -168,11 +221,11 @@ module.exports = me = React.createClass({
             case '2':
               return done();
             case '4':
-              return done(new Error("" + xhr.status + " Client Error"));
+              return done(httpError('Client Error', xhr.status));
             case '5':
-              return done(new Error("" + xhr.status + " Server Error"));
+              return done(httpError('Server Error', xhr.status));
             default:
-              return done(new Error("" + xhr.status + " HTTP Error"));
+              return done(httpError('HTTP Error', xhr.status));
           }
         }
       };
@@ -181,7 +234,7 @@ module.exports = me = React.createClass({
       return done();
     };
     xhr.onerror = function() {
-      return done(new Error('Internal XHR error'));
+      return done(httpError('Internal XHR Error', xhr.status || 0));
     };
     xhr.open('GET', this.props.src);
     return xhr.send();

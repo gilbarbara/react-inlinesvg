@@ -33,7 +33,7 @@ describe 'react-inlinesvg', ->
     el = renderComponent isvg
       src: 'DOESNOTEXIST.svg'
       supportTest: -> false
-      onError: ->
+      onError: (err) ->
         if /MISSINGNO/.test el.innerHTML then done()
         else done new Error 'Missing fallback contents'
       (span null, '')
@@ -46,3 +46,11 @@ describe 'react-inlinesvg', ->
           done new Error 'Children shown even though loading is supported'
         else done()
       (span null, 'MISSINGNO')
+
+  describe 'errors', ->
+    it 'should have a status code HTTP errors', (done) ->
+      renderComponent isvg
+        src: 'DOESNOTEXIST.svg'
+        onError: (err) ->
+          if err.isHttpError and err.statusCode is 404 then done()
+          else done new Error 'Error missing information'
