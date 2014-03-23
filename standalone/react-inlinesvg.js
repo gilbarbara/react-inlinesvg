@@ -89,7 +89,13 @@ module.exports = me = React.createClass({
     if (this.state.status !== Status.PENDING) {
       return;
     }
-    return this.load();
+    if (!(this.props.src && isSupportedEnvironment())) {
+      this.fail(new Error('Unsupported Browser'));
+      return;
+    }
+    return this.setState({
+      status: Status.LOADING
+    }, this.load);
   },
   getContents: function() {
     switch (this.state.status) {
@@ -124,26 +130,40 @@ module.exports = me = React.createClass({
     })(this));
   },
   load: function() {
-    var xhr;
-    if (!(this.props.src && isSupportedEnvironment())) {
-      this.fail(new Error('Unsupported Browser'));
-      return;
-    }
+    var done, xhr;
     xhr = new XHR();
+    done = once((function(_this) {
+      return function(err) {
+        xhr.onload = xhr.onerror = xhr.onreadystatechange = null;
+        if (err) {
+          return _this.fail(err);
+        } else {
+          return _this.handleResponse(xhr.responseText);
+        }
+      };
+    })(this));
     xhr.onreadystatechange = (function(_this) {
       return function() {
-        if (xhr.readyState !== 4) {
-          return;
-        }
-        xhr.onreadystatechange = null;
-        switch (xhr.status) {
-          case 200:
-            return _this.handleResponse(xhr.responseText);
-          default:
-            return _this.fail(new Error("Request failed with a status of " + xhr.status));
+        if (xhr.readyState === 4) {
+          switch (xhr.status.toString().slice(0, 1)) {
+            case '2':
+              return done();
+            case '4':
+              return _this.fail(new Error("" + xhr.status + " Client Error"));
+            case '5':
+              return _this.fail(new Error("" + xhr.status + " Server Error"));
+            default:
+              return _this.fail(new Error("" + xhr.status + " HTTP Error"));
+          }
         }
       };
     })(this);
+    xhr.onload = function() {
+      return done();
+    };
+    xhr.onerror = function() {
+      return done(new Error('Internal XHR error'));
+    };
     xhr.open('GET', this.props.src);
     return xhr.send();
   },

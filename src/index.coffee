@@ -41,7 +41,10 @@ module.exports = me =
       status: Status.PENDING
     componentDidMount: ->
       return unless @state.status is Status.PENDING
-      @load()
+      unless @props.src and isSupportedEnvironment()
+        @fail new Error 'Unsupported Browser'
+        return
+      @setState status: Status.LOADING, @load
     getContents: ->
       switch @state.status
         when Status.FAILED then @props.children
@@ -55,18 +58,20 @@ module.exports = me =
         status: Status.LOADED
         => @props.onLoad?()
     load: ->
-      unless @props.src and isSupportedEnvironment()
-        @fail new Error 'Unsupported Browser'
-        return
-
       xhr = new XHR()
+      done = once (err) =>
+        xhr.onload = xhr.onerror = xhr.onreadystatechange = null
+        if err then @fail err
+        else @handleResponse xhr.responseText
       xhr.onreadystatechange = =>
-        return if xhr.readyState isnt 4
-        xhr.onreadystatechange = null
-        switch xhr.status
-          when 200 then @handleResponse xhr.responseText
-          else @fail new Error "Request failed with a status of #{ xhr.status }"
-
+        if xhr.readyState is 4
+          switch xhr.status.toString()[...1]
+            when '2' then done()
+            when '4' then @fail new Error "#{ xhr.status } Client Error"
+            when '5' then @fail new Error "#{ xhr.status } Server Error"
+            else @fail new Error "#{ xhr.status } HTTP Error"
+      xhr.onload = -> done()
+      xhr.onerror = -> done new Error 'Internal XHR error'
       xhr.open 'GET', @props.src
       xhr.send()
 
