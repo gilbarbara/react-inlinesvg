@@ -7,6 +7,7 @@
   "description": "An SVG loader for React",
   "main": "./standalone/react-inlinesvg.js",
   "keywords": [
+    "react-component",
     "react",
     "svg",
     "component"

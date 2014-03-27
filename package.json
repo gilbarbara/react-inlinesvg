@@ -34,6 +34,7 @@
     "url": "git://github.com/matthewwithanm/react-inlinesvg.git"
   },
   "keywords": [
+    "react-component",
     "react",
     "svg",
     "component"
