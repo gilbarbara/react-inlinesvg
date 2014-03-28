@@ -104,6 +104,9 @@ module.exports = me = React.createClass({
     })(this));
   },
   handleResponse: function(txt) {
+    if (!this.isMounted()) {
+      return;
+    }
     return this.setState({
       loadedText: txt,
       status: Status.LOADED
