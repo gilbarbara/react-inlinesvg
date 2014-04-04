@@ -70,7 +70,7 @@ module.exports = me =
       # `once` util to make sure that only one is called (and it's only called
       # one time).
       done = once delay (err) =>
-        xhr.onload = xhr.onerror = xhr.onreadystatechange = null
+        xhr.onload = xhr.onerror = xhr.onreadystatechange = xhr.ontimeout = xhr.onprogress = null
         if err then @fail err
         else @handleResponse xhr.responseText
 
@@ -87,6 +87,11 @@ module.exports = me =
       # `xhr.status` having been set, so we don't check it.
       xhr.onload = -> done()
       xhr.onerror = -> done httpError 'Internal XHR Error', xhr.status or 0
+
+      # IE sometimes fails if you don't specify every handler.
+      # See http://social.msdn.microsoft.com/Forums/ie/en-US/30ef3add-767c-4436-b8a9-f1ca19b4812e/ie9-rtm-xdomainrequest-issued-requests-may-abort-if-all-event-handlers-not-specified?forum=iewebdevelopment
+      xhr.ontimeout = ->
+      xhr.onprogress = ->
 
       # Send the request.
       xhr.open 'GET', @props.src
