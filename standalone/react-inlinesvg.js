@@ -21,7 +21,90 @@ function once (fn) {
 }
 
 },{}],2:[function(_dereq_,module,exports){
-var InlineSVGError, PropTypes, React, Status, XHR, configurationError, createError, delay, httpError, isSupportedEnvironment, me, once, span, supportsInlineSVG, unsupportedBrowserError,
+(function() {
+  var URL, URL_PATTERN, defaults, urllite,
+    __hasProp = {}.hasOwnProperty,
+    __slice = [].slice;
+
+  URL_PATTERN = /^(?:(?:([^:\/?\#]+:)\/+|(\/\/))(?:([a-z0-9-\._~%]+)(?::([a-z0-9-\._~%]+))?@)?(([a-z0-9-\._~%!$&'()*+,;=]+)(?::([0-9]+))?)?)?([^?\#]*?)(\?[^\#]*)?(\#.*)?$/;
+
+  urllite = function(raw, opts) {
+    return urllite.URL.parse(raw, opts);
+  };
+
+  urllite.URL = URL = (function() {
+    function URL(props) {
+      var k, v;
+      for (k in props) {
+        if (!__hasProp.call(props, k)) continue;
+        v = props[k];
+        this[k] = v;
+      }
+    }
+
+    URL.parse = function(raw) {
+      var m, pathname, protocol;
+      m = raw.toString().match(URL_PATTERN);
+      pathname = m[8] || '';
+      protocol = m[1];
+      return urllite._createURL({
+        protocol: protocol,
+        username: m[3],
+        password: m[4],
+        hostname: m[6],
+        port: m[7],
+        pathname: protocol && pathname.charAt(0) !== '/' ? "/" + pathname : pathname,
+        search: m[9],
+        hash: m[10],
+        isSchemeRelative: m[2] != null
+      });
+    };
+
+    return URL;
+
+  })();
+
+  defaults = {
+    protocol: '',
+    username: '',
+    password: '',
+    host: '',
+    hostname: '',
+    port: '',
+    pathname: '',
+    search: '',
+    hash: '',
+    origin: '',
+    isSchemeRelative: false
+  };
+
+  urllite._createURL = function() {
+    var base, bases, k, props, v, _i, _len, _ref, _ref1;
+    bases = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    props = {};
+    for (_i = 0, _len = bases.length; _i < _len; _i++) {
+      base = bases[_i];
+      for (k in defaults) {
+        if (!__hasProp.call(defaults, k)) continue;
+        v = defaults[k];
+        props[k] = (_ref = (_ref1 = base[k]) != null ? _ref1 : props[k]) != null ? _ref : v;
+      }
+    }
+    props.host = props.hostname && props.port ? "" + props.hostname + ":" + props.port : props.hostname ? props.hostname : '';
+    props.origin = props.protocol ? "" + props.protocol + "//" + props.host : '';
+    props.isAbsolutePathRelative = !props.host && props.pathname.charAt(0) === '/';
+    props.isPathRelative = !props.host && props.pathname.charAt(0) !== '/';
+    props.isRelative = props.isSchemeRelative || props.isAbsolutePathRelative || props.isPathRelative;
+    props.isAbsolute = !props.isRelative;
+    return new urllite.URL(props);
+  };
+
+  module.exports = urllite;
+
+}).call(this);
+
+},{}],3:[function(_dereq_,module,exports){
+var InlineSVGError, PropTypes, React, Status, configurationError, createError, createXHR, delay, httpError, isSupportedEnvironment, me, once, span, supportsInlineSVG, unsupportedBrowserError, urllite,
   __slice = [].slice,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -29,6 +112,8 @@ var InlineSVGError, PropTypes, React, Status, XHR, configurationError, createErr
 React = (window.React);
 
 once = _dereq_('once');
+
+urllite = _dereq_('urllite/lib/core');
 
 PropTypes = React.PropTypes;
 
@@ -119,10 +204,10 @@ module.exports = me = React.createClass({
   },
   load: function() {
     var done, xhr;
-    xhr = new XHR();
+    xhr = createXHR(this.props.src);
     done = once(delay((function(_this) {
       return function(err) {
-        xhr.onload = xhr.onerror = xhr.onreadystatechange = null;
+        xhr.onload = xhr.onerror = xhr.onreadystatechange = xhr.ontimeout = xhr.onprogress = null;
         if (err) {
           return _this.fail(err);
         } else {
@@ -152,7 +237,11 @@ module.exports = me = React.createClass({
     xhr.onerror = function() {
       return done(httpError('Internal XHR Error', xhr.status || 0));
     };
-    xhr.open('GET', this.props.src);
+    xhr.ontimeout = function() {};
+    xhr.onprogress = function() {};
+    xhr.open('GET', this.props.src.replace(/[^%]+/g, function(s) {
+      return encodeURI(s);
+    }));
     return xhr.send();
   },
   getClassName: function() {
@@ -194,15 +283,30 @@ supportsInlineSVG = once(function() {
   return div.firstChild && div.firstChild.namespaceURI === 'http://www.w3.org/2000/svg';
 });
 
-XHR = (function() {
+createXHR = function(src) {
+  var XDR, XHR, a, b, xhr;
   if (typeof window === "undefined" || window === null) {
     return null;
   }
-  if ((XHR = window.XMLHttpRequest) && 'withCredentials' in new XHR) {
-    return XHR;
+  if (XHR = window.XMLHttpRequest) {
+    xhr = new XHR;
+    if ('withCredentials' in xhr) {
+      return xhr;
+    }
   }
-  return window.XDomainRequest;
-})();
+  if (XDR = window.XDomainRequest) {
+    a = urllite(src);
+    b = urllite(window.location.href);
+    if (!a.host) {
+      return xhr;
+    }
+    if (a.protocol === b.protocol && a.host === b.host && a.port === b.port) {
+      return xhr;
+    }
+    return new XDR;
+  }
+  return xhr;
+};
 
 delay = function(fn) {
   return function() {
@@ -216,7 +320,7 @@ delay = function(fn) {
 };
 
 isSupportedEnvironment = once(function() {
-  return XHR && supportsInlineSVG();
+  return ((typeof window !== "undefined" && window !== null ? window.XMLHttpRequest : void 0) || (typeof window !== "undefined" && window !== null ? window.XDomainRequest : void 0)) && supportsInlineSVG();
 });
 
 InlineSVGError = (function(_super) {
@@ -271,6 +375,6 @@ configurationError = function(message) {
   });
 };
 
-},{"once":1}]},{},[2])
-(2)
+},{"once":1,"urllite/lib/core":2}]},{},[3])
+(3)
 });
