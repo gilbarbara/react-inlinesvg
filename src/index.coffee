@@ -93,8 +93,10 @@ module.exports = me =
       xhr.ontimeout = ->
       xhr.onprogress = ->
 
-      # Send the request.
-      xhr.open 'GET', @props.src
+      # Send the request. Since old versions of IE will fail on UTF8 paths, we
+      # try to intelligently escape the URL (being careful not to double escape
+      # anything).
+      xhr.open 'GET', @props.src.replace /[^%]+/g, (s) -> encodeURI s
       xhr.send()
     getClassName: ->
       # Build a CSS class name based on the current state.
