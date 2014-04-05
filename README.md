@@ -90,6 +90,14 @@ Props
 </table>
 
 
+Browser Support
+---------------
+
+Any browsers that support inlining SVGs and XHR will work. The component goes
+out of its way to handle IE9's weird XHR support so, IE9 and up get your SVG;
+lesser browsers get the fallback.
+
+
 CORS
 ----
 
