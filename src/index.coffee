@@ -34,9 +34,11 @@ module.exports = me =
       onLoad: PropTypes.func
       onError: PropTypes.func
       supportTest: PropTypes.func
+      uniquifyIDs: PropTypes.bool
     getDefaultProps: ->
       wrapper: span
       supportTest: isSupportedEnvironment
+      uniquifyIDs: true
     getInitialState: ->
       status: Status.PENDING
     componentDidMount: ->
@@ -77,9 +79,12 @@ module.exports = me =
     render: ->
       (@props.wrapper
         className: @getClassName()
-        dangerouslySetInnerHTML: __html: @state.loadedText if @state.loadedText
+        dangerouslySetInnerHTML: __html: @processSVG(@state.loadedText) if @state.loadedText
         @renderContents()
       )
+    processSVG: (svgText) ->
+      if @props.uniquifyIDs then uniquifyIDs svgText, getComponentID this
+      else svgText
     renderContents: ->
       switch @state.status
         when Status.UNSUPPORTED then @props.children
@@ -111,6 +116,60 @@ delay = (fn) ->
 
 isSupportedEnvironment = once ->
   (window?.XMLHttpRequest or window?.XDomainRequest) and supportsInlineSVG()
+
+# Replaces the IDs in the provided string with document-unique IDs. This is
+# obviously very naive, but is intended to provide a good-enough solution
+# without adding too much overhead as would, for example, parsing as XML. See
+# GH-3.
+
+uniquifyIDs = do ->
+  mkAttributePattern = (attr) -> "(?:(?:\\s|\\:)#{ attr })"
+  idPattern =
+    ///
+    (?:                                    # Match ID declarations:
+      (
+        #{ mkAttributePattern 'id' }       #   The start of an attribute named "id"
+      )
+      ="
+        ([^"]+)                            #   Our attribute value—match anything that isn't a quote.
+      "                                    #   The end of the attribute
+    )
+    |                                      # ...OR...
+    (?:                                    # Match IRI references:
+      (
+        #{ mkAttributePattern 'href' }
+        |
+        #{ mkAttributePattern 'role' }
+        |
+        #{ mkAttributePattern 'arcrole' }
+      )
+      ="                                   #   The start of an attribute
+        \#                                 #   A literal # indicating this is an IRI reference
+        ([^"]+)                            #   Our attribute value—match anything that isn't a quote.
+      "                                    #   The end of the attribute
+    )
+    |                                      # ...OR...
+    (?:                                    # Match FuncIRI references
+      ="                                   #   The start of an attribute
+        url\(                              #   The beginning of a FuncIRI
+          \#                               #   A literal # indicating this is an IRI reference
+          ([^\)]+)                         #   The id—match anything that isn't a closing paren
+        \)                                 #   The end of the FuncIRI
+      "                                    #   The end of the attribute
+    )
+    ///g
+  (svgText, svgID) ->
+    uniquifyID = (id) -> "#{ id }___#{ svgID }"
+    svgText.replace idPattern, (m, p1, p2, p3, p4, p5) ->
+      if p2 then "#{ p1 }=\"#{ uniquifyID p2 }\""
+      else if p3 then "=\"url(##{ uniquifyID p3 })\""
+      else if p5 then "#{ p4 }=\"##{ uniquifyID p4 }\""
+
+# Gets a unique ID for the given component, for use in the id attribute.
+
+getComponentID = do ->
+  clean = (str) -> str.toString().replace /[^a-zA-Z0-9]/g, '_'
+  (component) -> "#{ clean component._rootNodeID }__#{ clean component._mountDepth }"
 
 
 # Errors
