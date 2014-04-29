@@ -52,5 +52,7 @@ describe 'react-inlinesvg', ->
       renderComponent isvg
         src: 'DOESNOTEXIST.svg'
         onError: (err) ->
-          if err.isHttpError and err.statusCode is 404 then done()
+          # This is actually functionality of the underlying HTTP library,
+          # httpplease.
+          if err.isHttpError and err.status is 404 then done()
           else done new Error 'Error missing information'

@@ -5,10 +5,12 @@
 
 React = require 'react'
 once = require 'once'
-urllite = require 'urllite/lib/core'
+httpplease = require 'httpplease'
+ieXDomain = require 'httpplease/lib/plugins/oldiexdomain'
 
 {PropTypes} = React
 {span} = React.DOM
+http = httpplease.use ieXDomain
 
 # An enum containing all the possible statuses of an isvg component. This is
 # accessible via `InlineSVG.Status`.
@@ -49,9 +51,12 @@ module.exports = me =
       else
         do delay => @fail unsupportedBrowserError()
     fail: (error) ->
-      status = if not error.isSupportedBrowser then Status.UNSUPPORTED else Status.FAILED
+      console.log error
+      status = if error.isUnsupportedBrowserError then Status.UNSUPPORTED else Status.FAILED
       @setState {status}, => @props.onError? error
-    handleResponse: (txt) ->
+    handleLoad: (err, res) ->
+      return @fail err if err
+
       # If the component has been unmounted since we started the load, just
       # forget it. (Setting the state of an unmounted component causes an
       # error.)
@@ -60,45 +65,10 @@ module.exports = me =
       # Update the state to include the loaded text. This will be rendered to
       # the DOM the next time `render()` runs.
       @setState
-        loadedText: txt
+        loadedText: res.text
         status: Status.LOADED
         => @props.onLoad?()
-    load: ->
-      xhr = createXHR @props.src
-
-      # Because XHR can be an XMLHttpRequest or an XDomainRequest, we add
-      # `onreadystatechange`, `onload`, and `onerror` callbacks. We use the
-      # `once` util to make sure that only one is called (and it's only called
-      # one time).
-      done = once delay (err) =>
-        xhr.onload = xhr.onerror = xhr.onreadystatechange = xhr.ontimeout = xhr.onprogress = null
-        if err then @fail err
-        else @handleResponse xhr.responseText
-
-      # When the request completes, continue.
-      xhr.onreadystatechange = =>
-        if xhr.readyState is 4
-          switch xhr.status.toString()[...1]
-            when '2' then done()
-            when '4' then done httpError 'Client Error', xhr.status
-            when '5' then done httpError 'Server Error', xhr.status
-            else done httpError 'HTTP Error', xhr.status
-
-      # `onload` is only called on success and, in IE, will be called without
-      # `xhr.status` having been set, so we don't check it.
-      xhr.onload = -> done()
-      xhr.onerror = -> done httpError 'Internal XHR Error', xhr.status or 0
-
-      # IE sometimes fails if you don't specify every handler.
-      # See http://social.msdn.microsoft.com/Forums/ie/en-US/30ef3add-767c-4436-b8a9-f1ca19b4812e/ie9-rtm-xdomainrequest-issued-requests-may-abort-if-all-event-handlers-not-specified?forum=iewebdevelopment
-      xhr.ontimeout = ->
-      xhr.onprogress = ->
-
-      # Send the request. Since old versions of IE will fail on UTF8 paths, we
-      # try to intelligently escape the URL (being careful not to double escape
-      # anything).
-      xhr.open 'GET', @props.src.replace /[^%]+/g, (s) -> encodeURI s
-      xhr.send()
+    load: -> http.get @props.src, @handleLoad
     getClassName: ->
       # Build a CSS class name based on the current state.
       className = "isvg #{ @state.status }"
@@ -128,25 +98,6 @@ supportsInlineSVG = once ->
   div.innerHTML = '<svg />'
   div.firstChild and div.firstChild.namespaceURI is 'http://www.w3.org/2000/svg'
 
-# Get the XHR class to use. This is necessary to support IE9, which only
-# supports CORS via its proprietary `XDomainRequest` object. But that's not all!
-# `XDomainRequest` *doesn't* work for same domain requests, unless your server
-# sends CORS headers. So we have to choose which to use based on whether the
-# thing we're trying to load is on the same domain.
-
-createXHR = (src) ->
-  return null unless window?
-  if XHR = window.XMLHttpRequest
-    xhr = new XHR
-    return xhr if 'withCredentials' of xhr
-  if XDR = window.XDomainRequest
-    a = urllite src
-    b = urllite window.location.href
-    return xhr if not a.host
-    return xhr if a.protocol is b.protocol and a.host is b.host and a.port is b.port
-    return new XDR
-  return xhr
-
 # Wrap a function in a `setTimeout` call. This is used to guarantee async
 # behavior, which can avoid unexpected errors.
 
@@ -171,9 +122,9 @@ isSupportedEnvironment = once ->
 
 class InlineSVGError extends Error
   name: 'InlineSVGError'
-  isHttpError: false
   isSupportedBrowser: true
   isConfigurationError: false
+  isUnsupportedBrowserError: false
   constructor: (@message) ->
 
 # Utility functions for creating `InlineSVGError` instances.
@@ -184,11 +135,10 @@ createError = (message, attrs) ->
     err[k] = v
   err
 
-httpError = (message, statusCode) ->
-  createError message, isHttpError: true, statusCode: statusCode
-
 unsupportedBrowserError = (message = 'Unsupported Browser') ->
-  createError message, isSupportedBrowser: false
+  createError message,
+    isSupportedBrowser: false
+    isUnsupportedBrowserError: true
 
 configurationError = (message) ->
   createError message, isConfigurationError: true

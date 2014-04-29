@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "once": "~1.3.0",
-    "urllite": "~0.4.1"
+    "httpplease": "~0.5.3"
   },
   "devDependencies": {
     "coffee-script": "~1.7.1",
