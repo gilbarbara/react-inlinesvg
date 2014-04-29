@@ -162,8 +162,8 @@ uniquifyIDs = do ->
     uniquifyID = (id) -> "#{ id }___#{ svgID }"
     svgText.replace idPattern, (m, p1, p2, p3, p4, p5) ->
       if p2 then "#{ p1 }=\"#{ uniquifyID p2 }\""
-      else if p3 then "=\"url(##{ uniquifyID p3 })\""
-      else if p5 then "#{ p4 }=\"##{ uniquifyID p4 }\""
+      else if p4 then "#{ p3 }=\"##{ uniquifyID p4 }\""
+      else if p5 then "=\"url(##{ uniquifyID p5 })\""
 
 # Gets a unique ID for the given component, for use in the id attribute.
 
