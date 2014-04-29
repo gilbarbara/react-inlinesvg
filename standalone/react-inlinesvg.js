@@ -623,10 +623,10 @@ uniquifyIDs = (function() {
     return svgText.replace(idPattern, function(m, p1, p2, p3, p4, p5) {
       if (p2) {
         return "" + p1 + "=\"" + (uniquifyID(p2)) + "\"";
-      } else if (p3) {
-        return "=\"url(#" + (uniquifyID(p3)) + ")\"";
+      } else if (p4) {
+        return "" + p3 + "=\"#" + (uniquifyID(p4)) + "\"";
       } else if (p5) {
-        return "" + p4 + "=\"#" + (uniquifyID(p4)) + "\"";
+        return "=\"url(#" + (uniquifyID(p5)) + ")\"";
       }
     });
   };
