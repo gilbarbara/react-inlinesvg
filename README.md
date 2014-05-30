@@ -12,6 +12,8 @@ element has to be in the same document. This leaves you with three bad options:
 2. Link to a CSS file in your SVG document
     * Sharing styles with your HTML means duplicating paths across your project,
       making maintenance a pain
+    * Not sharing styles with your HTML means extra HTTP requests (and likely
+      duplicating paths between different SVGs)
     * Still can't target parent elements
     * Your SVG becomes coupled to your external stylesheet, complicating reuse.
 3. Embed the SVG in your HTML
