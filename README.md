@@ -2,20 +2,32 @@ react-inlinesvg
 ===============
 
 One of the reasons SVGs are awesome is because you can style them with CSS.
-Unfortunately, this winds up not being too useful in practice because the CSS
-has to be in the same document. This leaves you with two bad options:
+Unfortunately, this winds up not being too useful in practice because the style
+element has to be in the same document. This leaves you with three bad options:
 
 1. Embed the CSS in the SVG document
     * Can't use your CSS preprocessors (LESS, SASS)
     * Can't target parent elements (button hover, etc.)
     * Makes maintenance difficult
-2. Embed the SVG in your HTML
+2. Link to a CSS file in your SVG document
+    * Sharing styles with your HTML means duplicating paths across your project,
+      making maintenance a pain
+    * Still can't target parent elements
+    * Your SVG becomes coupled to your external stylesheet, complicating reuse.
+3. Embed the SVG in your HTML
     * Bloats your HTML
     * SVGs can't be cached by browsers between pages.
     * A maintenance nightmare
 
 But there's an alternative that sidesteps these issues: load the SVG with an XHR
 request and then embed it in the document. That's what this component does.
+
+
+### Note
+
+This plugin works similarly to the SVG [`<use>`][svg-use] element. See [this
+article][use-article] for more information and [this table][use-support] for
+browser support and caveats.
 
 
 Usage
@@ -113,3 +125,6 @@ input to generate the `src`!
 
 
 [CORS]: https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS
+[svg-use]: http://css-tricks.com/svg-use-external-source
+[use-article]: http://css-tricks.com/svg-use-external-source
+[use-support]: https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use#Browser_compatibility
