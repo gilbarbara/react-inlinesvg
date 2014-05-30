@@ -27,9 +27,9 @@ request and then embed it in the document. That's what this component does.
 
 ### Note
 
-This plugin works similarly to the SVG [`<use>`][svg-use] element. See [this
-article][use-article] for more information and [this table][use-support] for
-browser support and caveats.
+The SVG [`<use>`][svg-use] element can be used to achieve something similar to
+this component. See [this article][use-article] for more information and [this
+table][use-support] for browser support and caveats.
 
 
 Usage
