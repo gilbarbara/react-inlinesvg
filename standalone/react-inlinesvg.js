@@ -517,7 +517,6 @@ module.exports = me = React.createClass({
   },
   fail: function(error) {
     var status;
-    console.log(error);
     status = error.isUnsupportedBrowserError ? Status.UNSUPPORTED : Status.FAILED;
     return this.setState({
       status: status
