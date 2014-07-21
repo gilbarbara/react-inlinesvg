@@ -53,7 +53,6 @@ module.exports = me =
       else
         do delay => @fail unsupportedBrowserError()
     fail: (error) ->
-      console.log error
       status = if error.isUnsupportedBrowserError then Status.UNSUPPORTED else Status.FAILED
       @setState {status}, => @props.onError? error
     handleLoad: (err, res) ->
