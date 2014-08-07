@@ -22,75 +22,6 @@ Status =
   FAILED: 'failed'
   UNSUPPORTED: 'unsupported'
 
-module.exports = me =
-  React.createClass
-    statics: {Status}
-    displayName: 'InlineSVG'
-    propTypes:
-      wrapper: PropTypes.func
-      src: PropTypes.string.isRequired
-      className: PropTypes.string
-      preloader: PropTypes.func
-      onLoad: PropTypes.func
-      onError: PropTypes.func
-      supportTest: PropTypes.func
-      uniquifyIDs: PropTypes.bool
-    getDefaultProps: ->
-      wrapper: span
-      supportTest: isSupportedEnvironment
-      uniquifyIDs: true
-    getInitialState: ->
-      status: Status.PENDING
-    componentDidMount: ->
-      return unless @state.status is Status.PENDING
-
-      # Either load the SVG or trigger an error, simulating async behavior with
-      # `delay` so as not to violate any implicit expectations in the user's
-      # code which would be difficult to troubleshoot.
-      if @props.supportTest()
-        if @props.src then @setState status: Status.LOADING, @load
-        else do delay => @fail configurationError 'Missing source'
-      else
-        do delay => @fail unsupportedBrowserError()
-    fail: (error) ->
-      status = if error.isUnsupportedBrowserError then Status.UNSUPPORTED else Status.FAILED
-      @setState {status}, => @props.onError? error
-    handleLoad: (err, res) ->
-      return @fail err if err
-
-      # If the component has been unmounted since we started the load, just
-      # forget it. (Setting the state of an unmounted component causes an
-      # error.)
-      return unless @isMounted()
-
-      # Update the state to include the loaded text. This will be rendered to
-      # the DOM the next time `render()` runs.
-      @setState
-        loadedText: res.text
-        status: Status.LOADED
-        => @props.onLoad?()
-    load: -> http.get @props.src, @handleLoad
-    getClassName: ->
-      # Build a CSS class name based on the current state.
-      className = "isvg #{ @state.status }"
-      className += " #{ @props.className }" if @props.className
-      className
-    render: ->
-      (@props.wrapper
-        className: @getClassName()
-        dangerouslySetInnerHTML: __html: @processSVG(@state.loadedText) if @state.loadedText
-        @renderContents()
-      )
-    processSVG: (svgText) ->
-      if @props.uniquifyIDs then uniquifyIDs svgText, getComponentID this
-      else svgText
-    renderContents: ->
-      switch @state.status
-        when Status.UNSUPPORTED then @props.children
-        when Status.PENDING, Status.LOADING
-          new @props.preloader if @props.preloader
-
-
 # Utils
 # -----
 #
@@ -200,3 +131,73 @@ unsupportedBrowserError = (message = 'Unsupported Browser') ->
 
 configurationError = (message) ->
   createError message, isConfigurationError: true
+
+# The InlineSVG component
+
+module.exports = me =
+  React.createClass
+    statics: {Status}
+    displayName: 'InlineSVG'
+    propTypes:
+      wrapper: PropTypes.func
+      src: PropTypes.string.isRequired
+      className: PropTypes.string
+      preloader: PropTypes.func
+      onLoad: PropTypes.func
+      onError: PropTypes.func
+      supportTest: PropTypes.func
+      uniquifyIDs: PropTypes.bool
+    getDefaultProps: ->
+      wrapper: span
+      supportTest: isSupportedEnvironment
+      uniquifyIDs: true
+    getInitialState: ->
+      status: Status.PENDING
+    componentDidMount: ->
+      return unless @state.status is Status.PENDING
+
+      # Either load the SVG or trigger an error, simulating async behavior with
+      # `delay` so as not to violate any implicit expectations in the user's
+      # code which would be difficult to troubleshoot.
+      if @props.supportTest()
+        if @props.src then @setState status: Status.LOADING, @load
+        else do delay => @fail configurationError 'Missing source'
+      else
+        do delay => @fail unsupportedBrowserError()
+    fail: (error) ->
+      status = if error.isUnsupportedBrowserError then Status.UNSUPPORTED else Status.FAILED
+      @setState {status}, => @props.onError? error
+    handleLoad: (err, res) ->
+      return @fail err if err
+
+      # If the component has been unmounted since we started the load, just
+      # forget it. (Setting the state of an unmounted component causes an
+      # error.)
+      return unless @isMounted()
+
+      # Update the state to include the loaded text. This will be rendered to
+      # the DOM the next time `render()` runs.
+      @setState
+        loadedText: res.text
+        status: Status.LOADED
+        => @props.onLoad?()
+    load: -> http.get @props.src, @handleLoad
+    getClassName: ->
+      # Build a CSS class name based on the current state.
+      className = "isvg #{ @state.status }"
+      className += " #{ @props.className }" if @props.className
+      className
+    render: ->
+      (@props.wrapper
+        className: @getClassName()
+        dangerouslySetInnerHTML: __html: @processSVG(@state.loadedText) if @state.loadedText
+        @renderContents()
+      )
+    processSVG: (svgText) ->
+      if @props.uniquifyIDs then uniquifyIDs svgText, getComponentID this
+      else svgText
+    renderContents: ->
+      switch @state.status
+        when Status.UNSUPPORTED then @props.children
+        when Status.PENDING, Status.LOADING
+          new @props.preloader if @props.preloader
