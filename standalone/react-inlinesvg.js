@@ -464,6 +464,110 @@ Status = {
   UNSUPPORTED: 'unsupported'
 };
 
+supportsInlineSVG = once(function() {
+  var div;
+  if (!document) {
+    return false;
+  }
+  div = document.createElement('div');
+  div.innerHTML = '<svg />';
+  return div.firstChild && div.firstChild.namespaceURI === 'http://www.w3.org/2000/svg';
+});
+
+delay = function(fn) {
+  return function() {
+    var args, newFunc;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    newFunc = function() {
+      return fn.apply(null, args);
+    };
+    setTimeout(newFunc, 0);
+  };
+};
+
+isSupportedEnvironment = once(function() {
+  return ((typeof window !== "undefined" && window !== null ? window.XMLHttpRequest : void 0) || (typeof window !== "undefined" && window !== null ? window.XDomainRequest : void 0)) && supportsInlineSVG();
+});
+
+uniquifyIDs = (function() {
+  var idPattern, mkAttributePattern;
+  mkAttributePattern = function(attr) {
+    return "(?:(?:\\s|\\:)" + attr + ")";
+  };
+  idPattern = RegExp("(?:(" + (mkAttributePattern('id')) + ")=\"([^\"]+)\")|(?:(" + (mkAttributePattern('href')) + "|" + (mkAttributePattern('role')) + "|" + (mkAttributePattern('arcrole')) + ")=\"\\#([^\"]+)\")|(?:=\"url\\(\\#([^\\)]+)\\)\")", "g");
+  return function(svgText, svgID) {
+    var uniquifyID;
+    uniquifyID = function(id) {
+      return "" + id + "___" + svgID;
+    };
+    return svgText.replace(idPattern, function(m, p1, p2, p3, p4, p5) {
+      if (p2) {
+        return "" + p1 + "=\"" + (uniquifyID(p2)) + "\"";
+      } else if (p4) {
+        return "" + p3 + "=\"#" + (uniquifyID(p4)) + "\"";
+      } else if (p5) {
+        return "=\"url(#" + (uniquifyID(p5)) + ")\"";
+      }
+    });
+  };
+})();
+
+getComponentID = (function() {
+  var clean;
+  clean = function(str) {
+    return str.toString().replace(/[^a-zA-Z0-9]/g, '_');
+  };
+  return function(component) {
+    return "" + (clean(component._rootNodeID)) + "__" + (clean(component._mountDepth));
+  };
+})();
+
+InlineSVGError = (function(_super) {
+  __extends(InlineSVGError, _super);
+
+  InlineSVGError.prototype.name = 'InlineSVGError';
+
+  InlineSVGError.prototype.isSupportedBrowser = true;
+
+  InlineSVGError.prototype.isConfigurationError = false;
+
+  InlineSVGError.prototype.isUnsupportedBrowserError = false;
+
+  function InlineSVGError(message) {
+    this.message = message;
+  }
+
+  return InlineSVGError;
+
+})(Error);
+
+createError = function(message, attrs) {
+  var err, k, v;
+  err = new InlineSVGError(message);
+  for (k in attrs) {
+    if (!__hasProp.call(attrs, k)) continue;
+    v = attrs[k];
+    err[k] = v;
+  }
+  return err;
+};
+
+unsupportedBrowserError = function(message) {
+  if (message == null) {
+    message = 'Unsupported Browser';
+  }
+  return createError(message, {
+    isSupportedBrowser: false,
+    isUnsupportedBrowserError: true
+  });
+};
+
+configurationError = function(message) {
+  return createError(message, {
+    isConfigurationError: true
+  });
+};
+
 module.exports = me = React.createClass({
   statics: {
     Status: Status
@@ -582,110 +686,6 @@ module.exports = me = React.createClass({
     }
   }
 });
-
-supportsInlineSVG = once(function() {
-  var div;
-  if (!document) {
-    return false;
-  }
-  div = document.createElement('div');
-  div.innerHTML = '<svg />';
-  return div.firstChild && div.firstChild.namespaceURI === 'http://www.w3.org/2000/svg';
-});
-
-delay = function(fn) {
-  return function() {
-    var args, newFunc;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    newFunc = function() {
-      return fn.apply(null, args);
-    };
-    setTimeout(newFunc, 0);
-  };
-};
-
-isSupportedEnvironment = once(function() {
-  return ((typeof window !== "undefined" && window !== null ? window.XMLHttpRequest : void 0) || (typeof window !== "undefined" && window !== null ? window.XDomainRequest : void 0)) && supportsInlineSVG();
-});
-
-uniquifyIDs = (function() {
-  var idPattern, mkAttributePattern;
-  mkAttributePattern = function(attr) {
-    return "(?:(?:\\s|\\:)" + attr + ")";
-  };
-  idPattern = RegExp("(?:(" + (mkAttributePattern('id')) + ")=\"([^\"]+)\")|(?:(" + (mkAttributePattern('href')) + "|" + (mkAttributePattern('role')) + "|" + (mkAttributePattern('arcrole')) + ")=\"\\#([^\"]+)\")|(?:=\"url\\(\\#([^\\)]+)\\)\")", "g");
-  return function(svgText, svgID) {
-    var uniquifyID;
-    uniquifyID = function(id) {
-      return "" + id + "___" + svgID;
-    };
-    return svgText.replace(idPattern, function(m, p1, p2, p3, p4, p5) {
-      if (p2) {
-        return "" + p1 + "=\"" + (uniquifyID(p2)) + "\"";
-      } else if (p4) {
-        return "" + p3 + "=\"#" + (uniquifyID(p4)) + "\"";
-      } else if (p5) {
-        return "=\"url(#" + (uniquifyID(p5)) + ")\"";
-      }
-    });
-  };
-})();
-
-getComponentID = (function() {
-  var clean;
-  clean = function(str) {
-    return str.toString().replace(/[^a-zA-Z0-9]/g, '_');
-  };
-  return function(component) {
-    return "" + (clean(component._rootNodeID)) + "__" + (clean(component._mountDepth));
-  };
-})();
-
-InlineSVGError = (function(_super) {
-  __extends(InlineSVGError, _super);
-
-  InlineSVGError.prototype.name = 'InlineSVGError';
-
-  InlineSVGError.prototype.isSupportedBrowser = true;
-
-  InlineSVGError.prototype.isConfigurationError = false;
-
-  InlineSVGError.prototype.isUnsupportedBrowserError = false;
-
-  function InlineSVGError(message) {
-    this.message = message;
-  }
-
-  return InlineSVGError;
-
-})(Error);
-
-createError = function(message, attrs) {
-  var err, k, v;
-  err = new InlineSVGError(message);
-  for (k in attrs) {
-    if (!__hasProp.call(attrs, k)) continue;
-    v = attrs[k];
-    err[k] = v;
-  }
-  return err;
-};
-
-unsupportedBrowserError = function(message) {
-  if (message == null) {
-    message = 'Unsupported Browser';
-  }
-  return createError(message, {
-    isSupportedBrowser: false,
-    isUnsupportedBrowserError: true
-  });
-};
-
-configurationError = function(message) {
-  return createError(message, {
-    isConfigurationError: true
-  });
-};
 
 },{"httpplease":3,"httpplease/lib/plugins/oldiexdomain":5,"once":11}]},{},[12])
 (12)
