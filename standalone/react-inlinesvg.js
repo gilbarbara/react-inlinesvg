@@ -1,322 +1,345 @@
 !function(e){if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else{var n;"undefined"!=typeof window?n=window:"undefined"!=typeof global?n=global:"undefined"!=typeof self&&(n=self),n.ReactInlineSVG=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
-(function() {
-  var delay,
-    __slice = [].slice;
+'use strict';
 
-  delay = function(fn) {
-    return function() {
-      var args, newFunc;
-      args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-      newFunc = function() {
-        return fn.apply(null, args);
-      };
-      setTimeout(newFunc, 0);
-    };
-  };
+var Response = _dereq_('./response');
 
-  module.exports = delay;
-
-}).call(this);
-
-},{}],2:[function(_dereq_,module,exports){
-(function() {
-  var RequestError, Response,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  Response = _dereq_('./response');
-
-  RequestError = (function(_super) {
-    __extends(RequestError, _super);
-
-    RequestError.prototype.name = 'RequestError';
-
-    function RequestError(message) {
-      this.message = message;
+function RequestError(message, props) {
+    var err = new Error(message);
+    err.name = 'RequestError';
+    this.name = err.name;
+    this.message = err.message;
+    if (err.stack) {
+        this.stack = err.stack;
     }
 
-    RequestError.create = function(message, req) {
-      var err;
-      err = new RequestError(message);
-      Response.call(err, req);
-      return err;
+    this.toString = function () {
+        return this.message;
     };
 
-    return RequestError;
-
-  })(Error);
-
-  module.exports = RequestError;
-
-}).call(this);
-
-},{"./response":7}],3:[function(_dereq_,module,exports){
-(function() {
-  var Request, Response, XHR, cleanURL, createError, delay, extend, factory, once,
-    __hasProp = {}.hasOwnProperty,
-    __slice = [].slice;
-
-  cleanURL = _dereq_('./plugins/cleanurl');
-
-  XHR = _dereq_('./xhr');
-
-  delay = _dereq_('./delay');
-
-  createError = _dereq_('./error').create;
-
-  Response = _dereq_('./response');
-
-  Request = _dereq_('./request');
-
-  extend = _dereq_('xtend');
-
-  once = _dereq_('once');
-
-  factory = function(defaults, plugins) {
-    var http, method, _fn, _i, _len, _ref;
-    if (defaults == null) {
-      defaults = {};
+    for (var k in props) {
+        if (props.hasOwnProperty(k)) {
+            this[k] = props[k];
+        }
     }
-    if (plugins == null) {
-      plugins = [];
+}
+
+RequestError.prototype = Error.prototype;
+
+RequestError.create = function (message, req, props) {
+    var err = new RequestError(message, props);
+    Response.call(err, req);
+    return err;
+};
+
+module.exports = RequestError;
+
+},{"./response":4}],2:[function(_dereq_,module,exports){
+'use strict';
+
+var i,
+    cleanURL = _dereq_('../plugins/cleanurl'),
+    XHR = _dereq_('./xhr'),
+    delay = _dereq_('./utils/delay'),
+    createError = _dereq_('./error').create,
+    Response = _dereq_('./response'),
+    Request = _dereq_('./request'),
+    extend = _dereq_('xtend'),
+    once = _dereq_('./utils/once');
+
+function factory(defaults, plugins) {
+    defaults = defaults || {};
+    plugins = plugins || [];
+
+    function http(req, cb) {
+        var xhr, plugin, done, k, timeoutId;
+
+        req = new Request(extend(defaults, req));
+
+        for (i = 0; i < plugins.length; i++) {
+            plugin = plugins[i];
+            if (plugin.processRequest) {
+                plugin.processRequest(req);
+            }
+        }
+
+        // Give the plugins a chance to create the XHR object
+        for (i = 0; i < plugins.length; i++) {
+            plugin = plugins[i];
+            if (plugin.createXHR) {
+                xhr = plugin.createXHR(req);
+                break; // First come, first serve
+            }
+        }
+        xhr = xhr || new XHR();
+
+        req.xhr = xhr;
+
+        // Because XHR can be an XMLHttpRequest or an XDomainRequest, we add
+        // `onreadystatechange`, `onload`, and `onerror` callbacks. We use the
+        // `once` util to make sure that only one is called (and it's only called
+        // one time).
+        done = once(delay(function (err) {
+            clearTimeout(timeoutId);
+            xhr.onload = xhr.onerror = xhr.onreadystatechange = xhr.ontimeout = xhr.onprogress = null;
+            var res = err && err.isHttpError ? err : new Response(req);
+            for (i = 0; i < plugins.length; i++) {
+                plugin = plugins[i];
+                if (plugin.processResponse) {
+                    plugin.processResponse(res);
+                }
+            }
+            if (err) {
+                if (req.onerror) {
+                    req.onerror(err);
+                }
+            } else {
+                if (req.onload) {
+                    req.onload(res);
+                }
+            }
+            if (cb) {
+                cb(err, res);
+            }
+        }));
+
+        // When the request completes, continue.
+        xhr.onreadystatechange = function () {
+            if (req.timedOut) return;
+
+            if (req.aborted) {
+                done(createError('Request aborted', req, {name: 'Abort'}));
+            } else if (xhr.readyState === 4) {
+                var type = Math.floor(xhr.status / 100);
+                if (type === 2) {
+                    done();
+                } else if (xhr.status === 404 && !req.errorOn404) {
+                    done();
+                } else {
+                    var kind;
+                    switch (type) {
+                        case 4:
+                            kind = 'Client';
+                            break;
+                        case 5:
+                            kind = 'Server';
+                            break;
+                        default:
+                            kind = 'HTTP';
+                    }
+                    var msg = kind + ' Error: ' +
+                              'The server returned a status of ' + xhr.status +
+                              ' for the request "' +
+                              req.method.toUpperCase() + ' ' + req.url + '"';
+                    done(createError(msg, req));
+                }
+            }
+        };
+
+        // `onload` is only called on success and, in IE, will be called without
+        // `xhr.status` having been set, so we don't check it.
+        xhr.onload = function () { done(); };
+
+        xhr.onerror = function () {
+            done(createError('Internal XHR Error', req));
+        };
+
+        // IE sometimes fails if you don't specify every handler.
+        // See http://social.msdn.microsoft.com/Forums/ie/en-US/30ef3add-767c-4436-b8a9-f1ca19b4812e/ie9-rtm-xdomainrequest-issued-requests-may-abort-if-all-event-handlers-not-specified?forum=iewebdevelopment
+        xhr.ontimeout = function () { /* noop */ };
+        xhr.onprogress = function () { /* noop */ };
+
+        xhr.open(req.method, req.url);
+
+        if (req.timeout) {
+            // If we use the normal XHR timeout mechanism (`xhr.timeout` and
+            // `xhr.ontimeout`), `onreadystatechange` will be triggered before
+            // `ontimeout`. There's no way to recognize that it was triggered by
+            // a timeout, and we'd be unable to dispatch the right error.
+            timeoutId = setTimeout(function () {
+                req.timedOut = true;
+                done(createError('Request timeout', req, {name: 'Timeout'}));
+                try {
+                    xhr.abort();
+                } catch (err) {}
+            }, req.timeout);
+        }
+
+        for (k in req.headers) {
+            if (req.headers.hasOwnProperty(k)) {
+                xhr.setRequestHeader(k, req.headers[k]);
+            }
+        }
+
+        xhr.send(req.body);
+
+        return req;
     }
-    http = function(req, cb) {
-      var done, k, plugin, v, xhr, _i, _j, _len, _len1, _ref;
-      req = new Request(extend(defaults, req));
-      for (_i = 0, _len = plugins.length; _i < _len; _i++) {
-        plugin = plugins[_i];
-        if (xhr = plugin != null ? typeof plugin.createXHR === "function" ? plugin.createXHR(req) : void 0 : void 0) {
-          break;
-        }
-      }
-      if (xhr == null) {
-        xhr = new XHR;
-      }
-      done = once(delay(function(err) {
-        var res, _j, _len1;
-        xhr.onload = xhr.onerror = xhr.onreadystatechange = xhr.ontimeout = xhr.onprogress = null;
-        res = (err != null ? err.isHttpError : void 0) ? err : new Response(req);
-        for (_j = 0, _len1 = plugins.length; _j < _len1; _j++) {
-          plugin = plugins[_j];
-          if (typeof plugin.processResponse === "function") {
-            plugin.processResponse(res);
-          }
-        }
-        return cb(err, res);
-      }));
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-          switch (Math.floor(xhr.status / 100)) {
-            case 2:
-              return done();
-            case 4:
-              if (xhr.status === 404 && !req.errorOn404) {
-                return done();
-              } else {
-                return done(createError('Client Error', req));
-              }
-              break;
-            case 5:
-              return done(createError('Server Error', req));
-            default:
-              return done(createError('HTTP Error', req));
-          }
-        }
-      };
-      xhr.onload = function() {
-        return done();
-      };
-      xhr.onerror = function() {
-        return done(createError('Internal XHR Error', req));
-      };
-      xhr.ontimeout = function() {};
-      xhr.onprogress = function() {};
-      req.xhr = xhr;
-      for (_j = 0, _len1 = plugins.length; _j < _len1; _j++) {
-        plugin = plugins[_j];
-        if (typeof plugin.processRequest === "function") {
-          plugin.processRequest(req);
-        }
-      }
-      xhr.open(req.method, req.url);
-      _ref = req.headers;
-      for (k in _ref) {
-        if (!__hasProp.call(_ref, k)) continue;
-        v = _ref[k];
-        xhr.setRequestHeader(k, v);
-      }
-      xhr.send(req.body);
-      return req;
-    };
-    _ref = ['get', 'post', 'put', 'head', 'patch', 'delete'];
-    _fn = function(http, method) {
-      return http[method] = function(req, cb) {
-        req = new Request(req);
-        req.method = method;
-        return http(req, cb);
-      };
-    };
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      method = _ref[_i];
-      _fn(http, method);
+
+    var method,
+        methods = ['get', 'post', 'put', 'head', 'patch', 'delete'],
+        verb = function (method) {
+            return function (req, cb) {
+                req = new Request(req);
+                req.method = method;
+                return http(req, cb);
+            };
+        };
+    for (i = 0; i < methods.length; i++) {
+        method = methods[i];
+        http[method] = verb(method);
     }
-    http.plugins = function() {
-      return plugins;
+
+    http.plugins = function () {
+        return plugins;
     };
-    http.defaults = function(newValues) {
-      if (newValues) {
-        return factory(extend(defaults, newValues), plugins);
-      } else {
+
+    http.defaults = function (newValues) {
+        if (newValues) {
+            return factory(extend(defaults, newValues), plugins);
+        }
         return defaults;
-      }
     };
-    http.use = function() {
-      var newPlugins;
-      newPlugins = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-      return factory(defaults, plugins.concat(newPlugins));
+
+    http.use = function () {
+        var newPlugins = Array.prototype.slice.call(arguments, 0);
+        return factory(defaults, plugins.concat(newPlugins));
     };
-    http.bare = function() {
-      return factory();
+
+    http.bare = function () {
+        return factory();
     };
+
+    http.Request = Request;
+    http.Response = Response;
+
     return http;
-  };
+}
 
-  module.exports = factory({}, [cleanURL]);
+module.exports = factory({}, [cleanURL]);
 
-}).call(this);
+},{"../plugins/cleanurl":10,"./error":1,"./request":3,"./response":4,"./utils/delay":5,"./utils/once":6,"./xhr":7,"xtend":9}],3:[function(_dereq_,module,exports){
+'use strict';
 
-},{"./delay":1,"./error":2,"./plugins/cleanurl":4,"./request":6,"./response":7,"./xhr":8,"once":11,"xtend":10}],4:[function(_dereq_,module,exports){
-(function() {
-  module.exports = {
-    processRequest: function(req) {
-      return req.url = req.url.replace(/[^%]+/g, function(s) {
-        return encodeURI(s);
-      });
-    }
-  };
+function Request(optsOrUrl) {
+    var opts = typeof optsOrUrl === 'string' ? {url: optsOrUrl} : optsOrUrl || {};
+    this.method = opts.method ? opts.method.toUpperCase() : 'GET';
+    this.url = opts.url;
+    this.headers = opts.headers || {};
+    this.body = opts.body;
+    this.timeout = opts.timeout || 0;
+    this.errorOn404 = opts.errorOn404 != null ? opts.errorOn404 : true;
+    this.onload = opts.onload;
+    this.onerror = opts.onerror;
+}
 
-}).call(this);
+Request.prototype.abort = function () {
+    if (this.aborted) return;
+    this.aborted = true;
+    this.xhr.abort();
+    return this;
+};
 
-},{}],5:[function(_dereq_,module,exports){
-(function() {
-  var once, supportsXHR, urllite,
-    __hasProp = {}.hasOwnProperty;
+Request.prototype.header = function (name, value) {
+    var k;
+    for (k in this.headers) {
+        if (this.headers.hasOwnProperty(k)) {
+            if (name.toLowerCase() === k.toLowerCase()) {
+                if (arguments.length === 1) {
+                    return this.headers[k];
+                }
 
-  urllite = _dereq_('urllite/lib/core');
-
-  once = _dereq_('once');
-
-  supportsXHR = once(function() {
-    return (typeof window !== "undefined" && window !== null ? window.XMLHttpRequest : void 0) && 'withCredentials' in new window.XMLHttpRequest;
-  });
-
-  module.exports = {
-    createXHR: function(req) {
-      var a, b, k, _ref;
-      if (typeof window === "undefined" || window === null) {
-        return;
-      }
-      a = urllite(req.url);
-      b = urllite(window.location.href);
-      if (!a.host) {
-        return;
-      }
-      if (a.protocol === b.protocol && a.host === b.host && a.port === b.port) {
-        return;
-      }
-      if (req.headers) {
-        _ref = req.headers;
-        for (k in _ref) {
-          if (!__hasProp.call(_ref, k)) continue;
-          throw new Error("You can't provide request headers when using the oldiexdomain plugin.");
+                delete this.headers[k];
+                break;
+            }
         }
-      }
-      if (!window.XDomainRequest) {
-        return;
-      }
-      if (supportsXHR()) {
-        return;
-      }
-      return new window.XDomainRequest;
     }
-  };
+    if (value != null) {
+        this.headers[name] = value;
+        return value;
+    }
+};
 
-}).call(this);
 
-},{"once":11,"urllite/lib/core":9}],6:[function(_dereq_,module,exports){
-(function() {
-  var Request;
+module.exports = Request;
 
-  Request = (function() {
-    function Request(optsOrUrl) {
-      var opts, _ref, _ref1;
-      opts = typeof optsOrUrl === 'string' ? {
-        url: optsOrUrl
-      } : optsOrUrl;
-      this.method = ((_ref = opts.method) != null ? _ref.toUpperCase() : void 0) || 'GET';
-      this.url = opts.url;
-      this.headers = opts.headers || {};
-      this.body = opts.body;
-      this.errorOn404 = (_ref1 = opts.errorOn404) != null ? _ref1 : true;
+},{}],4:[function(_dereq_,module,exports){
+'use strict';
+
+var Request = _dereq_('./request');
+
+
+function Response(req) {
+    var i, lines, m,
+        xhr = req.xhr;
+    this.request = req;
+    this.xhr = xhr;
+    this.headers = {};
+
+    // Browsers don't like you trying to read XHR properties when you abort the
+    // request, so we don't.
+    if (req.aborted || req.timedOut) return;
+
+    this.status = xhr.status || 0;
+    this.text = xhr.responseText;
+    this.body = xhr.response || xhr.responseText;
+    this.contentType = xhr.contentType || (xhr.getResponseHeader && xhr.getResponseHeader('Content-Type'));
+
+    if (xhr.getAllResponseHeaders) {
+        lines = xhr.getAllResponseHeaders().split('\n');
+        for (i = 0; i < lines.length; i++) {
+            if ((m = lines[i].match(/\s*([^\s]+):\s+([^\s]+)/))) {
+                this.headers[m[1]] = m[2];
+            }
+        }
     }
 
-    return Request;
+    this.isHttpError = this.status >= 400;
+}
 
-  })();
+Response.prototype.header = Request.prototype.header;
 
-  module.exports = Request;
 
-}).call(this);
+module.exports = Response;
+
+},{"./request":3}],5:[function(_dereq_,module,exports){
+'use strict';
+
+// Wrap a function in a `setTimeout` call. This is used to guarantee async
+// behavior, which can avoid unexpected errors.
+
+module.exports = function (fn) {
+    return function () {
+        var
+            args = Array.prototype.slice.call(arguments, 0),
+            newFunc = function () {
+                return fn.apply(null, args);
+            };
+        setTimeout(newFunc, 0);
+    };
+};
+
+},{}],6:[function(_dereq_,module,exports){
+'use strict';
+
+// A "once" utility.
+module.exports = function (fn) {
+    var result, called = false;
+    return function () {
+        if (!called) {
+            called = true;
+            result = fn.apply(this, arguments);
+        }
+        return result;
+    };
+};
 
 },{}],7:[function(_dereq_,module,exports){
-(function() {
-  var Response;
-
-  Response = (function() {
-    function Response(req) {
-      var xhr;
-      xhr = req.xhr;
-      this.request = req;
-      this.xhr = xhr;
-      this.status = xhr.status || 0;
-      this.text = xhr.responseText;
-      this.body = xhr.response || xhr.responseText;
-      this.contentType = xhr.contentType || (typeof xhr.getResponseHeader === "function" ? xhr.getResponseHeader('Content-Type') : void 0);
-      this.headers = (function() {
-        var header, headers, lines, m, _i, _len;
-        headers = {};
-        if (lines = typeof xhr.getAllResponseHeaders === "function" ? xhr.getAllResponseHeaders().split('\n') : void 0) {
-          for (_i = 0, _len = lines.length; _i < _len; _i++) {
-            header = lines[_i];
-            if (m = header.match(/\s+([^\s]+):\s+([^\s]+)/)) {
-              headers[m[1]] = m[2];
-            }
-          }
-        }
-        return headers;
-      })();
-      this.isHttpError = this.status >= 400;
-    }
-
-    return Response;
-
-  })();
-
-  module.exports = Response;
-
-}).call(this);
+module.exports = window.XMLHttpRequest;
 
 },{}],8:[function(_dereq_,module,exports){
 (function() {
-  module.exports = window.XMLHttpRequest;
-
-}).call(this);
-
-},{}],9:[function(_dereq_,module,exports){
-(function() {
   var URL, URL_PATTERN, defaults, urllite,
-    __hasProp = {}.hasOwnProperty,
-    __slice = [].slice;
+    __hasProp = {}.hasOwnProperty;
 
   URL_PATTERN = /^(?:(?:([^:\/?\#]+:)\/+|(\/\/))(?:([a-z0-9-\._~%]+)(?::([a-z0-9-\._~%]+))?@)?(([a-z0-9-\._~%!$&'()*+,;=]+)(?::([0-9]+))?)?)?([^?\#]*?)(\?[^\#]*)?(\#.*)?$/;
 
@@ -326,12 +349,18 @@
 
   urllite.URL = URL = (function() {
     function URL(props) {
-      var k, v;
-      for (k in props) {
-        if (!__hasProp.call(props, k)) continue;
-        v = props[k];
-        this[k] = v;
+      var k, v, _ref;
+      for (k in defaults) {
+        if (!__hasProp.call(defaults, k)) continue;
+        v = defaults[k];
+        this[k] = (_ref = props[k]) != null ? _ref : v;
       }
+      this.host || (this.host = this.hostname && this.port ? "" + this.hostname + ":" + this.port : this.hostname ? this.hostname : '');
+      this.origin || (this.origin = this.protocol ? "" + this.protocol + "//" + this.host : '');
+      this.isAbsolutePathRelative = !this.host && this.pathname.charAt(0) === '/';
+      this.isPathRelative = !this.host && this.pathname.charAt(0) !== '/';
+      this.isRelative = this.isSchemeRelative || this.isAbsolutePathRelative || this.isPathRelative;
+      this.isAbsolute = !this.isRelative;
     }
 
     URL.parse = function(raw) {
@@ -339,7 +368,7 @@
       m = raw.toString().match(URL_PATTERN);
       pathname = m[8] || '';
       protocol = m[1];
-      return urllite._createURL({
+      return new urllite.URL({
         protocol: protocol,
         username: m[3],
         password: m[4],
@@ -370,32 +399,11 @@
     isSchemeRelative: false
   };
 
-  urllite._createURL = function() {
-    var base, bases, k, props, v, _i, _len, _ref, _ref1;
-    bases = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    props = {};
-    for (_i = 0, _len = bases.length; _i < _len; _i++) {
-      base = bases[_i];
-      for (k in defaults) {
-        if (!__hasProp.call(defaults, k)) continue;
-        v = defaults[k];
-        props[k] = (_ref = (_ref1 = base[k]) != null ? _ref1 : props[k]) != null ? _ref : v;
-      }
-    }
-    props.host = props.hostname && props.port ? "" + props.hostname + ":" + props.port : props.hostname ? props.hostname : '';
-    props.origin = props.protocol ? "" + props.protocol + "//" + props.host : '';
-    props.isAbsolutePathRelative = !props.host && props.pathname.charAt(0) === '/';
-    props.isPathRelative = !props.host && props.pathname.charAt(0) !== '/';
-    props.isRelative = props.isSchemeRelative || props.isAbsolutePathRelative || props.isPathRelative;
-    props.isAbsolute = !props.isRelative;
-    return new urllite.URL(props);
-  };
-
   module.exports = urllite;
 
 }).call(this);
 
-},{}],10:[function(_dereq_,module,exports){
+},{}],9:[function(_dereq_,module,exports){
 module.exports = extend
 
 function extend() {
@@ -414,7 +422,87 @@ function extend() {
     return target
 }
 
+},{}],10:[function(_dereq_,module,exports){
+'use strict';
+
+module.exports = {
+    processRequest: function (req) {
+        req.url = req.url.replace(/[^%]+/g, function (s) {
+            return encodeURI(s);
+        });
+    }
+};
+
 },{}],11:[function(_dereq_,module,exports){
+'use strict';
+
+var
+    urllite = _dereq_('urllite/lib/core'),
+    once = _dereq_('../lib/utils/once'),
+    warningShown = false;
+
+var supportsXHR = once(function () {
+    return (
+        typeof window !== "undefined" &&
+        window !== null &&
+        window.XMLHttpRequest &&
+        'withCredentials' in new window.XMLHttpRequest()
+    );
+});
+
+// This plugin creates a Microsoft `XDomainRequest` in supporting browsers when
+// the URL being requested is on a different domain. This is necessary to
+// support IE9, which only supports CORS via its proprietary `XDomainRequest`
+// object. We need to check the URL because `XDomainRequest` *doesn't* work for
+// same domain requests (unless your server sends CORS headers).
+// `XDomainRequest` also has other limitations (no custom headers), so we try to
+// catch those and error.
+module.exports = {
+    createXHR: function (req) {
+        var a, b, k;
+
+        if (typeof window === "undefined" || window === null) {
+            return;
+        }
+
+        a = urllite(req.url);
+        b = urllite(window.location.href);
+
+        // Don't do anything for same-domain requests.
+        if (!a.host) {
+            return;
+        }
+        if (a.protocol === b.protocol && a.host === b.host && a.port === b.port) {
+            return;
+        }
+
+        // Show a warning if there are custom headers. We do this even in
+        // browsers that won't use XDomainRequest so that users know there's an
+        // issue right away, instead of if/when they test in IE9.
+        if (!warningShown && req.headers) {
+            for (k in req.headers) {
+                if (req.headers.hasOwnProperty(k)) {
+                    warningShown = true;
+                    if (window && window.console && window.console.warn) {
+                        window.console.warn("Request headers are ignored in old IE when using the oldiexdomain plugin.");
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Don't do anything if we can't do anything (:
+        // Don't do anything if the browser supports proper XHR.
+        if (window.XDomainRequest && !supportsXHR()) {
+            // We've come this far. Might as well make an XDomainRequest.
+            var xdr = new window.XDomainRequest();
+            xdr.setRequestHeader = function() {}; // Ignore request headers.
+            return xdr;
+        }
+    }
+};
+
+},{"../lib/utils/once":6,"urllite/lib/core":8}],12:[function(_dereq_,module,exports){
 module.exports = once
 
 once.proto = once(function () {
@@ -436,7 +524,7 @@ function once (fn) {
   return f
 }
 
-},{}],12:[function(_dereq_,module,exports){
+},{}],13:[function(_dereq_,module,exports){
 var InlineSVGError, PropTypes, React, Status, configurationError, createError, delay, getComponentID, http, httpplease, ieXDomain, isSupportedEnvironment, me, once, span, supportsInlineSVG, uniquifyIDs, unsupportedBrowserError,
   __slice = [].slice,
   __hasProp = {}.hasOwnProperty,
@@ -448,7 +536,7 @@ once = _dereq_('once');
 
 httpplease = _dereq_('httpplease');
 
-ieXDomain = _dereq_('httpplease/lib/plugins/oldiexdomain');
+ieXDomain = _dereq_('httpplease/plugins/oldiexdomain');
 
 PropTypes = React.PropTypes;
 
@@ -687,6 +775,6 @@ module.exports = me = React.createClass({
   }
 });
 
-},{"httpplease":3,"httpplease/lib/plugins/oldiexdomain":5,"once":11}]},{},[12])
-(12)
+},{"httpplease":2,"httpplease/plugins/oldiexdomain":11,"once":12}]},{},[13])
+(13)
 });
