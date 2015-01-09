@@ -6,7 +6,7 @@
 React = require 'react'
 once = require 'once'
 httpplease = require 'httpplease'
-ieXDomain = require 'httpplease/lib/plugins/oldiexdomain'
+ieXDomain = require 'httpplease/plugins/oldiexdomain'
 
 {PropTypes} = React
 {span} = React.DOM
