@@ -24,7 +24,7 @@
     "cors": "~2.2.0"
   },
   "peerDependencies": {
-    "react": "^0.13.0-rc1"
+    "react": "*"
   },
   "scripts": {
     "prepublish": "gulp build",
