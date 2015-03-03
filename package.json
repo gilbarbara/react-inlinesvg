@@ -14,7 +14,7 @@
     "coffee-script": "~1.7.1",
     "browserify": "~3.33.0",
     "browserify-shim": "~3.3.2",
-    "gulp": "~3.5.6",
+    "gulp": "~3.8.11",
     "gulp-bump": "~0.1.6",
     "gulp-coffee": "~1.4.1",
     "gulp-util": "~2.2.14",
