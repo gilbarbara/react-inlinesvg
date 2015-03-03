@@ -561,7 +561,7 @@ function once (fn) {
 }
 
 },{"wrappy":12}],14:[function(_dereq_,module,exports){
-var InlineSVGError, PropTypes, React, Status, configurationError, createError, delay, getComponentID, http, httpplease, ieXDomain, isSupportedEnvironment, me, once, span, supportsInlineSVG, uniquifyIDs, unsupportedBrowserError,
+var InlineSVGError, PropTypes, React, Status, configurationError, createError, delay, getHash, http, httpplease, ieXDomain, isSupportedEnvironment, me, once, span, supportsInlineSVG, uniquifyIDs, unsupportedBrowserError,
   __slice = [].slice,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -636,15 +636,22 @@ uniquifyIDs = (function() {
   };
 })();
 
-getComponentID = (function() {
-  var clean;
-  clean = function(str) {
-    return str.toString().replace(/[^a-zA-Z0-9]/g, '_');
-  };
-  return function(component) {
-    return "" + (clean(component._rootNodeID)) + "__" + (clean(component._mountDepth));
-  };
-})();
+getHash = function(svgPath) {
+  var char, hash, i;
+  hash = 0;
+  i = 0;
+  char = '';
+  if (svgPath.length === 0) {
+    return hash;
+  }
+  while (i < svgPath.length) {
+    char = svgPath.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash;
+    i++;
+  }
+  return hash;
+};
 
 InlineSVGError = (function(_super) {
   __extends(InlineSVGError, _super);
@@ -793,7 +800,7 @@ module.exports = me = React.createClass({
   },
   processSVG: function(svgText) {
     if (this.props.uniquifyIDs) {
-      return uniquifyIDs(svgText, getComponentID(this));
+      return uniquifyIDs(svgText, getHash(this.props.src));
     } else {
       return svgText;
     }
