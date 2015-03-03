@@ -48,9 +48,6 @@ gulp.task 'testserver', connect.server
   port: 1337
   livereload: false
   middleware: -> [cors()]
-  open:
-    file: 'test/index.html'
-    browser: 'Google Chrome'
 
 # A server with another port for testing CORS
 gulp.task 'xdomainserver', connect.server
