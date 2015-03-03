@@ -503,7 +503,43 @@ module.exports = {
 };
 
 },{"../lib/utils/once":6,"urllite/lib/core":8}],12:[function(_dereq_,module,exports){
-module.exports = once
+// Returns a wrapper function that returns a wrapped callback
+// The wrapper function should do some stuff, and return a
+// presumably different callback function.
+// This makes sure that own properties are retained, so that
+// decorations and such are not lost along the way.
+module.exports = wrappy
+function wrappy (fn, cb) {
+  if (fn && cb) return wrappy(fn)(cb)
+
+  if (typeof fn !== 'function')
+    throw new TypeError('need wrapper function')
+
+  Object.keys(fn).forEach(function (k) {
+    wrapper[k] = fn[k]
+  })
+
+  return wrapper
+
+  function wrapper() {
+    var args = new Array(arguments.length)
+    for (var i = 0; i < args.length; i++) {
+      args[i] = arguments[i]
+    }
+    var ret = fn.apply(this, args)
+    var cb = args[args.length-1]
+    if (typeof ret === 'function' && ret !== cb) {
+      Object.keys(cb).forEach(function (k) {
+        ret[k] = cb[k]
+      })
+    }
+    return ret
+  }
+}
+
+},{}],13:[function(_dereq_,module,exports){
+var wrappy = _dereq_('wrappy')
+module.exports = wrappy(once)
 
 once.proto = once(function () {
   Object.defineProperty(Function.prototype, 'once', {
@@ -524,8 +560,8 @@ function once (fn) {
   return f
 }
 
-},{}],13:[function(_dereq_,module,exports){
-var InlineSVGError, PropTypes, React, Status, configurationError, createError, delay, getComponentID, http, httpplease, ieXDomain, isSupportedEnvironment, me, once, span, supportsInlineSVG, uniquifyIDs, unsupportedBrowserError,
+},{"wrappy":12}],14:[function(_dereq_,module,exports){
+var InlineSVGError, PropTypes, React, Status, configurationError, createError, delay, getHash, http, httpplease, ieXDomain, isSupportedEnvironment, me, once, span, supportsInlineSVG, uniquifyIDs, unsupportedBrowserError,
   __slice = [].slice,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -600,15 +636,22 @@ uniquifyIDs = (function() {
   };
 })();
 
-getComponentID = (function() {
-  var clean;
-  clean = function(str) {
-    return str.toString().replace(/[^a-zA-Z0-9]/g, '_');
-  };
-  return function(component) {
-    return "" + (clean(component._rootNodeID)) + "__" + (clean(component._mountDepth));
-  };
-})();
+getHash = function(svgPath) {
+  var char, hash, i;
+  hash = 0;
+  i = 0;
+  char = '';
+  if (svgPath.length === 0) {
+    return hash;
+  }
+  while (i < svgPath.length) {
+    char = svgPath.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash;
+    i++;
+  }
+  return hash;
+};
 
 InlineSVGError = (function(_super) {
   __extends(InlineSVGError, _super);
@@ -757,7 +800,7 @@ module.exports = me = React.createClass({
   },
   processSVG: function(svgText) {
     if (this.props.uniquifyIDs) {
-      return uniquifyIDs(svgText, getComponentID(this));
+      return uniquifyIDs(svgText, getHash(this.props.src));
     } else {
       return svgText;
     }
@@ -775,6 +818,6 @@ module.exports = me = React.createClass({
   }
 });
 
-},{"httpplease":2,"httpplease/plugins/oldiexdomain":11,"once":12}]},{},[13])
-(13)
+},{"httpplease":2,"httpplease/plugins/oldiexdomain":11,"once":13}]},{},[14])
+(14)
 });
