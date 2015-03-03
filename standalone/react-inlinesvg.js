@@ -503,7 +503,43 @@ module.exports = {
 };
 
 },{"../lib/utils/once":6,"urllite/lib/core":8}],12:[function(_dereq_,module,exports){
-module.exports = once
+// Returns a wrapper function that returns a wrapped callback
+// The wrapper function should do some stuff, and return a
+// presumably different callback function.
+// This makes sure that own properties are retained, so that
+// decorations and such are not lost along the way.
+module.exports = wrappy
+function wrappy (fn, cb) {
+  if (fn && cb) return wrappy(fn)(cb)
+
+  if (typeof fn !== 'function')
+    throw new TypeError('need wrapper function')
+
+  Object.keys(fn).forEach(function (k) {
+    wrapper[k] = fn[k]
+  })
+
+  return wrapper
+
+  function wrapper() {
+    var args = new Array(arguments.length)
+    for (var i = 0; i < args.length; i++) {
+      args[i] = arguments[i]
+    }
+    var ret = fn.apply(this, args)
+    var cb = args[args.length-1]
+    if (typeof ret === 'function' && ret !== cb) {
+      Object.keys(cb).forEach(function (k) {
+        ret[k] = cb[k]
+      })
+    }
+    return ret
+  }
+}
+
+},{}],13:[function(_dereq_,module,exports){
+var wrappy = _dereq_('wrappy')
+module.exports = wrappy(once)
 
 once.proto = once(function () {
   Object.defineProperty(Function.prototype, 'once', {
@@ -524,7 +560,7 @@ function once (fn) {
   return f
 }
 
-},{}],13:[function(_dereq_,module,exports){
+},{"wrappy":12}],14:[function(_dereq_,module,exports){
 var InlineSVGError, PropTypes, React, Status, configurationError, createError, delay, getComponentID, http, httpplease, ieXDomain, isSupportedEnvironment, me, once, span, supportsInlineSVG, uniquifyIDs, unsupportedBrowserError,
   __slice = [].slice,
   __hasProp = {}.hasOwnProperty,
@@ -775,6 +811,6 @@ module.exports = me = React.createClass({
   }
 });
 
-},{"httpplease":2,"httpplease/plugins/oldiexdomain":11,"once":12}]},{},[13])
-(13)
+},{"httpplease":2,"httpplease/plugins/oldiexdomain":11,"once":13}]},{},[14])
+(14)
 });
