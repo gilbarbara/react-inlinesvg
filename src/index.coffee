@@ -97,17 +97,13 @@ uniquifyIDs = do ->
 
 # Generates a 32bit hash from the SVG path
 
-getHash = (svgPath) ->
+getHash = (str) ->
   hash = 0
-  i = 0
-  char = ''
-  if svgPath.length == 0
-    return hash
-  while i < svgPath.length
-    char = svgPath.charCodeAt(i)
+  return hash unless str
+  for i in [0...str.length]
+    char = str.charCodeAt(i)
     hash = (hash << 5) - hash + char
     hash = hash & hash
-    i++
   hash
 
 # Errors
