@@ -95,12 +95,16 @@ uniquifyIDs = do ->
       else if p4 then "#{ p3 }=\"##{ uniquifyID p4 }\""
       else if p5 then "=\"url(##{ uniquifyID p5 })\""
 
-# Gets a unique ID for the given component, for use in the id attribute.
+# Generates a 32bit hash from the SVG path
 
-getComponentID = do ->
-  clean = (str) -> str.toString().replace /[^a-zA-Z0-9]/g, '_'
-  (component) -> "#{ clean component._rootNodeID }__#{ clean component._mountDepth }"
-
+getHash = (str) ->
+  hash = 0
+  return hash unless str
+  for i in [0...str.length]
+    char = str.charCodeAt(i)
+    hash = (hash << 5) - hash + char
+    hash = hash & hash
+  hash
 
 # Errors
 # ------
@@ -194,8 +198,9 @@ module.exports = me =
         @renderContents()
       )
     processSVG: (svgText) ->
-      if @props.uniquifyIDs then uniquifyIDs svgText, getComponentID this
+      if @props.uniquifyIDs then uniquifyIDs svgText, getHash @props.src
       else svgText
+
     renderContents: ->
       switch @state.status
         when Status.UNSUPPORTED then @props.children

@@ -43,21 +43,20 @@ gulp.task 'build:tests', ->
     .pipe gulp.dest('./test/')
 
 # A server for the test page
-gulp.task 'testserver', connect.server
-  root: [__dirname]
-  port: 1337
-  livereload: false
-  middleware: -> [cors()]
-  open:
-    file: 'test/index.html'
-    browser: 'Google Chrome'
+gulp.task 'testserver', ->
+  connect.server
+    root: [__dirname]
+    port: 1337
+    livereload: false
+    middleware: -> [cors()]
 
 # A server with another port for testing CORS
-gulp.task 'xdomainserver', connect.server
-  root: [__dirname]
-  port: 1338
-  livereload: false
-  middleware: -> [cors()]
+gulp.task 'xdomainserver', ->
+  connect.server
+    root: [__dirname]
+    port: 1338
+    livereload: false
+    middleware: -> [cors()]
 
 gulp.task 'test', ['build:browser', 'build:tests', 'xdomainserver', 'testserver']
 gulp.task 'build', ['build:node', 'build:browser']
