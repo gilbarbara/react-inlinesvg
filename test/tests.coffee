@@ -20,6 +20,16 @@ describe 'react-inlinesvg', ->
       src: 'tiger.svg'
       onError: done
       onLoad: -> assertContainsSvg el, done
+  it 'should load data-uri', (done) ->
+    el = renderComponent isvg
+      # Material design icon
+      # https://github.com/google/material-design-icons/blob/master/av/svg/production/ic_play_arrow_24px.svg
+      #
+      src: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxwYXRoIGQ9Ik04IDV2MTRsMTEtN3oiLz4KICAgIDxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4KPC9zdmc+Cg=='
+      onError: done
+      onLoad: ->
+        # Make sure variable "el" is populated before assertion
+        setTimeout (-> assertContainsSvg el, done), 0
   it 'should call onError for a 404', (done) ->
     renderComponent isvg
       src: 'DOESNOTEXIST.svg'
