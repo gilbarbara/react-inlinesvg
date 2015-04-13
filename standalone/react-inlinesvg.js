@@ -741,7 +741,15 @@ module.exports = me = React.createClass({
     })(this));
   },
   load: function() {
-    return http.get(this.props.src, this.handleLoad);
+    var m, text;
+    if (m = this.props.src.match(/data:image\/svg[^,]*?(;base64)?,(.*)/)) {
+      text = m[1] ? atob(m[2]) : decodeURIComponent(m[2]);
+      return this.handleLoad(null, {
+        text: text
+      });
+    } else {
+      return http.get(this.props.src, this.handleLoad);
+    }
   },
   getClassName: function() {
     var className;
