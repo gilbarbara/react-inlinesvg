@@ -185,7 +185,14 @@ module.exports = me =
         loadedText: res.text
         status: Status.LOADED
         => @props.onLoad?()
-    load: -> http.get @props.src, @handleLoad
+    load: ->
+      if m = @props.src.match /data:image\/svg[^,]*?(;base64)?,(.*)/
+        text =
+          if m[1] then atob m[2]
+          else decodeURIComponent m[2]
+        @handleLoad null, {text}
+      else
+        http.get @props.src, @handleLoad
     getClassName: ->
       # Build a CSS class name based on the current state.
       className = "isvg #{ @state.status }"
