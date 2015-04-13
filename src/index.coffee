@@ -186,11 +186,11 @@ module.exports = me =
         status: Status.LOADED
         => @props.onLoad?()
     load: ->
-      if @props.src.indexOf('data:image/svg') is 0
-        # is data-uri
-        chunks = @props.src.split ';base64,'
-        @handleLoad null,
-          text: atob(chunks[1])
+      if m = @props.src.match /data:image\/svg[^,]*?(;base64)?,(.*)/
+        text =
+          if m[1] then atob m[2]
+          else decodeURIComponent m[2]
+        @handleLoad null, {text}
       else
         http.get @props.src, @handleLoad
     getClassName: ->
