@@ -172,7 +172,7 @@ module.exports = me =
       status = if error.isUnsupportedBrowserError then Status.UNSUPPORTED else Status.FAILED
       @setState {status}, => @props.onError? error
     handleLoad: (err, res) ->
-      return @fail err if err
+      return @fail err if err and err.status is not 0
 
       # If the component has been unmounted since we started the load, just
       # forget it. (Setting the state of an unmounted component causes an
