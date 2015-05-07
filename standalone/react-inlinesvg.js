@@ -51,7 +51,7 @@ function factory(defaults, plugins) {
     plugins = plugins || [];
 
     function http(req, cb) {
-        var xhr, plugin, done, k, timeoutId;
+        var xhr, plugin, done, k, timeoutId, supportsLoadAndErrorEvents;
 
         req = new Request(extend(defaults, req));
 
@@ -74,13 +74,15 @@ function factory(defaults, plugins) {
 
         req.xhr = xhr;
 
-        // Because XHR can be an XMLHttpRequest or an XDomainRequest, we add
-        // `onreadystatechange`, `onload`, and `onerror` callbacks. We use the
-        // `once` util to make sure that only one is called (and it's only called
-        // one time).
-        done = once(delay(function (err) {
+        // Use a single completion callback. This can be called with or without
+        // an error. If no error is passed, the request will be examined to see
+        // if it was successful.
+        done = once(delay(function (rawError) {
             clearTimeout(timeoutId);
-            xhr.onload = xhr.onerror = xhr.onreadystatechange = xhr.ontimeout = xhr.onprogress = null;
+            xhr.onload = xhr.onerror = xhr.onabort = xhr.onreadystatechange = xhr.ontimeout = xhr.onprogress = null;
+
+            var err = getError(req, rawError);
+
             var res = err && err.isHttpError ? err : new Response(req);
             for (i = 0; i < plugins.length; i++) {
                 plugin = plugins[i];
@@ -102,46 +104,29 @@ function factory(defaults, plugins) {
             }
         }));
 
-        // When the request completes, continue.
-        xhr.onreadystatechange = function () {
-            if (req.timedOut) return;
+        supportsLoadAndErrorEvents = ('onload' in xhr) && ('onerror' in xhr);
+        xhr.onload = function () { done(); };
+        xhr.onerror = done;
+        xhr.onabort = function () { done(); };
 
-            if (req.aborted) {
-                done(createError('Request aborted', req, {name: 'Abort'}));
-            } else if (xhr.readyState === 4) {
-                var type = Math.floor(xhr.status / 100);
-                if (type === 2) {
-                    done();
-                } else if (xhr.status === 404 && !req.errorOn404) {
-                    done();
-                } else {
-                    var kind;
-                    switch (type) {
-                        case 4:
-                            kind = 'Client';
-                            break;
-                        case 5:
-                            kind = 'Server';
-                            break;
-                        default:
-                            kind = 'HTTP';
-                    }
-                    var msg = kind + ' Error: ' +
-                              'The server returned a status of ' + xhr.status +
-                              ' for the request "' +
-                              req.method.toUpperCase() + ' ' + req.url + '"';
-                    done(createError(msg, req));
-                }
+        // We'd rather use `onload`, `onerror`, and `onabort` since they're the
+        // only way to reliably detect successes and failures but, if they
+        // aren't available, we fall back to using `onreadystatechange`.
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState !== 4) return;
+
+            if (req.aborted) return done();
+
+            if (!supportsLoadAndErrorEvents) {
+                // Assume a status of 0 is an error. This could be a false
+                // positive, but there's no way to tell when using
+                // `onreadystatechange` ):
+                // See matthewwithanm/react-inlinesvg#10.
+                var err = xhr.status === 0 ? new Error('Internal XHR Error') : null;
+                return done(err);
             }
         };
 
-        // `onload` is only called on success and, in IE, will be called without
-        // `xhr.status` having been set, so we don't check it.
-        xhr.onload = function () { done(); };
-
-        xhr.onerror = function () {
-            done(createError('Internal XHR Error', req));
-        };
 
         // IE sometimes fails if you don't specify every handler.
         // See http://social.msdn.microsoft.com/Forums/ie/en-US/30ef3add-767c-4436-b8a9-f1ca19b4812e/ie9-rtm-xdomainrequest-issued-requests-may-abort-if-all-event-handlers-not-specified?forum=iewebdevelopment
@@ -157,7 +142,7 @@ function factory(defaults, plugins) {
             // a timeout, and we'd be unable to dispatch the right error.
             timeoutId = setTimeout(function () {
                 req.timedOut = true;
-                done(createError('Request timeout', req, {name: 'Timeout'}));
+                done();
                 try {
                     xhr.abort();
                 } catch (err) {}
@@ -216,6 +201,46 @@ function factory(defaults, plugins) {
 }
 
 module.exports = factory({}, [cleanURL]);
+
+/**
+ * Analyze the request to see if it represents an error. If so, return it! An
+ * original error object can be passed as a hint.
+ */
+function getError(req, err) {
+    if (req.aborted)
+        return createError('Request aborted', req, {name: 'Abort'});
+
+    if (req.timedOut)
+        return createError('Request timeout', req, {name: 'Timeout'});
+
+    var xhr = req.xhr;
+    var type = Math.floor(xhr.status / 100);
+
+    var kind;
+    switch (type) {
+        case 0:
+        case 2:
+            // These don't represent errors unless the function was passed an
+            // error object explicitly.
+            if (!err) return;
+            return createError(err.message, req);
+        case 4:
+            // Sometimes 4XX statuses aren't errors.
+            if (xhr.status === 404 && !req.errorOn404) return;
+            kind = 'Client';
+            break;
+        case 5:
+            kind = 'Server';
+            break;
+        default:
+            kind = 'HTTP';
+    }
+    var msg = kind + ' Error: ' +
+              'The server returned a status of ' + xhr.status +
+              ' for the request "' +
+              req.method.toUpperCase() + ' ' + req.url + '"';
+    return createError(msg, req);
+}
 
 },{"../plugins/cleanurl":10,"./error":1,"./request":3,"./response":4,"./utils/delay":5,"./utils/once":6,"./xhr":7,"xtend":9}],3:[function(_dereq_,module,exports){
 'use strict';
