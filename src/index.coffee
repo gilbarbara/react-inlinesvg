@@ -101,8 +101,8 @@ getHash = (str) ->
   hash = 0
   return hash unless str
   for i in [0...str.length]
-    char = str.charCodeAt(i)
-    hash = (hash << 5) - hash + char
+    chr = str.charCodeAt(i)
+    hash = (hash << 5) - hash + chr
     hash = hash & hash
   hash
 
