@@ -626,14 +626,14 @@ uniquifyIDs = (function() {
 })();
 
 getHash = function(str) {
-  var char, hash, i, _i, _ref;
+  var chr, hash, i, _i, _ref;
   hash = 0;
   if (!str) {
     return hash;
   }
   for (i = _i = 0, _ref = str.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
-    char = str.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
+    chr = str.charCodeAt(i);
+    hash = (hash << 5) - hash + chr;
     hash = hash & hash;
   }
   return hash;
