@@ -144,6 +144,7 @@ module.exports = me =
     displayName: 'InlineSVG'
     propTypes:
       wrapper: PropTypes.func
+      wrapperStyle: PropTypes.object
       src: PropTypes.string.isRequired
       className: PropTypes.string
       preloader: PropTypes.func
@@ -201,6 +202,7 @@ module.exports = me =
     render: ->
       (@props.wrapper
         className: @getClassName()
+        style: @props.wrapperStyle
         dangerouslySetInnerHTML: __html: @processSVG(@state.loadedText) if @state.loadedText
         @renderContents()
       )

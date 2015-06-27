@@ -71,6 +71,13 @@ Props
     </td>
   </tr>
   <tr>
+    <td><code>wrapperStyle</code></td>
+    <td>object</td>
+    <td>
+      Overrides the inline-styles of the svg wrapper.
+    </td>
+  </tr>
+  <tr>
     <td><code>preloader</code></td>
     <td>function</td>
     <td>

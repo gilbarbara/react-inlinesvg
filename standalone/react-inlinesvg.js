@@ -692,6 +692,7 @@ module.exports = me = React.createClass({
   displayName: 'InlineSVG',
   propTypes: {
     wrapper: PropTypes.func,
+    wrapperStyle: PropTypes.object,
     src: PropTypes.string.isRequired,
     className: PropTypes.string,
     preloader: PropTypes.func,
@@ -787,6 +788,7 @@ module.exports = me = React.createClass({
   render: function() {
     return this.props.wrapper({
       className: this.getClassName(),
+      style: this.props.wrapperStyle,
       dangerouslySetInnerHTML: this.state.loadedText ? {
         __html: this.processSVG(this.state.loadedText)
       } : void 0
