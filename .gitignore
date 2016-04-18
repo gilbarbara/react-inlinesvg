@@ -1,4 +1,2 @@
-/node_modules/
-/Gruntfile.js
-/test/tests.js
-/lib/
+node_modules
+lib
