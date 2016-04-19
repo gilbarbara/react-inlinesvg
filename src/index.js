@@ -1,11 +1,11 @@
 import React from 'react';
-import shallowCompare from 'react-addons-shallow-compare';
 import once from 'once';
 import httpplease from 'httpplease';
 import ieXDomain from 'httpplease/plugins/oldiexdomain';
 
+import { shouldComponentUpdate } from './shouldComponentUpdate';
+
 const http = httpplease.use(ieXDomain);
-const PropTypes = React.PropTypes;
 
 const Status = {
   PENDING: 'pending',
@@ -128,15 +128,15 @@ export default class InlineSVG extends React.Component {
   }
 
   static propTypes = {
-    children: PropTypes.array,
-    className: PropTypes.string,
-    onError: PropTypes.func,
-    onLoad: PropTypes.func,
-    preloader: PropTypes.func,
-    src: PropTypes.string.isRequired,
-    supportTest: PropTypes.func,
-    uniquifyIDs: PropTypes.bool,
-    wrapper: PropTypes.func
+    children: React.PropTypes.array,
+    className: React.PropTypes.string,
+    onError: React.PropTypes.func,
+    onLoad: React.PropTypes.func,
+    preloader: React.PropTypes.func,
+    src: React.PropTypes.string.isRequired,
+    supportTest: React.PropTypes.func,
+    uniquifyIDs: React.PropTypes.bool,
+    wrapper: React.PropTypes.func
   };
 
   static defaultProps = {
@@ -145,9 +145,7 @@ export default class InlineSVG extends React.Component {
     uniquifyIDs: true
   };
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return shallowCompare(this, nextProps, nextState);
-  }
+  shouldComponentUpdate = shouldComponentUpdate;
 
   componentWillMount() {
     if (this.state.status === Status.PENDING) {

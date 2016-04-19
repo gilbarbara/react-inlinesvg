@@ -5,7 +5,6 @@ const win = doc.defaultView; // get the window object out of the document
 
 global.document = doc;
 global.window = win;
-global.window.matchMedia = () => ({ matches: true });
 global.navigator = { userAgent: 'node.js' };
 
 // from mocha-jsdom https://github.com/rstacruz/mocha-jsdom/blob/master/index.js#L80

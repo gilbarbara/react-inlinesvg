@@ -36,9 +36,8 @@ gulp.task('build:node', function() {
         'stage-1'
       ],
       plugins: [
-        'add-module-exports',
-        'transform-decorators-legacy'
-      ]
+        'add-module-exports'
+	  ]
     }))
     .pipe(gulp.dest('./lib'));
 });
@@ -55,7 +54,7 @@ gulp.task('build:browser', function() {
     .pipe(gulp.dest('./standalone/'));
 });
 
-gulp.task('testserver', function() {
+gulp.task('localserver', function() {
   return $.connect.server({
     root: [__dirname],
     port: 1337,
@@ -79,4 +78,4 @@ gulp.task('xdomainserver', function() {
 
 gulp.task('build', ['build:node', 'build:browser']);
 
-gulp.task('test', ['xdomainserver', 'testserver']);
+gulp.task('test-server', ['localserver', 'xdomainserver']);
