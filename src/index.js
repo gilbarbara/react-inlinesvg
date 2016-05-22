@@ -90,11 +90,9 @@ class InlineSVGError extends Error {
 const createError = (message, attrs) => {
   const err = new InlineSVGError(message);
 
-  for (const k in attrs) {
-    if (attrs.hasOwnProperty(k)) {
-      err[k] = attrs[k];
-    }
-  }
+  Object.keys(attrs).forEach(k => {
+    err[k] = attrs[k];
+  });
 
   return err;
 };
@@ -128,7 +126,7 @@ export default class InlineSVG extends React.Component {
   }
 
   static propTypes = {
-    children: React.PropTypes.array,
+    children: React.PropTypes.node,
     className: React.PropTypes.string,
     onError: React.PropTypes.func,
     onLoad: React.PropTypes.func,
