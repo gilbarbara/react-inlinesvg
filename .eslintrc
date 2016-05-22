@@ -7,9 +7,6 @@
   "globals": {
     "$": true
   },
-  "plugins": [
-    "jsdoc"
-  ],
   "rules": {
     "arrow-body-style": [
       1,
@@ -82,7 +79,7 @@
       "avoid-escape"
     ],
     "require-jsdoc": [
-      0,
+      1,
       {
         "require": {
           "FunctionDeclaration": true,
@@ -120,12 +117,6 @@
         "requireReturnDescription": false
       }
     ],
-    // JSDoc
-    "jsdoc/check-tag-names": 1,
-    "jsdoc/check-types": 1,
-    "jsdoc/newline-after-description": 1,
-    "jsdoc/require-description-complete-sentence": 0,
-    "jsdoc/require-hyphen-before-param-description": 1,
     // React
     "jsx-quotes": 1,
     "react/jsx-closing-bracket-location": [
