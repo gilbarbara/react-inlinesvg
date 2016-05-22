@@ -1,5 +1,6 @@
 react-inlinesvg
 ===============
+<a href="https://www.npmjs.com/package/react-inlinesvg" target="_blank">![](https://badge.fury.io/js/react-inlinesvg.svg)</a>
 
 One of the reasons SVGs are awesome is because you can style them with CSS.
 Unfortunately, this winds up not being too useful in practice because the style
@@ -116,10 +117,9 @@ Props
 Browser Support
 ---------------
 
-Any browsers that support inlining SVGs and XHR will work. The component goes
-out of its way to handle IE9's weird XHR support so, IE9 and up get your SVG;
-lesser browsers get the fallback.
-
+Any browsers that support inlining SVGs and XHR will work. The component goes out of its way to handle IE9's weird XHR support so, IE9 and up get your SVG;
+lesser browsers get the fallback.  
+We use [httpplease](https://github.com/matthewwithanm/httpplease.js) for XHR requests.
 
 CORS
 ----
@@ -135,7 +135,6 @@ about XSS attacks. Only load trusted content, and don't use unsanitized user
 input to generate the `src`!
 
 
-[CORS]: https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS
-[svg-use]: http://css-tricks.com/svg-use-external-source
-[use-article]: http://css-tricks.com/svg-use-external-source
-[use-support]: https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use#Browser_compatibility
+[CORS](https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS)  
+[svg-use-external-source](http://css-tricks.com/svg-use-external-source)  
+[use-support](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use#Browser_compatibility)
