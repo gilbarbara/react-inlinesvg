@@ -5,6 +5,12 @@ import TestUtils from 'react-addons-test-utils';
 
 import ReactInlineSVG from '../src';
 
+/**
+ * Create a new iSvg element.
+ *
+ * @param {Object} props
+ * @returns {*}
+ */
 function setup(props = {}) {
   return TestUtils.renderIntoDocument(
     <ReactInlineSVG {...props} />
@@ -75,6 +81,25 @@ describe('react-inlinesvg', () => {
           const el = ReactDOM.renderToStaticMarkup(<ReactInlineSVG {...props} />);
 
           if (/MISSINGNO/.test(el)) {
+            return done();
+          }
+
+          return done(new Error('Missing fallback contents'));
+        }
+      };
+
+      setup(props);
+    });
+
+    it('should show a single children if loading not supported', (done) => {
+      const props = {
+        src: 'DOESNOTEXIST.svg',
+        children: React.DOM.img({ src: '/test/tiger.png' }),
+        supportTest: () => false,
+        onError: () => {
+          const el = ReactDOM.renderToStaticMarkup(<ReactInlineSVG {...props} />);
+
+          if (/src="\/test\/tiger.png"/.test(el)) {
             return done();
           }
 
