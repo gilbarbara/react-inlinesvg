@@ -29,7 +29,7 @@ request and then embed it in the document. That's what this component does.
 ### Note
 
 The SVG [`<use>`][svg-use] element can be used to achieve something similar to
-this component. See [this article][use-article] for more information and [this
+this component. See [this article][svg-use-external-source] for more information and [this
 table][use-support] for browser support and caveats.
 
 
@@ -124,7 +124,7 @@ We use [httpplease](https://github.com/matthewwithanm/httpplease.js) for XHR req
 CORS
 ----
 
-If loading SVGs from another domain, you'll need to make sure it allows [CORS].
+If loading SVGs from another domain, you'll need to make sure it allows [CORS][CORS].
 
 
 XSS Warning
@@ -134,7 +134,7 @@ This component places the loaded file into your DOM, so you need to be careful
 about XSS attacks. Only load trusted content, and don't use unsanitized user
 input to generate the `src`!
 
-
-[CORS](https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS)  
-[svg-use-external-source](http://css-tricks.com/svg-use-external-source)  
-[use-support](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use#Browser_compatibility)
+[svg-use]: https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use
+[svg-use-external-source]: http://css-tricks.com/svg-use-external-source
+[use-support]: https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use#Browser_compatibility
+[CORS]: https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS
