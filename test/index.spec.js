@@ -5,6 +5,9 @@ import TestUtils from 'react-addons-test-utils';
 
 import ReactInlineSVG from '../src';
 
+const svgResponse = {text: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>'}
+
+
 /**
  * Create a new iSvg element.
  *
@@ -18,6 +21,85 @@ function setup(props = {}) {
 }
 
 describe('react-inlinesvg', () => {
+  describe('where httpplease has been mocked out', () =>
+  {
+    before(() =>
+    {
+      let getCallCount = 0;
+
+      ReactInlineSVG.__Rewire__('http', {
+        get: (src, callback) =>
+        {
+          console.log('mocked get call')
+          setTimeout(() => callback(++getCallCount > 1 ? new Error('Unexpected Second Call') : null, svgResponse), 0)
+        }
+      });
+    })
+
+    it('should request an SVG only once when caching', done =>
+    {
+      let loadCallbacks = 0
+
+      let component = setup({
+            src: 'https://raw.githubusercontent.com/google/material-design-icons/master/av/svg/production/ic_play_arrow_24px.svg',
+            onLoad: () =>
+            {
+              console.log('loadCallbacks')
+              loadCallbacks++
+            },
+            cacheGetRequests: true
+          }
+      )
+
+      let secondComponent = setup({
+            src: 'https://raw.githubusercontent.com/google/material-design-icons/master/av/svg/production/ic_play_arrow_24px.svg',
+            onError: (err) =>
+            {
+              done(err)
+            },
+            onLoad: () =>
+            {
+              console.log(loadCallbacks, 'loadCallbacks')
+              expect(loadCallbacks).toBe(1)
+              done()
+            },
+            cacheGetRequests: true
+          }
+      )
+    })
+
+    it('it should call load on newly instantiated icons even if cached', done =>
+    {
+      let component = setup({
+            src: 'https://raw.githubusercontent.com/google/material-design-icons/master/av/svg/production/ic_play_arrow_24px.svg',
+            onLoad: () => {
+              console.log('first onLoad')
+              let secondComponent = setup({
+                    src: 'https://raw.githubusercontent.com/google/material-design-icons/master/av/svg/production/ic_play_arrow_24px.svg',
+                    onError: (err) =>
+                    {
+                      console.log('second onLoad')
+                      done(err)
+                    },
+                    onLoad: () =>
+                    {
+                      console.log('second onLoad')
+                      done()
+                    },
+                    cacheGetRequests: true
+                  }
+              )
+            },
+            cacheGetRequests: true
+          }
+      )
+    })
+
+    after( ()=> {
+        ReactInlineSVG.__ResetDependency__('http');
+    })
+  })
+
   it('should be a Component', () => {
     const render = setup({ src: '' });
 

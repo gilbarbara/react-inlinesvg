@@ -15,6 +15,33 @@ const Status = {
   UNSUPPORTED: 'unsupported'
 };
 
+let getRequestsByUrl = {};
+let loadedIcons = {};
+
+let createGetOrUseCacheForUrl = (url, callback) => {
+  if( loadedIcons[url] )
+  {
+    let params = loadedIcons[url];
+
+    setTimeout(() => callback(params[0], params[1]), 0);
+  }
+
+  if( !getRequestsByUrl[url] )
+  {
+    getRequestsByUrl[url] = [];
+
+    http.get(url, (err, res) => {
+      getRequestsByUrl[url].forEach(function(callback)
+      {
+        loadedIcons[url] = [err, res];
+        callback(err, res);
+      })
+    });
+  }
+
+  getRequestsByUrl[url].push(callback);
+}
+
 const supportsInlineSVG = once(() => {
   if (!document) {
     return false;
@@ -134,13 +161,15 @@ export default class InlineSVG extends React.Component {
     src: React.PropTypes.string.isRequired,
     supportTest: React.PropTypes.func,
     uniquifyIDs: React.PropTypes.bool,
-    wrapper: React.PropTypes.func
+    wrapper: React.PropTypes.func,
+    cacheGetRequests: React.PropTypes.bool
   };
 
   static defaultProps = {
     wrapper: React.DOM.span,
     supportTest: isSupportedEnvironment,
-    uniquifyIDs: true
+    uniquifyIDs: true,
+    cacheGetRequests: false
   };
 
   shouldComponentUpdate = shouldComponentUpdate;
@@ -193,8 +222,20 @@ export default class InlineSVG extends React.Component {
         text: match[1] ? atob(match[2]) : decodeURIComponent(match[2])
       });
     }
-
-    return http.get(this.props.src, this.handleLoad);
+    else
+    {
+      if (this.props.cacheGetRequests)
+      {
+        return createGetOrUseCacheForUrl(
+            this.props.src,
+            this.handleLoad
+        )
+      }
+      else
+      {
+        return http.get(this.props.src, this.handleLoad);
+      }
+    }
   }
 
   getClassName() {
