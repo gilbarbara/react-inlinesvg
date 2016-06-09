@@ -111,6 +111,15 @@ Props
       <code>&lt;Isvg uniquifyIDs={false}&gt;&lt;/Isvg&gt;</code>
     </td>
   </tr>
+  <tr>
+    <td><code>cacheGetRequests</code></td>
+    <td>boolean</td>
+    <td>
+      A boolean that tells Isvg to only request svgs once. Default is <code>false</code> but you can alter the behaviour by setting the boolean to <code>true</code>.
+
+      <code>&lt;Isvg cacheGetRequests={true}&gt;&lt;/Isvg&gt;</code>
+    </td>
+  </tr>
 </table>
 
 

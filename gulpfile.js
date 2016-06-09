@@ -29,16 +29,7 @@ gulp.task('watch', function() {
 
 gulp.task('build:node', function() {
   return gulp.src('./src/**/*.js')
-    .pipe($.babel({
-      presets: [
-        'es2015',
-        'react',
-        'stage-1'
-      ],
-      plugins: [
-        'add-module-exports'
-	  ]
-    }))
+    .pipe($.babel({}))
     .pipe(gulp.dest('./lib'));
 });
 
