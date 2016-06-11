@@ -15,32 +15,29 @@ const Status = {
   UNSUPPORTED: 'unsupported'
 };
 
-let getRequestsByUrl = {};
-let loadedIcons = {};
+const getRequestsByUrl = {};
+const loadedIcons = {};
 
-let createGetOrUseCacheForUrl = (url, callback) => {
-  if( loadedIcons[url] )
-  {
-    let params = loadedIcons[url];
+const createGetOrUseCacheForUrl = (url, callback) => {
+  if (loadedIcons[url]) {
+    const params = loadedIcons[url];
 
     setTimeout(() => callback(params[0], params[1]), 0);
   }
 
-  if( !getRequestsByUrl[url] )
-  {
+  if (!getRequestsByUrl[url]) {
     getRequestsByUrl[url] = [];
 
     http.get(url, (err, res) => {
-      getRequestsByUrl[url].forEach(function(callback)
-      {
+      getRequestsByUrl[url].forEach(cb => {
         loadedIcons[url] = [err, res];
-        callback(err, res);
-      })
+        cb(err, res);
+      });
     });
   }
 
   getRequestsByUrl[url].push(callback);
-}
+};
 
 const supportsInlineSVG = once(() => {
   if (!document) {
@@ -153,6 +150,7 @@ export default class InlineSVG extends React.Component {
   }
 
   static propTypes = {
+    cacheGetRequests: React.PropTypes.bool,
     children: React.PropTypes.node,
     className: React.PropTypes.string,
     onError: React.PropTypes.func,
@@ -161,8 +159,7 @@ export default class InlineSVG extends React.Component {
     src: React.PropTypes.string.isRequired,
     supportTest: React.PropTypes.func,
     uniquifyIDs: React.PropTypes.bool,
-    wrapper: React.PropTypes.func,
-    cacheGetRequests: React.PropTypes.bool
+    wrapper: React.PropTypes.func
   };
 
   static defaultProps = {
@@ -210,9 +207,7 @@ export default class InlineSVG extends React.Component {
     this.setState({
       loadedText: res.text,
       status: Status.LOADED
-    }, () =>
-        (typeof this.props.onLoad === 'function' ? this.props.onLoad() : null)
-    );
+    }, () => (typeof this.props.onLoad === 'function' ? this.props.onLoad() : null));
   }
 
   load() {
@@ -222,20 +217,14 @@ export default class InlineSVG extends React.Component {
         text: match[1] ? atob(match[2]) : decodeURIComponent(match[2])
       });
     }
-    else
-    {
-      if (this.props.cacheGetRequests)
-      {
-        return createGetOrUseCacheForUrl(
-            this.props.src,
-            this.handleLoad
-        )
-      }
-      else
-      {
-        return http.get(this.props.src, this.handleLoad);
-      }
+    if (this.props.cacheGetRequests) {
+      return createGetOrUseCacheForUrl(
+        this.props.src,
+        this.handleLoad
+      );
     }
+
+    return http.get(this.props.src, this.handleLoad);
   }
 
   getClassName() {
