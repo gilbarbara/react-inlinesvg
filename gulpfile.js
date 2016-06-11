@@ -28,12 +28,14 @@ gulp.task('watch', function() {
 });
 
 gulp.task('build:node', function() {
+  process.env.NODE_ENV = 'production';
   return gulp.src('./src/**/*.js')
     .pipe($.babel({}))
     .pipe(gulp.dest('./lib'));
 });
 
 gulp.task('build:browser', function() {
+  process.env.NODE_ENV = 'production';
   var bundler, stream;
   bundler = browserify({
     entries: './src/index.js',
