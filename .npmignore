@@ -1,3 +1,6 @@
+.babelrc
+.editorconfig
+.eslintrc
 bower.json
 gulpfile.js
 node_modules
