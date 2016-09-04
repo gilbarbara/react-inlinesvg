@@ -171,7 +171,7 @@ export default class InlineSVG extends React.Component {
 
   shouldComponentUpdate = shouldComponentUpdate;
 
-  componentWillMount() {
+  componentDidMount() {
     if (this.state.status === Status.PENDING) {
       if (this.props.supportTest()) {
         if (this.props.src) {
