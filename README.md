@@ -28,9 +28,9 @@ request and then embed it in the document. That's what this component does.
 
 ### Note
 
-The SVG [`<use>`][svg-use] element can be used to achieve something similar to
-this component. See [this article][use-article] for more information and [this
-table][use-support] for browser support and caveats.
+The SVG [`<use>`][svg-use-external-source] element can be used to achieve
+something similar to this component. See [this article][use-article] for more
+information and [this table][use-support] for browser support and caveats.
 
 
 Usage
@@ -144,6 +144,7 @@ about XSS attacks. Only load trusted content, and don't use unsanitized user
 input to generate the `src`!
 
 
-[CORS](https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS)  
-[svg-use-external-source](http://css-tricks.com/svg-use-external-source)  
-[use-support](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use#Browser_compatibility)
+[CORS]: https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS
+[svg-use-external-source]: http://css-tricks.com/svg-use-external-source
+[use-article]: http://taye.me/blog/svg/a-guide-to-svg-use-elements/
+[use-support]: https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use#Browser_compatibility
