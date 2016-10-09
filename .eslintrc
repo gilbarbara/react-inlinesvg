@@ -2,6 +2,7 @@
   "extends": "airbnb",
   "parser": "babel-eslint",
   "env": {
+    "browser": true,
     "mocha": true
   },
   "globals": {
@@ -12,6 +13,7 @@
       1,
       "as-needed"
     ],
+    "arrow-parens": [1, "as-needed"],
     "brace-style": [
       1,
       "stroustrup",
@@ -36,6 +38,7 @@
         "ignoreChainWithDepth": 5
       }
     ],
+    "no-bitwise": 0,
     "no-case-declarations": 1,
     "no-confusing-arrow": [
       1,
@@ -63,6 +66,7 @@
         "props": false
       }
     ],
+    "no-plusplus": 0,
     "no-trailing-spaces": 1,
     "no-unused-vars": 1,
     "object-shorthand": [
@@ -117,12 +121,14 @@
         "requireReturnDescription": false
       }
     ],
+    "import/no-extraneous-dependencies": [2, { "devDependencies": true }],
     // React
     "jsx-quotes": 1,
     "react/jsx-closing-bracket-location": [
       1,
       "after-props"
     ],
+    "react/jsx-filename-extension": 0,
     "react/jsx-indent-props": [
       1,
       2

@@ -51,19 +51,19 @@ const supportsInlineSVG = once(() => {
 
 const isSupportedEnvironment = once(() =>
   (
-    (typeof window !== 'undefined' && window !== null ? window.XMLHttpRequest : void 0) ||
-    (typeof window !== 'undefined' && window !== null ? window.XDomainRequest : void 0)
+    (typeof window !== 'undefined' && window !== null ? window.XMLHttpRequest : false) ||
+    (typeof window !== 'undefined' && window !== null ? window.XDomainRequest : false)
   ) &&
   supportsInlineSVG()
 );
 
 const uniquifyIDs = (() => {
-  const mkAttributePattern = (attr) => `(?:(?:\\s|\\:)${attr})`;
+  const mkAttributePattern = attr => `(?:(?:\\s|\\:)${attr})`;
 
   const idPattern = new RegExp(`(?:(${(mkAttributePattern('id'))})="([^"]+)")|(?:(${(mkAttributePattern('href'))}|${(mkAttributePattern('role'))}|${(mkAttributePattern('arcrole'))})="\\#([^"]+)")|(?:="url\\(\\#([^\\)]+)\\)")`, 'g');
 
   return (svgText, svgID) => {
-    const uniquifyID = (id) => `${id}___${svgID}`;
+    const uniquifyID = id => `${id}___${svgID}`;
 
     return svgText.replace(idPattern, (m, p1, p2, p3, p4, p5) => { //eslint-disable-line consistent-return
       if (p2) {
@@ -79,28 +79,30 @@ const uniquifyIDs = (() => {
   };
 })();
 
-const getHash = (str) => {
+const getHash = str => {
   let chr;
   let hash = 0;
   let i;
   let j;
-  let len;
+  let ref;
 
   if (!str) {
     return hash;
   }
 
-  for (i = 0, j = 0, len = str.length; len <= 0 ? j < len : j > len; i = len <= 0 ? ++j : --j) {
+  for (i = j = 0, ref = str.length; ref >= 0 ? j < ref : j > ref; i = ref >= 0 ? ++j : --j) {
     chr = str.charCodeAt(i);
-    hash = (hash << 5) - hash + chr;
-    hash = hash & hash;
+    hash = ((hash << 5) - hash) + chr;
+    hash &= hash;
   }
+
   return hash;
 };
 
 class InlineSVGError extends Error {
   constructor(message) {
     super();
+
     this.name = 'InlineSVGError';
     this.isSupportedBrowser = true;
     this.isConfigurationError = false;
@@ -121,7 +123,7 @@ const createError = (message, attrs) => {
   return err;
 };
 
-const unsupportedBrowserError = (message) => {
+const unsupportedBrowserError = message => {
   let newMessage = message;
 
   if (newMessage === null) {
@@ -134,7 +136,7 @@ const unsupportedBrowserError = (message) => {
   });
 };
 
-const configurationError = (message) => createError(message, {
+const configurationError = message => createError(message, {
   isConfigurationError: true
 });
 
@@ -175,9 +177,7 @@ export default class InlineSVG extends React.Component {
     if (this.state.status === Status.PENDING) {
       if (this.props.supportTest()) {
         if (this.props.src) {
-          this.setState({
-            status: Status.LOADING
-          }, this.load);
+          this.startLoad();
         }
         else {
           this.fail(configurationError('Missing source'));
@@ -208,6 +208,12 @@ export default class InlineSVG extends React.Component {
       loadedText: res.text,
       status: Status.LOADED
     }, () => (typeof this.props.onLoad === 'function' ? this.props.onLoad() : null));
+  }
+
+  startLoad() {
+    this.setState({
+      status: Status.LOADING
+    }, this.load);
   }
 
   load() {
@@ -248,6 +254,7 @@ export default class InlineSVG extends React.Component {
   renderContents() {
     switch (this.state.status) {
       case Status.UNSUPPORTED:
+      case Status.FAILED:
         return this.props.children;
       default:
         return this.props.preloader;
