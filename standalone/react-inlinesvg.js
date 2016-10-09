@@ -218,7 +218,8 @@ function is(x, y) {
   if (x === y) {
     // Steps 1-5, 7-10
     // Steps 6.b-6.e: +0 != -0
-    return x !== 0 || 1 / x === 1 / y;
+    // Added the nonzero y check to make Flow happy, but it is redundant
+    return x !== 0 || y !== 0 || 1 / x === 1 / y;
   } else {
     // Step 6.a: NaN == NaN
     return x !== x && y !== y;
@@ -799,98 +800,21 @@ module.exports = {
 };
 
 },{"../lib/utils/once":14,"urllite/lib/core":46}],18:[function(require,module,exports){
-'use strict';
-/* eslint-disable no-unused-vars */
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-var propIsEnumerable = Object.prototype.propertyIsEnumerable;
-
-function toObject(val) {
-	if (val === null || val === undefined) {
-		throw new TypeError('Object.assign cannot be called with null or undefined');
-	}
-
-	return Object(val);
-}
-
-function shouldUseNative() {
-	try {
-		if (!Object.assign) {
-			return false;
-		}
-
-		// Detect buggy property enumeration order in older V8 versions.
-
-		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
-		var test1 = new String('abc');  // eslint-disable-line
-		test1[5] = 'de';
-		if (Object.getOwnPropertyNames(test1)[0] === '5') {
-			return false;
-		}
-
-		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
-		var test2 = {};
-		for (var i = 0; i < 10; i++) {
-			test2['_' + String.fromCharCode(i)] = i;
-		}
-		var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
-			return test2[n];
-		});
-		if (order2.join('') !== '0123456789') {
-			return false;
-		}
-
-		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
-		var test3 = {};
-		'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
-			test3[letter] = letter;
-		});
-		if (Object.keys(Object.assign({}, test3)).join('') !==
-				'abcdefghijklmnopqrst') {
-			return false;
-		}
-
-		return true;
-	} catch (e) {
-		// We don't expect any of the above to throw, but better to be safe.
-		return false;
-	}
-}
-
-module.exports = shouldUseNative() ? Object.assign : function (target, source) {
-	var from;
-	var to = toObject(target);
-	var symbols;
-
-	for (var s = 1; s < arguments.length; s++) {
-		from = Object(arguments[s]);
-
-		for (var key in from) {
-			if (hasOwnProperty.call(from, key)) {
-				to[key] = from[key];
-			}
-		}
-
-		if (Object.getOwnPropertySymbols) {
-			symbols = Object.getOwnPropertySymbols(from);
-			for (var i = 0; i < symbols.length; i++) {
-				if (propIsEnumerable.call(from, symbols[i])) {
-					to[symbols[i]] = from[symbols[i]];
-				}
-			}
-		}
-	}
-
-	return to;
-};
-
-},{}],19:[function(require,module,exports){
 var wrappy = require('wrappy')
 module.exports = wrappy(once)
+module.exports.strict = wrappy(onceStrict)
 
 once.proto = once(function () {
   Object.defineProperty(Function.prototype, 'once', {
     value: function () {
       return once(this)
+    },
+    configurable: true
+  })
+
+  Object.defineProperty(Function.prototype, 'onceStrict', {
+    value: function () {
+      return onceStrict(this)
     },
     configurable: true
   })
@@ -906,7 +830,20 @@ function once (fn) {
   return f
 }
 
-},{"wrappy":47}],20:[function(require,module,exports){
+function onceStrict (fn) {
+  var f = function () {
+    if (f.called)
+      throw new Error(f.onceError)
+    f.called = true
+    return f.value = fn.apply(this, arguments)
+  }
+  var name = fn.name || 'Function wrapped with `once`'
+  f.onceError = name + " shouldn't be called more than once"
+  f.called = false
+  return f
+}
+
+},{"wrappy":47}],19:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -1088,7 +1025,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],21:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -1148,7 +1085,7 @@ var KeyEscapeUtils = {
 };
 
 module.exports = KeyEscapeUtils;
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -1270,7 +1207,7 @@ var PooledClass = {
 };
 
 module.exports = PooledClass;
-},{"./reactProdInvariant":43,"fbjs/lib/invariant":3}],23:[function(require,module,exports){
+},{"./reactProdInvariant":42,"fbjs/lib/invariant":3}],22:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -1360,7 +1297,7 @@ var React = {
 };
 
 module.exports = React;
-},{"./ReactChildren":24,"./ReactClass":25,"./ReactComponent":26,"./ReactDOMFactories":29,"./ReactElement":30,"./ReactElementValidator":31,"./ReactPropTypes":35,"./ReactPureComponent":37,"./ReactVersion":38,"./onlyChild":42,"fbjs/lib/warning":7,"object-assign":18}],24:[function(require,module,exports){
+},{"./ReactChildren":23,"./ReactClass":24,"./ReactComponent":25,"./ReactDOMFactories":28,"./ReactElement":29,"./ReactElementValidator":30,"./ReactPropTypes":34,"./ReactPureComponent":36,"./ReactVersion":37,"./onlyChild":41,"fbjs/lib/warning":7,"object-assign":44}],23:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -1552,7 +1489,7 @@ var ReactChildren = {
 };
 
 module.exports = ReactChildren;
-},{"./PooledClass":22,"./ReactElement":30,"./traverseAllChildren":44,"fbjs/lib/emptyFunction":1}],25:[function(require,module,exports){
+},{"./PooledClass":21,"./ReactElement":29,"./traverseAllChildren":43,"fbjs/lib/emptyFunction":1}],24:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -2285,7 +2222,7 @@ var ReactClass = {
 };
 
 module.exports = ReactClass;
-},{"./ReactComponent":26,"./ReactElement":30,"./ReactNoopUpdateQueue":32,"./ReactPropTypeLocationNames":33,"./ReactPropTypeLocations":34,"./reactProdInvariant":43,"fbjs/lib/emptyObject":2,"fbjs/lib/invariant":3,"fbjs/lib/keyMirror":4,"fbjs/lib/keyOf":5,"fbjs/lib/warning":7,"object-assign":18}],26:[function(require,module,exports){
+},{"./ReactComponent":25,"./ReactElement":29,"./ReactNoopUpdateQueue":31,"./ReactPropTypeLocationNames":32,"./ReactPropTypeLocations":33,"./reactProdInvariant":42,"fbjs/lib/emptyObject":2,"fbjs/lib/invariant":3,"fbjs/lib/keyMirror":4,"fbjs/lib/keyOf":5,"fbjs/lib/warning":7,"object-assign":44}],25:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -2404,7 +2341,7 @@ if ("production" !== 'production') {
 }
 
 module.exports = ReactComponent;
-},{"./ReactNoopUpdateQueue":32,"./canDefineProperty":39,"./reactProdInvariant":43,"fbjs/lib/emptyObject":2,"fbjs/lib/invariant":3,"fbjs/lib/warning":7}],27:[function(require,module,exports){
+},{"./ReactNoopUpdateQueue":31,"./canDefineProperty":38,"./reactProdInvariant":42,"fbjs/lib/emptyObject":2,"fbjs/lib/invariant":3,"fbjs/lib/warning":7}],26:[function(require,module,exports){
 /**
  * Copyright 2016-present, Facebook, Inc.
  * All rights reserved.
@@ -2747,7 +2684,7 @@ var ReactComponentTreeHook = {
 };
 
 module.exports = ReactComponentTreeHook;
-},{"./ReactCurrentOwner":28,"./reactProdInvariant":43,"fbjs/lib/invariant":3,"fbjs/lib/warning":7}],28:[function(require,module,exports){
+},{"./ReactCurrentOwner":27,"./reactProdInvariant":42,"fbjs/lib/invariant":3,"fbjs/lib/warning":7}],27:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -2779,7 +2716,7 @@ var ReactCurrentOwner = {
 };
 
 module.exports = ReactCurrentOwner;
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -2950,7 +2887,7 @@ var ReactDOMFactories = {
 };
 
 module.exports = ReactDOMFactories;
-},{"./ReactElement":30,"./ReactElementValidator":31}],30:[function(require,module,exports){
+},{"./ReactElement":29,"./ReactElementValidator":30}],29:[function(require,module,exports){
 /**
  * Copyright 2014-present, Facebook, Inc.
  * All rights reserved.
@@ -3143,14 +3080,6 @@ ReactElement.createElement = function (type, config, children) {
   var source = null;
 
   if (config != null) {
-    if ("production" !== 'production') {
-      "production" !== 'production' ? warning(
-      /* eslint-disable no-proto */
-      config.__proto__ == null || config.__proto__ === Object.prototype,
-      /* eslint-enable no-proto */
-      'React.createElement(...): Expected props argument to be a plain object. ' + 'Properties defined in its prototype chain will be ignored.') : void 0;
-    }
-
     if (hasValidRef(config)) {
       ref = config.ref;
     }
@@ -3251,14 +3180,6 @@ ReactElement.cloneElement = function (element, config, children) {
   var owner = element._owner;
 
   if (config != null) {
-    if ("production" !== 'production') {
-      "production" !== 'production' ? warning(
-      /* eslint-disable no-proto */
-      config.__proto__ == null || config.__proto__ === Object.prototype,
-      /* eslint-enable no-proto */
-      'React.cloneElement(...): Expected props argument to be a plain object. ' + 'Properties defined in its prototype chain will be ignored.') : void 0;
-    }
-
     if (hasValidRef(config)) {
       // Silently steal the ref from the parent.
       ref = config.ref;
@@ -3315,7 +3236,7 @@ ReactElement.isValidElement = function (object) {
 ReactElement.REACT_ELEMENT_TYPE = REACT_ELEMENT_TYPE;
 
 module.exports = ReactElement;
-},{"./ReactCurrentOwner":28,"./canDefineProperty":39,"fbjs/lib/warning":7,"object-assign":18}],31:[function(require,module,exports){
+},{"./ReactCurrentOwner":27,"./canDefineProperty":38,"fbjs/lib/warning":7,"object-assign":44}],30:[function(require,module,exports){
 /**
  * Copyright 2014-present, Facebook, Inc.
  * All rights reserved.
@@ -3544,7 +3465,7 @@ var ReactElementValidator = {
 };
 
 module.exports = ReactElementValidator;
-},{"./ReactComponentTreeHook":27,"./ReactCurrentOwner":28,"./ReactElement":30,"./ReactPropTypeLocations":34,"./canDefineProperty":39,"./checkReactTypeSpec":40,"./getIteratorFn":41,"fbjs/lib/warning":7}],32:[function(require,module,exports){
+},{"./ReactComponentTreeHook":26,"./ReactCurrentOwner":27,"./ReactElement":29,"./ReactPropTypeLocations":33,"./canDefineProperty":38,"./checkReactTypeSpec":39,"./getIteratorFn":40,"fbjs/lib/warning":7}],31:[function(require,module,exports){
 /**
  * Copyright 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -3641,7 +3562,7 @@ var ReactNoopUpdateQueue = {
 };
 
 module.exports = ReactNoopUpdateQueue;
-},{"fbjs/lib/warning":7}],33:[function(require,module,exports){
+},{"fbjs/lib/warning":7}],32:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -3666,7 +3587,7 @@ if ("production" !== 'production') {
 }
 
 module.exports = ReactPropTypeLocationNames;
-},{}],34:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -3689,7 +3610,7 @@ var ReactPropTypeLocations = keyMirror({
 });
 
 module.exports = ReactPropTypeLocations;
-},{"fbjs/lib/keyMirror":4}],35:[function(require,module,exports){
+},{"fbjs/lib/keyMirror":4}],34:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -4121,7 +4042,7 @@ function getClassName(propValue) {
 }
 
 module.exports = ReactPropTypes;
-},{"./ReactElement":30,"./ReactPropTypeLocationNames":33,"./ReactPropTypesSecret":36,"./getIteratorFn":41,"fbjs/lib/emptyFunction":1,"fbjs/lib/warning":7}],36:[function(require,module,exports){
+},{"./ReactElement":29,"./ReactPropTypeLocationNames":32,"./ReactPropTypesSecret":35,"./getIteratorFn":40,"fbjs/lib/emptyFunction":1,"fbjs/lib/warning":7}],35:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -4138,7 +4059,7 @@ module.exports = ReactPropTypes;
 var ReactPropTypesSecret = 'SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED';
 
 module.exports = ReactPropTypesSecret;
-},{}],37:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -4181,7 +4102,7 @@ _assign(ReactPureComponent.prototype, ReactComponent.prototype);
 ReactPureComponent.prototype.isPureReactComponent = true;
 
 module.exports = ReactPureComponent;
-},{"./ReactComponent":26,"./ReactNoopUpdateQueue":32,"fbjs/lib/emptyObject":2,"object-assign":18}],38:[function(require,module,exports){
+},{"./ReactComponent":25,"./ReactNoopUpdateQueue":31,"fbjs/lib/emptyObject":2,"object-assign":44}],37:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -4195,8 +4116,8 @@ module.exports = ReactPureComponent;
 
 'use strict';
 
-module.exports = '15.3.1';
-},{}],39:[function(require,module,exports){
+module.exports = '15.3.2';
+},{}],38:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -4221,7 +4142,7 @@ if ("production" !== 'production') {
 }
 
 module.exports = canDefineProperty;
-},{}],40:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -4311,7 +4232,7 @@ function checkReactTypeSpec(typeSpecs, values, location, componentName, element,
 
 module.exports = checkReactTypeSpec;
 }).call(this,require('_process'))
-},{"./ReactComponentTreeHook":27,"./ReactPropTypeLocationNames":33,"./ReactPropTypesSecret":36,"./reactProdInvariant":43,"_process":20,"fbjs/lib/invariant":3,"fbjs/lib/warning":7}],41:[function(require,module,exports){
+},{"./ReactComponentTreeHook":26,"./ReactPropTypeLocationNames":32,"./ReactPropTypesSecret":35,"./reactProdInvariant":42,"_process":19,"fbjs/lib/invariant":3,"fbjs/lib/warning":7}],40:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -4353,7 +4274,7 @@ function getIteratorFn(maybeIterable) {
 }
 
 module.exports = getIteratorFn;
-},{}],42:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -4392,7 +4313,7 @@ function onlyChild(children) {
 }
 
 module.exports = onlyChild;
-},{"./ReactElement":30,"./reactProdInvariant":43,"fbjs/lib/invariant":3}],43:[function(require,module,exports){
+},{"./ReactElement":29,"./reactProdInvariant":42,"fbjs/lib/invariant":3}],42:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -4432,7 +4353,7 @@ function reactProdInvariant(code) {
 }
 
 module.exports = reactProdInvariant;
-},{}],44:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -4600,12 +4521,97 @@ function traverseAllChildren(children, callback, traverseContext) {
 }
 
 module.exports = traverseAllChildren;
-},{"./KeyEscapeUtils":21,"./ReactCurrentOwner":28,"./ReactElement":30,"./getIteratorFn":41,"./reactProdInvariant":43,"fbjs/lib/invariant":3,"fbjs/lib/warning":7}],45:[function(require,module,exports){
+},{"./KeyEscapeUtils":20,"./ReactCurrentOwner":27,"./ReactElement":29,"./getIteratorFn":40,"./reactProdInvariant":42,"fbjs/lib/invariant":3,"fbjs/lib/warning":7}],44:[function(require,module,exports){
+'use strict';
+/* eslint-disable no-unused-vars */
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+function toObject(val) {
+	if (val === null || val === undefined) {
+		throw new TypeError('Object.assign cannot be called with null or undefined');
+	}
+
+	return Object(val);
+}
+
+function shouldUseNative() {
+	try {
+		if (!Object.assign) {
+			return false;
+		}
+
+		// Detect buggy property enumeration order in older V8 versions.
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+		var test1 = new String('abc');  // eslint-disable-line
+		test1[5] = 'de';
+		if (Object.getOwnPropertyNames(test1)[0] === '5') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test2 = {};
+		for (var i = 0; i < 10; i++) {
+			test2['_' + String.fromCharCode(i)] = i;
+		}
+		var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+			return test2[n];
+		});
+		if (order2.join('') !== '0123456789') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test3 = {};
+		'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+			test3[letter] = letter;
+		});
+		if (Object.keys(Object.assign({}, test3)).join('') !==
+				'abcdefghijklmnopqrst') {
+			return false;
+		}
+
+		return true;
+	} catch (e) {
+		// We don't expect any of the above to throw, but better to be safe.
+		return false;
+	}
+}
+
+module.exports = shouldUseNative() ? Object.assign : function (target, source) {
+	var from;
+	var to = toObject(target);
+	var symbols;
+
+	for (var s = 1; s < arguments.length; s++) {
+		from = Object(arguments[s]);
+
+		for (var key in from) {
+			if (hasOwnProperty.call(from, key)) {
+				to[key] = from[key];
+			}
+		}
+
+		if (Object.getOwnPropertySymbols) {
+			symbols = Object.getOwnPropertySymbols(from);
+			for (var i = 0; i < symbols.length; i++) {
+				if (propIsEnumerable.call(from, symbols[i])) {
+					to[symbols[i]] = from[symbols[i]];
+				}
+			}
+		}
+	}
+
+	return to;
+};
+
+},{}],45:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./lib/React');
 
-},{"./lib/React":23}],46:[function(require,module,exports){
+},{"./lib/React":22}],46:[function(require,module,exports){
 (function() {
   var URL, URL_PATTERN, defaults, urllite,
     __hasProp = {}.hasOwnProperty;
@@ -4810,7 +4816,7 @@ var supportsInlineSVG = (0, _once2.default)(function () {
 });
 
 var isSupportedEnvironment = (0, _once2.default)(function () {
-  return ((typeof window !== 'undefined' && window !== null ? window.XMLHttpRequest : void 0) || (typeof window !== 'undefined' && window !== null ? window.XDomainRequest : void 0)) && supportsInlineSVG();
+  return ((typeof window !== 'undefined' && window !== null ? window.XMLHttpRequest : false) || (typeof window !== 'undefined' && window !== null ? window.XDomainRequest : false)) && supportsInlineSVG();
 });
 
 var uniquifyIDs = function () {
@@ -4843,17 +4849,18 @@ var getHash = function getHash(str) {
   var hash = 0;
   var i = void 0;
   var j = void 0;
-  var len = void 0;
+  var ref = void 0;
 
   if (!str) {
     return hash;
   }
 
-  for (i = 0, j = 0, len = str.length; len <= 0 ? j < len : j > len; i = len <= 0 ? ++j : --j) {
+  for (i = j = 0, ref = str.length; ref >= 0 ? j < ref : j > ref; i = ref >= 0 ? ++j : --j) {
     chr = str.charCodeAt(i);
     hash = (hash << 5) - hash + chr;
-    hash = hash & hash;
+    hash &= hash;
   }
+
   return hash;
 };
 
@@ -4933,9 +4940,7 @@ var InlineSVG = function (_React$Component) {
       if (this.state.status === Status.PENDING) {
         if (this.props.supportTest()) {
           if (this.props.src) {
-            this.setState({
-              status: Status.LOADING
-            }, this.load);
+            this.startLoad();
           } else {
             this.fail(configurationError('Missing source'));
           }
@@ -4972,6 +4977,13 @@ var InlineSVG = function (_React$Component) {
       }, function () {
         return typeof _this4.props.onLoad === 'function' ? _this4.props.onLoad() : null;
       });
+    }
+  }, {
+    key: 'startLoad',
+    value: function startLoad() {
+      this.setState({
+        status: Status.LOADING
+      }, this.load);
     }
   }, {
     key: 'load',
@@ -5013,6 +5025,7 @@ var InlineSVG = function (_React$Component) {
     value: function renderContents() {
       switch (this.state.status) {
         case Status.UNSUPPORTED:
+        case Status.FAILED:
           return this.props.children;
         default:
           return this.props.preloader;
@@ -5054,7 +5067,7 @@ InlineSVG.defaultProps = {
 exports.default = InlineSVG;
 module.exports = exports['default'];
 
-},{"./shouldComponentUpdate":50,"httpplease":9,"httpplease/plugins/oldiexdomain":17,"once":19,"react":45}],50:[function(require,module,exports){
+},{"./shouldComponentUpdate":50,"httpplease":9,"httpplease/plugins/oldiexdomain":17,"once":18,"react":45}],50:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
