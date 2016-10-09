@@ -4,16 +4,13 @@
     "react",
     "stage-1"
   ],
-  env: {
-    production: {
-      plugins: [
-        "add-module-exports"
-      ]
-    },
-    development: {
-      plugins: [
-        "babel-plugin-rewire",
-        "add-module-exports"
+  "plugins": [
+    "add-module-exports"
+  ],
+  "env": {
+    "development": {
+      "plugins": [
+        "babel-plugin-rewire"
       ]
     }
   }
