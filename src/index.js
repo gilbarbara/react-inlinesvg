@@ -18,17 +18,20 @@ const Status = {
 const getRequestsByUrl = {};
 const loadedIcons = {};
 
-const createGetOrUseCacheForUrl = function(url, callback) {
+const createGetOrUseCacheForUrl = (context, url, callback) => {
   if (loadedIcons[url]) {
     const params = loadedIcons[url];
 
-    setTimeout(() => callback(params[0], params[1]), 0);
+    context._pendingTimeout = setTimeout(() => {
+      context._pendingTimeout = null;
+      callback(params[0], params[1]);
+    }, 0);
   }
 
   if (!getRequestsByUrl[url]) {
     getRequestsByUrl[url] = [];
 
-    this._pendingRequest =  http.get(url, (err, res) => {
+    context._pendingRequest = http.get(url, (err, res) => {
       getRequestsByUrl[url].forEach(cb => {
         loadedIcons[url] = [err, res];
         cb(err, res);
@@ -178,6 +181,9 @@ export default class InlineSVG extends React.Component {
     if (this._pendingRequest) {
       this._pendingRequest.abort();
     }
+    if (this._pendingTimeout) {
+      clearTimeout(_pendingTimeout)
+    }
   }
 
   componentDidMount() {
@@ -235,7 +241,7 @@ export default class InlineSVG extends React.Component {
       });
     }
     if (this.props.cacheGetRequests) {
-      return createGetOrUseCacheForUrl.apply(
+      return createGetOrUseCacheForUrl(
         this,
         this.props.src,
         this.handleLoad
