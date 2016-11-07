@@ -4780,13 +4780,14 @@ var Status = {
 var getRequestsByUrl = {};
 var loadedIcons = {};
 
-var createGetOrUseCacheForUrl = function createGetOrUseCacheForUrl(url, callback) {
+var createGetOrUseCacheForUrl = function createGetOrUseCacheForUrl(context, url, callback) {
   if (loadedIcons[url]) {
     (function () {
       var params = loadedIcons[url];
 
-      setTimeout(function () {
-        return callback(params[0], params[1]);
+      context._pendingTimeout = setTimeout(function () {
+        context._pendingTimeout = null;
+        callback(params[0], params[1]);
       }, 0);
     })();
   }
@@ -4794,7 +4795,7 @@ var createGetOrUseCacheForUrl = function createGetOrUseCacheForUrl(url, callback
   if (!getRequestsByUrl[url]) {
     getRequestsByUrl[url] = [];
 
-    this._pendingRequest = http.get(url, function (err, res) {
+    context._pendingRequest = http.get(url, function (err, res) {
       getRequestsByUrl[url].forEach(function (cb) {
         loadedIcons[url] = [err, res];
         cb(err, res);
@@ -4941,6 +4942,9 @@ var InlineSVG = function (_React$Component) {
       if (this._pendingRequest) {
         this._pendingRequest.abort();
       }
+      if (this._pendingTimeout) {
+        clearTimeout(_pendingTimeout);
+      }
     }
   }, {
     key: 'componentDidMount',
@@ -5007,7 +5011,7 @@ var InlineSVG = function (_React$Component) {
         });
       }
       if (this.props.cacheGetRequests) {
-        return createGetOrUseCacheForUrl.apply(this, this.props.src, this.handleLoad);
+        return createGetOrUseCacheForUrl(this, this.props.src, this.handleLoad);
       }
 
       return this._pendingRequest = http.get(this.props.src, this.handleLoad);
