@@ -4977,7 +4977,10 @@ var InlineSVG = function (_React$Component) {
 
       this._pendingRequest = null;
       if (err) {
-        this.fail(err);
+        if (err.name !== 'Abort') {
+          this.fail(err);
+        }
+
         return;
       }
       this.setState({
