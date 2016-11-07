@@ -18,7 +18,7 @@ const Status = {
 const getRequestsByUrl = {};
 const loadedIcons = {};
 
-const createGetOrUseCacheForUrl = (url, callback) => {
+const createGetOrUseCacheForUrl = function(url, callback) {
   if (loadedIcons[url]) {
     const params = loadedIcons[url];
 
@@ -28,7 +28,7 @@ const createGetOrUseCacheForUrl = (url, callback) => {
   if (!getRequestsByUrl[url]) {
     getRequestsByUrl[url] = [];
 
-    http.get(url, (err, res) => {
+    this._pendingRequest =  http.get(url, (err, res) => {
       getRequestsByUrl[url].forEach(cb => {
         loadedIcons[url] = [err, res];
         cb(err, res);
@@ -173,6 +173,13 @@ export default class InlineSVG extends React.Component {
 
   shouldComponentUpdate = shouldComponentUpdate;
 
+  componentWillUnmount() {
+    //Abort pending request to prevent an error if the request completes after the component is unmounted
+    if (this._pendingRequest) {
+      this._pendingRequest.abort();
+    }
+  }
+
   componentDidMount() {
     if (this.state.status === Status.PENDING) {
       if (this.props.supportTest()) {
@@ -200,6 +207,7 @@ export default class InlineSVG extends React.Component {
   }
 
   handleLoad(err, res) {
+    this._pendingRequest = null;
     if (err) {
       this.fail(err);
       return;
@@ -224,13 +232,14 @@ export default class InlineSVG extends React.Component {
       });
     }
     if (this.props.cacheGetRequests) {
-      return createGetOrUseCacheForUrl(
+      return createGetOrUseCacheForUrl.apply(
+        this,
         this.props.src,
         this.handleLoad
       );
     }
 
-    return http.get(this.props.src, this.handleLoad);
+    return this._pendingRequest = http.get(this.props.src, this.handleLoad);
   }
 
   getClassName() {
