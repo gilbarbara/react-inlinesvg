@@ -209,7 +209,10 @@ export default class InlineSVG extends React.Component {
   handleLoad(err, res) {
     this._pendingRequest = null;
     if (err) {
-      this.fail(err);
+      if (err.name !== 'Abort') {
+        this.fail(err);
+      }
+
       return;
     }
     this.setState({
