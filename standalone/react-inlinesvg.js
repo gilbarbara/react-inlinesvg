@@ -4943,7 +4943,7 @@ var InlineSVG = function (_React$Component) {
         this._pendingRequest.abort();
       }
       if (this._pendingTimeout) {
-        clearTimeout(_pendingTimeout);
+        clearTimeout(this._pendingTimeout);
       }
     }
   }, {
