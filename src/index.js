@@ -152,6 +152,7 @@ export default class InlineSVG extends React.Component {
     };
 
     this.handleLoad = this.handleLoad.bind(this);
+    this.makeRequest = this.makeRequest.bind(this);
   }
 
   static propTypes = {
@@ -164,8 +165,11 @@ export default class InlineSVG extends React.Component {
     src: React.PropTypes.string.isRequired,
     supportTest: React.PropTypes.func,
     uniquifyIDs: React.PropTypes.bool,
-    wrapper: React.PropTypes.func
+    wrapper: React.PropTypes.func,
+    requestFunction: React.PropTypes.func
   };
+
+  static defaultRequestFunction = http.get
 
   static defaultProps = {
     wrapper: React.DOM.span,
@@ -200,6 +204,11 @@ export default class InlineSVG extends React.Component {
         this.fail(unsupportedBrowserError());
       }
     }
+  }
+
+  makeRequest(src, cb){
+    const requestFunction = this.props.requestFunction || InlineSVG.defaultRequestFunction
+    return requestFunction(src, cb)
   }
 
   fail(error) {
@@ -240,16 +249,17 @@ export default class InlineSVG extends React.Component {
         text: match[1] ? atob(match[2]) : decodeURIComponent(match[2])
       });
     }
+
     if (this.props.cacheGetRequests) {
       return createGetOrUseCacheForUrl(
         this,
         this.props.src,
-        http.get,
+        this.makeRequest,
         this.handleLoad
       );
     }
 
-    return this._pendingRequest = http.get(this.props.src, this.handleLoad);
+    return this._pendingRequest = this.makeRequest(this.props.src, this.handleLoad);
   }
 
   getClassName() {
