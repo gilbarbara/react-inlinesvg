@@ -31,10 +31,10 @@ const createGetOrUseCacheForUrl = (context, url, requestFunction, callback) => {
   if (!getRequestsByUrl[url]) {
     getRequestsByUrl[url] = [];
 
-    context._pendingRequest = requestFunction(url, (err, res) => {
+    context._pendingRequest = requestFunction(url, (err, svgText) => {
       getRequestsByUrl[url].forEach(cb => {
-        loadedIcons[url] = [err, res];
-        cb(err, res);
+        loadedIcons[url] = [err, svgText];
+        cb(err, svgText);
       });
     });
   }
@@ -169,7 +169,17 @@ export default class InlineSVG extends React.Component {
     requestFunction: React.PropTypes.func
   };
 
-  static defaultRequestFunction = http.get
+  static defaultRequestFunction = function XHRRequest(src, cb){
+    return http.get(src, (err, res) => {
+      if(err){
+        cb(err);
+      }
+      else{
+        const svgText = res.text
+        cb(svgText);
+      }
+    });
+  }
 
   static defaultProps = {
     wrapper: React.DOM.span,
@@ -221,7 +231,7 @@ export default class InlineSVG extends React.Component {
     });
   }
 
-  handleLoad(err, res) {
+  handleLoad(err, svgText) {
     this._pendingRequest = null;
     if (err) {
       if (err.name !== 'Abort') {
@@ -231,7 +241,7 @@ export default class InlineSVG extends React.Component {
       return;
     }
     this.setState({
-      loadedText: res.text,
+      svgText,
       status: Status.LOADED
     }, () => (typeof this.props.onLoad === 'function' ? this.props.onLoad() : null));
   }
@@ -245,9 +255,8 @@ export default class InlineSVG extends React.Component {
   load() {
     const match = this.props.src.match(/data:image\/svg[^,]*?(;base64)?,(.*)/);
     if (match) {
-      return this.handleLoad(null, {
-        text: match[1] ? atob(match[2]) : decodeURIComponent(match[2])
-      });
+      const svgText = match[1] ? atob(match[2]) : decodeURIComponent(match[2]);
+      return this.handleLoad(null, svgText);
     }
 
     if (this.props.cacheGetRequests) {
@@ -293,8 +302,8 @@ export default class InlineSVG extends React.Component {
   render() {
     return this.props.wrapper({
       className: this.getClassName(),
-      dangerouslySetInnerHTML: this.state.loadedText ? {
-        __html: this.processSVG(this.state.loadedText)
+      dangerouslySetInnerHTML: this.state.svgText ? {
+        __html: this.processSVG(this.state.svgText)
       } : undefined
     }, this.renderContents());
   }
