@@ -46,6 +46,33 @@ var Isvg = require('react-inlinesvg');
 </Isvg>
 ```
 
+To force the library to fetch the svg using a custom function assign the <code>defaultRequestFunction</code> on the library. For example:
+
+```
+var Isvg = require('react-inlinesvg');
+
+Isvg.defaultRequestFunction = function(url, callback){
+  const headers = new Headers()
+  headers.append('user_id', userId)
+
+  return fetch(url, { headers })
+    .then(r => {
+      return r.text()
+    })
+    .then(
+      response => callback(null, response),
+      error => callback(error)
+    )
+}
+```
+
+If a <code>requestFunction</code> property appears on an element, it will prefer it over the <code>defaultRequestFunction</code>. For example:
+
+```
+var Isvg = require('react-inlinesvg');
+
+<Isvg src="/path/to/myfile.svg" requestFunction={someCustomRequestFn}></Isvg>
+```
 
 Props
 -----
@@ -118,6 +145,15 @@ Props
       A boolean that tells Isvg to only request svgs once. Default is <code>false</code> but you can alter the behaviour by setting the boolean to <code>true</code>.
 
       <code>&lt;Isvg cacheGetRequests={true}&gt;&lt;/Isvg&gt;</code>
+    </td>
+  </tr>
+  <tr>
+    <td><code>requestFunction</code></td>
+    <td>function</td>
+    <td>
+      If set, forces the svg fetching to use this function.
+      
+      The function recieves the svg's <code>src</code> and a callback that expects <code>error</code> and <code>svgText</code>
     </td>
   </tr>
 </table>

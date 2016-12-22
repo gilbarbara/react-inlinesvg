@@ -18,20 +18,23 @@ const Status = {
 const getRequestsByUrl = {};
 const loadedIcons = {};
 
-const createGetOrUseCacheForUrl = (url, callback) => {
+const createGetOrUseCacheForUrl = (context, url, requestFunction, callback) => {
   if (loadedIcons[url]) {
     const params = loadedIcons[url];
 
-    setTimeout(() => callback(params[0], params[1]), 0);
+    context._pendingTimeout = setTimeout(() => {
+      context._pendingTimeout = null;
+      callback(params[0], params[1]);
+    }, 0);
   }
 
   if (!getRequestsByUrl[url]) {
     getRequestsByUrl[url] = [];
 
-    http.get(url, (err, res) => {
+    context._pendingRequest = requestFunction(url, (err, svgText) => {
       getRequestsByUrl[url].forEach(cb => {
-        loadedIcons[url] = [err, res];
-        cb(err, res);
+        loadedIcons[url] = [err, svgText];
+        cb(err, svgText);
       });
     });
   }
@@ -149,6 +152,7 @@ export default class InlineSVG extends React.Component {
     };
 
     this.handleLoad = this.handleLoad.bind(this);
+    this.makeRequest = this.makeRequest.bind(this);
   }
 
   static propTypes = {
@@ -161,8 +165,21 @@ export default class InlineSVG extends React.Component {
     src: React.PropTypes.string.isRequired,
     supportTest: React.PropTypes.func,
     uniquifyIDs: React.PropTypes.bool,
-    wrapper: React.PropTypes.func
+    wrapper: React.PropTypes.func,
+    requestFunction: React.PropTypes.func
   };
+
+  static defaultRequestFunction = function XHRRequest(src, cb){
+    return http.get(src, (err, res) => {
+      if(err){
+        cb(err);
+      }
+      else{
+        const svgText = res.text
+        cb(svgText);
+      }
+    });
+  }
 
   static defaultProps = {
     wrapper: React.DOM.span,
@@ -172,6 +189,19 @@ export default class InlineSVG extends React.Component {
   };
 
   shouldComponentUpdate = shouldComponentUpdate;
+
+  componentWillUnmount() {
+    //Abort pending request to prevent an error if the request completes after the component is unmounted
+    this._abortPendingRequest = true
+    if (this._pendingRequest) {
+      if(this._pendingRequest.abort){
+        this._pendingRequest.abort();
+      }
+    }
+    if (this._pendingTimeout) {
+      clearTimeout(this._pendingTimeout)
+    }
+  }
 
   componentDidMount() {
     if (this.state.status === Status.PENDING) {
@@ -189,6 +219,11 @@ export default class InlineSVG extends React.Component {
     }
   }
 
+  makeRequest(src, cb){
+    const requestFunction = this.props.requestFunction || InlineSVG.defaultRequestFunction
+    return requestFunction(src, cb)
+  }
+
   fail(error) {
     const status = error.isUnsupportedBrowserError ? Status.UNSUPPORTED : Status.FAILED;
 
@@ -199,13 +234,24 @@ export default class InlineSVG extends React.Component {
     });
   }
 
-  handleLoad(err, res) {
+  handleLoad(err, svgText) {
+    this._pendingRequest = null;
+
+    if(!err && this._abortPendingRequest){
+      err = new Error('Aborted svg loading.');
+      err.name = 'Abort';
+    }
+
     if (err) {
-      this.fail(err);
+      if (err.name !== 'Abort') {
+        this.fail(err);
+      }
+
       return;
     }
+
     this.setState({
-      loadedText: res.text,
+      svgText,
       status: Status.LOADED
     }, () => (typeof this.props.onLoad === 'function' ? this.props.onLoad() : null));
   }
@@ -219,18 +265,20 @@ export default class InlineSVG extends React.Component {
   load() {
     const match = this.props.src.match(/data:image\/svg[^,]*?(;base64)?,(.*)/);
     if (match) {
-      return this.handleLoad(null, {
-        text: match[1] ? atob(match[2]) : decodeURIComponent(match[2])
-      });
+      const svgText = match[1] ? atob(match[2]) : decodeURIComponent(match[2]);
+      return this.handleLoad(null, svgText);
     }
+
     if (this.props.cacheGetRequests) {
       return createGetOrUseCacheForUrl(
+        this,
         this.props.src,
+        this.makeRequest,
         this.handleLoad
       );
     }
 
-    return http.get(this.props.src, this.handleLoad);
+    return this._pendingRequest = this.makeRequest(this.props.src, this.handleLoad);
   }
 
   getClassName() {
@@ -264,8 +312,8 @@ export default class InlineSVG extends React.Component {
   render() {
     return this.props.wrapper({
       className: this.getClassName(),
-      dangerouslySetInnerHTML: this.state.loadedText ? {
-        __html: this.processSVG(this.state.loadedText)
+      dangerouslySetInnerHTML: this.state.svgText ? {
+        __html: this.processSVG(this.state.svgText)
       } : undefined
     }, this.renderContents());
   }
