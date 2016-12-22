@@ -192,8 +192,11 @@ export default class InlineSVG extends React.Component {
 
   componentWillUnmount() {
     //Abort pending request to prevent an error if the request completes after the component is unmounted
+    this._abortPendingRequest = true
     if (this._pendingRequest) {
-      this._pendingRequest.abort();
+      if(this._pendingRequest.abort){
+        this._pendingRequest.abort();
+      }
     }
     if (this._pendingTimeout) {
       clearTimeout(this._pendingTimeout)
@@ -233,6 +236,12 @@ export default class InlineSVG extends React.Component {
 
   handleLoad(err, svgText) {
     this._pendingRequest = null;
+
+    if(!err && this._abortPendingRequest){
+      err = new Error('Aborted svg loading.');
+      err.name = 'Abort';
+    }
+
     if (err) {
       if (err.name !== 'Abort') {
         this.fail(err);
@@ -240,6 +249,7 @@ export default class InlineSVG extends React.Component {
 
       return;
     }
+
     this.setState({
       svgText,
       status: Status.LOADED
