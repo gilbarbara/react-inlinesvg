@@ -149,6 +149,7 @@ export default class InlineSVG extends React.Component {
     };
 
     this.handleLoad = this.handleLoad.bind(this);
+    this.isActive = false;
   }
 
   static propTypes = {
@@ -173,6 +174,10 @@ export default class InlineSVG extends React.Component {
 
   shouldComponentUpdate = shouldComponentUpdate;
 
+  componentWillMount() {
+    this.isActive = true;
+  }
+
   componentDidMount() {
     if (this.state.status === Status.PENDING) {
       if (this.props.supportTest()) {
@@ -189,14 +194,20 @@ export default class InlineSVG extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    this.isActive = false;
+  }
+
   fail(error) {
     const status = error.isUnsupportedBrowserError ? Status.UNSUPPORTED : Status.FAILED;
 
-    this.setState({ status }, () => {
-      if (typeof this.props.onError === 'function') {
-        this.props.onError(error);
-      }
-    });
+    if (this.isActive) {
+      this.setState({ status }, () => {
+        if (typeof this.props.onError === 'function') {
+          this.props.onError(error);
+        }
+      });
+    }
   }
 
   handleLoad(err, res) {
@@ -204,16 +215,21 @@ export default class InlineSVG extends React.Component {
       this.fail(err);
       return;
     }
-    this.setState({
-      loadedText: res.text,
-      status: Status.LOADED
-    }, () => (typeof this.props.onLoad === 'function' ? this.props.onLoad() : null));
+
+    if (this.isActive) {
+      this.setState({
+        loadedText: res.text,
+        status: Status.LOADED
+      }, () => (typeof this.props.onLoad === 'function' ? this.props.onLoad() : null));
+    }
   }
 
   startLoad() {
-    this.setState({
-      status: Status.LOADING
-    }, this.load);
+    if (this.isActive) {
+      this.setState({
+        status: Status.LOADING
+      }, this.load);
+    }
   }
 
   load() {
