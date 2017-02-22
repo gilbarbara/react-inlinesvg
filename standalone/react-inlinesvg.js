@@ -4853,8 +4853,7 @@ var InlineSVG = function (_React$Component) {
   }, {
     key: 'makeRequest',
     value: function makeRequest(src, cb) {
-      var requestFunction = this.props.requestFunction || InlineSVG.defaultRequestFunction;
-      return requestFunction(src, cb);
+      return this.props.requestFunction(src, cb);
     }
   }, {
     key: 'fail',
@@ -4978,22 +4977,25 @@ InlineSVG.propTypes = {
   requestFunction: _react2.default.PropTypes.func
 };
 
-InlineSVG.defaultRequestFunction = function XHRRequest(src, cb) {
-  return http.get(src, function (err, res) {
-    if (err) {
-      cb(err);
-    } else {
-      var svgText = res.text;
-      cb(svgText);
-    }
-  });
+InlineSVG.setDefaultProps = function (defaultProps) {
+  Object.assign(InlineSVG.defaultProps, defaultProps);
 };
 
 InlineSVG.defaultProps = {
   wrapper: _react2.default.DOM.span,
   supportTest: isSupportedEnvironment,
   uniquifyIDs: true,
-  cacheGetRequests: false
+  cacheGetRequests: false,
+  requestFunction: function XHRRequest(src, cb) {
+    return http.get(src, function (err, res) {
+      if (err) {
+        cb(err);
+      } else {
+        var svgText = res.text;
+        cb(svgText);
+      }
+    });
+  }
 };
 exports.default = InlineSVG;
 module.exports = exports['default'];

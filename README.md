@@ -46,32 +46,29 @@ var Isvg = require('react-inlinesvg');
 </Isvg>
 ```
 
-To force the library to fetch the svg using a custom function assign the <code>defaultRequestFunction</code> on the library. For example:
+To set default properties for `Isvg` components, use `Isvg.setDefaultProps()`.
+For example, to force the library to fetch the svg using a custom function and cache requests,
+set default props as following:
 
 ```
 var Isvg = require('react-inlinesvg');
 
-Isvg.defaultRequestFunction = function(url, callback){
-  const headers = new Headers()
-  headers.append('user_id', userId)
+Isvg.setDefaultProps({
+  requestFunction: function(url, callback){
+    const headers = new Headers()
+    headers.append('user_id', userId)
 
-  return fetch(url, { headers })
-    .then(r => {
-      return r.text()
-    })
-    .then(
-      response => callback(null, response),
-      error => callback(error)
-    )
-}
-```
-
-If a <code>requestFunction</code> property appears on an element, it will prefer it over the <code>defaultRequestFunction</code>. For example:
-
-```
-var Isvg = require('react-inlinesvg');
-
-<Isvg src="/path/to/myfile.svg" requestFunction={someCustomRequestFn}></Isvg>
+    return fetch(url, { headers })
+      .then(r => {
+        return r.text()
+      })
+      .then(
+        response => callback(null, response),
+        error => callback(error)
+      )
+  },
+  cacheGetRequests: true
+})
 ```
 
 Props
