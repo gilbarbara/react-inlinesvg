@@ -169,23 +169,26 @@ export default class InlineSVG extends React.Component {
     requestFunction: React.PropTypes.func
   };
 
-  static defaultRequestFunction = function XHRRequest(src, cb){
-    return http.get(src, (err, res) => {
-      if(err){
-        cb(err);
-      }
-      else{
-        const svgText = res.text
-        cb(svgText);
-      }
-    });
+  static setDefaultProps = function(defaultProps){
+    Object.assign(InlineSVG.defaultProps, defaultProps);
   }
 
   static defaultProps = {
     wrapper: React.DOM.span,
     supportTest: isSupportedEnvironment,
     uniquifyIDs: true,
-    cacheGetRequests: false
+    cacheGetRequests: false,
+    requestFunction: function XHRRequest(src, cb){
+      return http.get(src, (err, res) => {
+        if(err){
+          cb(err);
+        }
+        else{
+          const svgText = res.text
+          cb(svgText);
+        }
+      });
+    }
   };
 
   shouldComponentUpdate = shouldComponentUpdate;
@@ -220,8 +223,7 @@ export default class InlineSVG extends React.Component {
   }
 
   makeRequest(src, cb){
-    const requestFunction = this.props.requestFunction || InlineSVG.defaultRequestFunction
-    return requestFunction(src, cb)
+    return this.props.requestFunction(src, cb)
   }
 
   fail(error) {
