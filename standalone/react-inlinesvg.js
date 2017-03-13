@@ -4888,6 +4888,8 @@ var InlineSVG = function (_React$Component) {
         return;
       }
 
+      svgText = this.processSVG(svgText);
+
       this.setState({
         svgText: svgText,
         status: Status.LOADED
@@ -4935,6 +4937,8 @@ var InlineSVG = function (_React$Component) {
         return uniquifyIDs(svgText, getHash(this.props.src));
       }
 
+      svgText = this.props.processSvg(svgText);
+
       return svgText;
     }
   }, {
@@ -4954,7 +4958,7 @@ var InlineSVG = function (_React$Component) {
       return this.props.wrapper({
         className: this.getClassName(),
         dangerouslySetInnerHTML: this.state.svgText ? {
-          __html: this.processSVG(this.state.svgText)
+          __html: this.state.svgText
         } : undefined
       }, this.renderContents());
     }
@@ -4974,13 +4978,9 @@ InlineSVG.propTypes = {
   supportTest: _react2.default.PropTypes.func,
   uniquifyIDs: _react2.default.PropTypes.bool,
   wrapper: _react2.default.PropTypes.func,
-  requestFunction: _react2.default.PropTypes.func
+  requestFunction: _react2.default.PropTypes.func,
+  processSvg: _react2.default.PropTypes.func
 };
-
-InlineSVG.setDefaultProps = function (defaultProps) {
-  Object.assign(InlineSVG.defaultProps, defaultProps);
-};
-
 InlineSVG.defaultProps = {
   wrapper: _react2.default.DOM.span,
   supportTest: isSupportedEnvironment,
@@ -4995,6 +4995,9 @@ InlineSVG.defaultProps = {
         cb(svgText);
       }
     });
+  },
+  processSvg: function processSvg(svgText) {
+    return svgText;
   }
 };
 exports.default = InlineSVG;
