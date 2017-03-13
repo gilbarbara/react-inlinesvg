@@ -166,7 +166,8 @@ export default class InlineSVG extends React.Component {
     supportTest: React.PropTypes.func,
     uniquifyIDs: React.PropTypes.bool,
     wrapper: React.PropTypes.func,
-    requestFunction: React.PropTypes.func
+    requestFunction: React.PropTypes.func,
+    processSvg: React.PropTypes.func
   };
 
   static defaultProps = {
@@ -180,10 +181,13 @@ export default class InlineSVG extends React.Component {
           cb(err);
         }
         else{
-          const svgText = res.text
+          const svgText = res.text;
           cb(svgText);
         }
       });
+    },
+    processSvg: function(svgText){
+      return svgText;
     }
   };
 
@@ -191,14 +195,14 @@ export default class InlineSVG extends React.Component {
 
   componentWillUnmount() {
     //Abort pending request to prevent an error if the request completes after the component is unmounted
-    this._abortPendingRequest = true
+    this._abortPendingRequest = true;
     if (this._pendingRequest) {
       if(this._pendingRequest.abort){
         this._pendingRequest.abort();
       }
     }
     if (this._pendingTimeout) {
-      clearTimeout(this._pendingTimeout)
+      clearTimeout(this._pendingTimeout);
     }
   }
 
@@ -248,6 +252,8 @@ export default class InlineSVG extends React.Component {
       return;
     }
 
+    svgText = this.processSVG(svgText);
+
     this.setState({
       svgText,
       status: Status.LOADED
@@ -294,6 +300,8 @@ export default class InlineSVG extends React.Component {
       return uniquifyIDs(svgText, getHash(this.props.src));
     }
 
+    svgText = this.props.processSvg(svgText);
+
     return svgText;
   }
 
@@ -311,7 +319,7 @@ export default class InlineSVG extends React.Component {
     return this.props.wrapper({
       className: this.getClassName(),
       dangerouslySetInnerHTML: this.state.svgText ? {
-        __html: this.processSVG(this.state.svgText)
+        __html: this.state.svgText
       } : undefined
     }, this.renderContents());
   }

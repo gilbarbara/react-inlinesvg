@@ -128,6 +128,13 @@ Props
       The function recieves the svg's <code>src</code> and a callback that expects <code>error</code> and <code>svgText</code>
     </td>
   </tr>
+  <tr>
+    <td><code>processSvg</code></td>
+    <td>function</td>
+    <td>
+      Process the svg before inserting the svg to the dom.
+    </td>
+  </tr>
 </table>
 
 Browser Support
