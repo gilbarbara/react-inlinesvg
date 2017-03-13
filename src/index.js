@@ -169,10 +169,6 @@ export default class InlineSVG extends React.Component {
     requestFunction: React.PropTypes.func
   };
 
-  static setDefaultProps = function(defaultProps){
-    Object.assign(InlineSVG.defaultProps, defaultProps);
-  }
-
   static defaultProps = {
     wrapper: React.DOM.span,
     supportTest: isSupportedEnvironment,

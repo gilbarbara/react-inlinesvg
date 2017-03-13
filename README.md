@@ -130,44 +130,6 @@ Props
   </tr>
 </table>
 
-Default Props
--------------
-To set default properties for `Isvg` components, use `Isvg.setDefaultProps()`.
-For example, to force the library to fetch the svg using a custom function and cache requests,
-set default props as following:
-
-```
-var Isvg = require('react-inlinesvg');
-
-function svgRequestFunctionUsingFetch(url, callback){
-  const headers = new Headers()
-  headers.append('user_id', userId)
-
-  return fetch(url, { headers })
-    .then(r => {
-      return r.text()
-    })
-    .then(
-      response => callback(null, response),
-      error => callback(error)
-    )
-}
-
-Isvg.setDefaultProps({
-  requestFunction: svgRequestFunctionUsingFetch,
-  cacheGetRequests: true
-})
-```
-
-And then
-
-```
-<Isvg src="/path/to/myfile.svg"></Isvg>
-```
-
-Will use the passed `requestFunction: svgRequestFunctionUsingFetch` and `cacheGetRequests: true` unless
-it will be created with other props. 
-
 Browser Support
 ---------------
 
