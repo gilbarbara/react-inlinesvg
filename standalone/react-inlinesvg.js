@@ -4937,7 +4937,7 @@ var InlineSVG = function (_React$Component) {
         svgText = uniquifyIDs(svgText, getHash(this.props.src));
       }
 
-      this.props.processSvg(svgText, function (value) {
+      this.props.processSvg(svgText, this.props.src, function (value) {
         callback(value);
       });
     }
