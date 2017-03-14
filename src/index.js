@@ -186,8 +186,8 @@ export default class InlineSVG extends React.Component {
         }
       });
     },
-    processSvg: function(svgText){
-      return svgText;
+    processSvg: function(svgText, callback){
+      callback(svgText);
     }
   };
 
@@ -252,12 +252,12 @@ export default class InlineSVG extends React.Component {
       return;
     }
 
-    svgText = this.processSVG(svgText);
-
-    this.setState({
-      svgText,
-      status: Status.LOADED
-    }, () => (typeof this.props.onLoad === 'function' ? this.props.onLoad() : null));
+    this.processSVG(svgText, processedSvgText => {
+      this.setState({
+        svgText: processedSvgText,
+        status: Status.LOADED
+      }, () => (typeof this.props.onLoad === 'function' ? this.props.onLoad() : null));
+    });
   }
 
   startLoad() {
@@ -295,14 +295,14 @@ export default class InlineSVG extends React.Component {
     return className;
   }
 
-  processSVG(svgText) {
+  processSVG(svgText, callback) {
     if (this.props.uniquifyIDs) {
-      return uniquifyIDs(svgText, getHash(this.props.src));
+      svgText = uniquifyIDs(svgText, getHash(this.props.src));
     }
 
-    svgText = this.props.processSvg(svgText);
-
-    return svgText;
+    this.props.processSvg(svgText, function(value){
+      callback(value)
+    });
   }
 
   renderContents() {

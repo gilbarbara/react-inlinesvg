@@ -121,7 +121,7 @@ Props
   </tr>
   <tr>
     <td><code>requestFunction</code></td>
-    <td>function</td>
+    <td>function(src, callback)</td>
     <td>
       If set, forces the svg fetching to use this function.
       
@@ -130,7 +130,7 @@ Props
   </tr>
   <tr>
     <td><code>processSvg</code></td>
-    <td>function</td>
+    <td>function(svg, callback)</td>
     <td>
       Process the svg before inserting the svg to the dom.
     </td>
