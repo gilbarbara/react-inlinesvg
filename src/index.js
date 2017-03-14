@@ -300,7 +300,7 @@ export default class InlineSVG extends React.Component {
       svgText = uniquifyIDs(svgText, getHash(this.props.src));
     }
 
-    this.props.processSvg(svgText, function(value){
+    this.props.processSvg(svgText, this.props.src, value => {
       callback(value)
     });
   }

@@ -130,7 +130,7 @@ Props
   </tr>
   <tr>
     <td><code>processSvg</code></td>
-    <td>function(svg, callback)</td>
+    <td>function(svgText, svgSrc, callback)</td>
     <td>
       Process the svg before inserting the svg to the dom.
     </td>
