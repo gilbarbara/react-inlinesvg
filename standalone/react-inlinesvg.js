@@ -4710,7 +4710,7 @@ var uniquifyIDs = function () {
     return '(?:(?:\\s|\\:)' + attr + ')';
   };
 
-  var idPattern = new RegExp('(?:(' + mkAttributePattern('id') + ')="([^"]+)")|(?:(' + mkAttributePattern('href') + '|' + mkAttributePattern('role') + '|' + mkAttributePattern('arcrole') + ')="\\#([^"]+)")|(?:="url\\(\\\'?\\#([^\\)]+)\\\'?\\)")', 'g');
+  var idPattern = new RegExp('(?:(' + mkAttributePattern('id') + ')="([^"]+)")|(?:(' + mkAttributePattern('href') + '|' + mkAttributePattern('role') + '|' + mkAttributePattern('arcrole') + ')="\\#([^"]+)")|(?:="url\\(\\\'?\\#([^\\)]+?)\\\'?\\)")', 'g');
 
   return function (svgText, svgID) {
     var uniquifyID = function uniquifyID(id) {
