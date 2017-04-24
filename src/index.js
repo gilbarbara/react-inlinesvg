@@ -207,18 +207,26 @@ export default class InlineSVG extends React.Component {
   }
 
   componentDidMount() {
-    if (this.state.status === Status.PENDING) {
-      if (this.props.supportTest()) {
-        if (this.props.src) {
-          this.startLoad();
-        }
-        else {
-          this.fail(configurationError('Missing source'));
-        }
+    this.srcUpdated()
+  }
+
+  componentWillReceiveProps(nextProps){
+    if(nextProps.src !== this.props.src){
+      this.srcUpdated()
+    }
+  }
+
+  srcUpdated(){
+    if (this.props.supportTest()) {
+      if (this.props.src) {
+        this.startLoad();
       }
       else {
-        this.fail(unsupportedBrowserError());
+        this.fail(configurationError('Missing source'));
       }
+    }
+    else {
+      this.fail(unsupportedBrowserError());
     }
   }
 
