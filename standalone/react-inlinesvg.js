@@ -4838,16 +4838,26 @@ var InlineSVG = function (_React$Component) {
   }, {
     key: 'componentDidMount',
     value: function componentDidMount() {
-      if (this.state.status === Status.PENDING) {
-        if (this.props.supportTest()) {
-          if (this.props.src) {
-            this.startLoad();
-          } else {
-            this.fail(configurationError('Missing source'));
-          }
+      this.srcUpdated();
+    }
+  }, {
+    key: 'componentWillReceiveProps',
+    value: function componentWillReceiveProps(nextProps) {
+      if (nextProps.src !== this.props.src) {
+        this.srcUpdated();
+      }
+    }
+  }, {
+    key: 'srcUpdated',
+    value: function srcUpdated() {
+      if (this.props.supportTest()) {
+        if (this.props.src) {
+          this.startLoad();
         } else {
-          this.fail(unsupportedBrowserError());
+          this.fail(configurationError('Missing source'));
         }
+      } else {
+        this.fail(unsupportedBrowserError());
       }
     }
   }, {
