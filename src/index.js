@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import once from 'once';
 import httpplease from 'httpplease';
 import ieXDomain from 'httpplease/plugins/oldiexdomain';
@@ -156,18 +157,18 @@ export default class InlineSVG extends React.Component {
   }
 
   static propTypes = {
-    cacheGetRequests: React.PropTypes.bool,
-    children: React.PropTypes.node,
-    className: React.PropTypes.string,
-    onError: React.PropTypes.func,
-    onLoad: React.PropTypes.func,
-    preloader: React.PropTypes.func,
-    src: React.PropTypes.string.isRequired,
-    supportTest: React.PropTypes.func,
-    uniquifyIDs: React.PropTypes.bool,
-    wrapper: React.PropTypes.func,
-    requestFunction: React.PropTypes.func,
-    processSvg: React.PropTypes.func
+    cacheGetRequests: PropTypes.bool,
+    children: PropTypes.node,
+    className: PropTypes.string,
+    onError: PropTypes.func,
+    onLoad: PropTypes.func,
+    preloader: PropTypes.func,
+    src: PropTypes.string.isRequired,
+    supportTest: PropTypes.func,
+    uniquifyIDs: PropTypes.bool,
+    wrapper: PropTypes.func,
+    requestFunction: PropTypes.func,
+    processSvg: PropTypes.func
   };
 
   static defaultProps = {
