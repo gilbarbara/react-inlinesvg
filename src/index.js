@@ -156,6 +156,7 @@ export default class InlineSVG extends React.Component {
   static propTypes = {
     cacheGetRequests: PropTypes.bool,
     children: PropTypes.node,
+    style: PropTypes.object,
     className: PropTypes.string,
     onError: PropTypes.func,
     onLoad: PropTypes.func,
@@ -280,6 +281,7 @@ export default class InlineSVG extends React.Component {
 
   render() {
     return this.props.wrapper({
+      style: this.props.style,
       className: this.getClassName(),
       dangerouslySetInnerHTML: this.state.loadedText ? {
         __html: this.processSVG(this.state.loadedText)
