@@ -52,14 +52,15 @@
     "gulp-util": "^3.0",
     "jsdom": "^9.6",
     "mocha": "^3.1",
-    "prop-types": "15.5.8",
     "react": "^15.3",
     "react-addons-test-utils": "^15.3",
     "react-dom": "^15.3",
+    "prop-types": "^15.5",
     "vinyl-source-stream": "^1.1"
   },
   "peerDependencies": {
-    "react": "^0.14 || ^15.0"
+    "react": "^0.14 || ^15.0",
+    "prop-types": "^15.5"
   },
   "scripts": {
     "build": "gulp build",
