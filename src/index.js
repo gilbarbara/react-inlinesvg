@@ -156,12 +156,12 @@ export default class InlineSVG extends React.Component {
   static propTypes = {
     cacheGetRequests: PropTypes.bool,
     children: PropTypes.node,
-    style: PropTypes.object,
     className: PropTypes.string,
     onError: PropTypes.func,
     onLoad: PropTypes.func,
     preloader: PropTypes.func,
     src: PropTypes.string.isRequired,
+    style: PropTypes.object,
     supportTest: PropTypes.func,
     uniquifyIDs: PropTypes.bool,
     wrapper: PropTypes.func

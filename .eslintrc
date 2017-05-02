@@ -50,6 +50,7 @@
       1,
       "smart-tabs"
     ],
+    "no-multi-assign": 0,
     "no-multi-spaces": [
       1,
       {
@@ -124,6 +125,7 @@
     "import/no-extraneous-dependencies": [2, { "devDependencies": true }],
     // React
     "jsx-quotes": 1,
+    "react/forbid-prop-types": 0,
     "react/jsx-closing-bracket-location": [
       1,
       "after-props"
@@ -140,14 +142,15 @@
         "maximum": 4
       }
     ],
-    "react/no-did-mount-set-state": 1,
-    "react/no-did-update-set-state": 1,
     "react/jsx-boolean-value": 0,
     "react/jsx-no-duplicate-props": 1,
     "react/jsx-pascal-case": 1,
+    "react/no-did-mount-set-state": 1,
+    "react/no-did-update-set-state": 1,
     "react/no-direct-mutation-state": 1,
     "react/prefer-stateless-function": 0,
     "react/prop-types": 2,
+    "react/require-default-props": 0,
     "react/sort-prop-types": 1,
     "react/sort-comp": [
       1,
