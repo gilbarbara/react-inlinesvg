@@ -1,3 +1,4 @@
+import DOM from 'react-dom-factories';
 import PropTypes from 'prop-types';
 import React from 'react';
 import once from 'once';
@@ -168,7 +169,7 @@ export default class InlineSVG extends React.Component {
   };
 
   static defaultProps = {
-    wrapper: React.DOM.span,
+    wrapper: DOM.span,
     supportTest: isSupportedEnvironment,
     uniquifyIDs: true,
     cacheGetRequests: false
