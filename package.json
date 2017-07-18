@@ -28,6 +28,8 @@
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-rewire": "1.1.0",
     "babel-preset-env": "^1.6.0",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-1": "^6.24.1",
     "babel-register": "^6.24",
     "babelify": "^7.3",
     "browserify": "^14.4",
@@ -52,8 +54,6 @@
     "prop-types": "^15.5.10",
     "react": "^15.6",
     "react-addons-test-utils": "^15.6",
-    "react-dom": "^15.6",
-    "react-dom-factories": "^1.0.0",
     "vinyl-source-stream": "^1.1"
   },
   "peerDependencies": {

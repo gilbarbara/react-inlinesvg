@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import DOM from 'react-dom-factories';
 import once from 'once';
 import httpplease from 'httpplease';
 import ieXDomain from 'httpplease/plugins/oldiexdomain';
@@ -167,7 +166,7 @@ export default class InlineSVG extends React.PureComponent {
   };
 
   static defaultProps = {
-    wrapper: DOM.span,
+    wrapper: React.createFactory('span'),
     supportTest: isSupportedEnvironment,
     uniquifyIDs: true,
     cacheGetRequests: false
