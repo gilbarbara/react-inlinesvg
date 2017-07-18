@@ -1092,7 +1092,7 @@ RequestError.create = function(message, req, props) {
 
 module.exports = RequestError;
 
-},{"./response":9,"./utils/extractResponseProps":11,"xtend":53}],7:[function(require,module,exports){
+},{"./response":9,"./utils/extractResponseProps":11,"xtend":52}],7:[function(require,module,exports){
 'use strict';
 
 var
@@ -1306,7 +1306,7 @@ function getError(req, err) {
   return createError(msg, req);
 }
 
-},{"../plugins/cleanurl":14,"./error":6,"./request":8,"./response":9,"./utils/delay":10,"./utils/once":12,"./xhr":13,"xtend":53}],8:[function(require,module,exports){
+},{"../plugins/cleanurl":14,"./error":6,"./request":8,"./response":9,"./utils/delay":10,"./utils/once":12,"./xhr":13,"xtend":52}],8:[function(require,module,exports){
 'use strict';
 
 function Request(optsOrUrl) {
@@ -1429,7 +1429,7 @@ module.exports = function(req) {
   return props;
 };
 
-},{"xtend":53}],12:[function(require,module,exports){
+},{"xtend":52}],12:[function(require,module,exports){
 'use strict';
 
 // A "once" utility.
@@ -1528,7 +1528,7 @@ module.exports = {
   }
 };
 
-},{"../lib/utils/once":12,"urllite/lib/core":51}],16:[function(require,module,exports){
+},{"../lib/utils/once":12,"urllite/lib/core":50}],16:[function(require,module,exports){
 /*
 object-assign
 (c) Sindre Sorhus
@@ -1664,7 +1664,7 @@ function onceStrict (fn) {
   return f
 }
 
-},{"wrappy":52}],18:[function(require,module,exports){
+},{"wrappy":51}],18:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -2560,199 +2560,6 @@ var ReactPropTypesSecret = 'SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED';
 module.exports = ReactPropTypesSecret;
 
 },{}],25:[function(require,module,exports){
-(function (global){
-'use strict';
-
-/**
- * Copyright 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- */
-
-(function(f) {
-  if (typeof exports === 'object' && typeof module !== 'undefined') {
-    module.exports = f(require('react'));
-    /* global define */
-  } else if (typeof define === 'function' && define.amd) {
-    define(['react'], f);
-  } else {
-    var g;
-    if (typeof window !== 'undefined') {
-      g = window;
-    } else if (typeof global !== 'undefined') {
-      g = global;
-    } else if (typeof self !== 'undefined') {
-      g = self;
-    } else {
-      g = this;
-    }
-
-    if (typeof g.React === 'undefined') {
-      throw Error('React module should be required before ReactDOMFactories');
-    }
-
-    g.ReactDOMFactories = f(g.React);
-  }
-})(function(React) {
-  /**
-   * Create a factory that creates HTML tag elements.
-   */
-  var createDOMFactory = React.createFactory;
-
-  /**
-   * Creates a mapping from supported HTML tags to `ReactDOMComponent` classes.
-   */
-  var ReactDOMFactories = {
-    a: createDOMFactory('a'),
-    abbr: createDOMFactory('abbr'),
-    address: createDOMFactory('address'),
-    area: createDOMFactory('area'),
-    article: createDOMFactory('article'),
-    aside: createDOMFactory('aside'),
-    audio: createDOMFactory('audio'),
-    b: createDOMFactory('b'),
-    base: createDOMFactory('base'),
-    bdi: createDOMFactory('bdi'),
-    bdo: createDOMFactory('bdo'),
-    big: createDOMFactory('big'),
-    blockquote: createDOMFactory('blockquote'),
-    body: createDOMFactory('body'),
-    br: createDOMFactory('br'),
-    button: createDOMFactory('button'),
-    canvas: createDOMFactory('canvas'),
-    caption: createDOMFactory('caption'),
-    cite: createDOMFactory('cite'),
-    code: createDOMFactory('code'),
-    col: createDOMFactory('col'),
-    colgroup: createDOMFactory('colgroup'),
-    data: createDOMFactory('data'),
-    datalist: createDOMFactory('datalist'),
-    dd: createDOMFactory('dd'),
-    del: createDOMFactory('del'),
-    details: createDOMFactory('details'),
-    dfn: createDOMFactory('dfn'),
-    dialog: createDOMFactory('dialog'),
-    div: createDOMFactory('div'),
-    dl: createDOMFactory('dl'),
-    dt: createDOMFactory('dt'),
-    em: createDOMFactory('em'),
-    embed: createDOMFactory('embed'),
-    fieldset: createDOMFactory('fieldset'),
-    figcaption: createDOMFactory('figcaption'),
-    figure: createDOMFactory('figure'),
-    footer: createDOMFactory('footer'),
-    form: createDOMFactory('form'),
-    h1: createDOMFactory('h1'),
-    h2: createDOMFactory('h2'),
-    h3: createDOMFactory('h3'),
-    h4: createDOMFactory('h4'),
-    h5: createDOMFactory('h5'),
-    h6: createDOMFactory('h6'),
-    head: createDOMFactory('head'),
-    header: createDOMFactory('header'),
-    hgroup: createDOMFactory('hgroup'),
-    hr: createDOMFactory('hr'),
-    html: createDOMFactory('html'),
-    i: createDOMFactory('i'),
-    iframe: createDOMFactory('iframe'),
-    img: createDOMFactory('img'),
-    input: createDOMFactory('input'),
-    ins: createDOMFactory('ins'),
-    kbd: createDOMFactory('kbd'),
-    keygen: createDOMFactory('keygen'),
-    label: createDOMFactory('label'),
-    legend: createDOMFactory('legend'),
-    li: createDOMFactory('li'),
-    link: createDOMFactory('link'),
-    main: createDOMFactory('main'),
-    map: createDOMFactory('map'),
-    mark: createDOMFactory('mark'),
-    menu: createDOMFactory('menu'),
-    menuitem: createDOMFactory('menuitem'),
-    meta: createDOMFactory('meta'),
-    meter: createDOMFactory('meter'),
-    nav: createDOMFactory('nav'),
-    noscript: createDOMFactory('noscript'),
-    object: createDOMFactory('object'),
-    ol: createDOMFactory('ol'),
-    optgroup: createDOMFactory('optgroup'),
-    option: createDOMFactory('option'),
-    output: createDOMFactory('output'),
-    p: createDOMFactory('p'),
-    param: createDOMFactory('param'),
-    picture: createDOMFactory('picture'),
-    pre: createDOMFactory('pre'),
-    progress: createDOMFactory('progress'),
-    q: createDOMFactory('q'),
-    rp: createDOMFactory('rp'),
-    rt: createDOMFactory('rt'),
-    ruby: createDOMFactory('ruby'),
-    s: createDOMFactory('s'),
-    samp: createDOMFactory('samp'),
-    script: createDOMFactory('script'),
-    section: createDOMFactory('section'),
-    select: createDOMFactory('select'),
-    small: createDOMFactory('small'),
-    source: createDOMFactory('source'),
-    span: createDOMFactory('span'),
-    strong: createDOMFactory('strong'),
-    style: createDOMFactory('style'),
-    sub: createDOMFactory('sub'),
-    summary: createDOMFactory('summary'),
-    sup: createDOMFactory('sup'),
-    table: createDOMFactory('table'),
-    tbody: createDOMFactory('tbody'),
-    td: createDOMFactory('td'),
-    textarea: createDOMFactory('textarea'),
-    tfoot: createDOMFactory('tfoot'),
-    th: createDOMFactory('th'),
-    thead: createDOMFactory('thead'),
-    time: createDOMFactory('time'),
-    title: createDOMFactory('title'),
-    tr: createDOMFactory('tr'),
-    track: createDOMFactory('track'),
-    u: createDOMFactory('u'),
-    ul: createDOMFactory('ul'),
-    var: createDOMFactory('var'),
-    video: createDOMFactory('video'),
-    wbr: createDOMFactory('wbr'),
-
-    // SVG
-    circle: createDOMFactory('circle'),
-    clipPath: createDOMFactory('clipPath'),
-    defs: createDOMFactory('defs'),
-    ellipse: createDOMFactory('ellipse'),
-    g: createDOMFactory('g'),
-    image: createDOMFactory('image'),
-    line: createDOMFactory('line'),
-    linearGradient: createDOMFactory('linearGradient'),
-    mask: createDOMFactory('mask'),
-    path: createDOMFactory('path'),
-    pattern: createDOMFactory('pattern'),
-    polygon: createDOMFactory('polygon'),
-    polyline: createDOMFactory('polyline'),
-    radialGradient: createDOMFactory('radialGradient'),
-    rect: createDOMFactory('rect'),
-    stop: createDOMFactory('stop'),
-    svg: createDOMFactory('svg'),
-    text: createDOMFactory('text'),
-    tspan: createDOMFactory('tspan'),
-  };
-
-  // due to wrapper and conditionals at the top, this will either become
-  // `module.exports ReactDOMFactories` if that is available,
-  // otherwise it will be defined via `define(['react'], ReactDOMFactories)`
-  // if that is available,
-  // otherwise it will be defined as global variable.
-  return ReactDOMFactories;
-});
-
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"react":50}],26:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -2811,7 +2618,7 @@ var KeyEscapeUtils = {
 };
 
 module.exports = KeyEscapeUtils;
-},{}],27:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -2923,7 +2730,7 @@ var PooledClass = {
 };
 
 module.exports = PooledClass;
-},{"./reactProdInvariant":48,"fbjs/lib/invariant":4}],28:[function(require,module,exports){
+},{"./reactProdInvariant":47,"fbjs/lib/invariant":4}],27:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -3055,7 +2862,7 @@ if ("production" !== 'production') {
 }
 
 module.exports = React;
-},{"./ReactBaseClasses":29,"./ReactChildren":30,"./ReactDOMFactories":33,"./ReactElement":34,"./ReactElementValidator":36,"./ReactPropTypes":39,"./ReactVersion":41,"./canDefineProperty":42,"./createClass":44,"./lowPriorityWarning":46,"./onlyChild":47,"object-assign":16}],29:[function(require,module,exports){
+},{"./ReactBaseClasses":28,"./ReactChildren":29,"./ReactDOMFactories":32,"./ReactElement":33,"./ReactElementValidator":35,"./ReactPropTypes":38,"./ReactVersion":40,"./canDefineProperty":41,"./createClass":43,"./lowPriorityWarning":45,"./onlyChild":46,"object-assign":16}],28:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -3198,7 +3005,7 @@ module.exports = {
   Component: ReactComponent,
   PureComponent: ReactPureComponent
 };
-},{"./ReactNoopUpdateQueue":37,"./canDefineProperty":42,"./lowPriorityWarning":46,"./reactProdInvariant":48,"fbjs/lib/emptyObject":3,"fbjs/lib/invariant":4,"object-assign":16}],30:[function(require,module,exports){
+},{"./ReactNoopUpdateQueue":36,"./canDefineProperty":41,"./lowPriorityWarning":45,"./reactProdInvariant":47,"fbjs/lib/emptyObject":3,"fbjs/lib/invariant":4,"object-assign":16}],29:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -3389,7 +3196,7 @@ var ReactChildren = {
 };
 
 module.exports = ReactChildren;
-},{"./PooledClass":27,"./ReactElement":34,"./traverseAllChildren":49,"fbjs/lib/emptyFunction":2}],31:[function(require,module,exports){
+},{"./PooledClass":26,"./ReactElement":33,"./traverseAllChildren":48,"fbjs/lib/emptyFunction":2}],30:[function(require,module,exports){
 /**
  * Copyright 2016-present, Facebook, Inc.
  * All rights reserved.
@@ -3768,7 +3575,7 @@ var ReactComponentTreeHook = {
 };
 
 module.exports = ReactComponentTreeHook;
-},{"./ReactCurrentOwner":32,"./reactProdInvariant":48,"fbjs/lib/invariant":4,"fbjs/lib/warning":5}],32:[function(require,module,exports){
+},{"./ReactCurrentOwner":31,"./reactProdInvariant":47,"fbjs/lib/invariant":4,"fbjs/lib/warning":5}],31:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -3797,7 +3604,7 @@ var ReactCurrentOwner = {
 };
 
 module.exports = ReactCurrentOwner;
-},{}],33:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -3966,7 +3773,7 @@ var ReactDOMFactories = {
 };
 
 module.exports = ReactDOMFactories;
-},{"./ReactElement":34,"./ReactElementValidator":36}],34:[function(require,module,exports){
+},{"./ReactElement":33,"./ReactElementValidator":35}],33:[function(require,module,exports){
 /**
  * Copyright 2014-present, Facebook, Inc.
  * All rights reserved.
@@ -4307,7 +4114,7 @@ ReactElement.isValidElement = function (object) {
 };
 
 module.exports = ReactElement;
-},{"./ReactCurrentOwner":32,"./ReactElementSymbol":35,"./canDefineProperty":42,"fbjs/lib/warning":5,"object-assign":16}],35:[function(require,module,exports){
+},{"./ReactCurrentOwner":31,"./ReactElementSymbol":34,"./canDefineProperty":41,"fbjs/lib/warning":5,"object-assign":16}],34:[function(require,module,exports){
 /**
  * Copyright 2014-present, Facebook, Inc.
  * All rights reserved.
@@ -4327,7 +4134,7 @@ module.exports = ReactElement;
 var REACT_ELEMENT_TYPE = typeof Symbol === 'function' && Symbol['for'] && Symbol['for']('react.element') || 0xeac7;
 
 module.exports = REACT_ELEMENT_TYPE;
-},{}],36:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 /**
  * Copyright 2014-present, Facebook, Inc.
  * All rights reserved.
@@ -4582,7 +4389,7 @@ var ReactElementValidator = {
 };
 
 module.exports = ReactElementValidator;
-},{"./ReactComponentTreeHook":31,"./ReactCurrentOwner":32,"./ReactElement":34,"./canDefineProperty":42,"./checkReactTypeSpec":43,"./getIteratorFn":45,"./lowPriorityWarning":46,"fbjs/lib/warning":5}],37:[function(require,module,exports){
+},{"./ReactComponentTreeHook":30,"./ReactCurrentOwner":31,"./ReactElement":33,"./canDefineProperty":41,"./checkReactTypeSpec":42,"./getIteratorFn":44,"./lowPriorityWarning":45,"fbjs/lib/warning":5}],36:[function(require,module,exports){
 /**
  * Copyright 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -4677,7 +4484,7 @@ var ReactNoopUpdateQueue = {
 };
 
 module.exports = ReactNoopUpdateQueue;
-},{"fbjs/lib/warning":5}],38:[function(require,module,exports){
+},{"fbjs/lib/warning":5}],37:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -4702,7 +4509,7 @@ if ("production" !== 'production') {
 }
 
 module.exports = ReactPropTypeLocationNames;
-},{}],39:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -4721,7 +4528,7 @@ var _require = require('./ReactElement'),
 var factory = require('prop-types/factory');
 
 module.exports = factory(isValidElement);
-},{"./ReactElement":34,"prop-types/factory":20}],40:[function(require,module,exports){
+},{"./ReactElement":33,"prop-types/factory":20}],39:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -4738,7 +4545,7 @@ module.exports = factory(isValidElement);
 var ReactPropTypesSecret = 'SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED';
 
 module.exports = ReactPropTypesSecret;
-},{}],41:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -4752,7 +4559,7 @@ module.exports = ReactPropTypesSecret;
 'use strict';
 
 module.exports = '15.6.1';
-},{}],42:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -4778,7 +4585,7 @@ if ("production" !== 'production') {
 }
 
 module.exports = canDefineProperty;
-},{}],43:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -4867,7 +4674,7 @@ function checkReactTypeSpec(typeSpecs, values, location, componentName, element,
 
 module.exports = checkReactTypeSpec;
 }).call(this,require('_process'))
-},{"./ReactComponentTreeHook":31,"./ReactPropTypeLocationNames":38,"./ReactPropTypesSecret":40,"./reactProdInvariant":48,"_process":18,"fbjs/lib/invariant":4,"fbjs/lib/warning":5}],44:[function(require,module,exports){
+},{"./ReactComponentTreeHook":30,"./ReactPropTypeLocationNames":37,"./ReactPropTypesSecret":39,"./reactProdInvariant":47,"_process":18,"fbjs/lib/invariant":4,"fbjs/lib/warning":5}],43:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -4890,7 +4697,7 @@ var ReactNoopUpdateQueue = require('./ReactNoopUpdateQueue');
 var factory = require('create-react-class/factory');
 
 module.exports = factory(Component, isValidElement, ReactNoopUpdateQueue);
-},{"./ReactBaseClasses":29,"./ReactElement":34,"./ReactNoopUpdateQueue":37,"create-react-class/factory":1}],45:[function(require,module,exports){
+},{"./ReactBaseClasses":28,"./ReactElement":33,"./ReactNoopUpdateQueue":36,"create-react-class/factory":1}],44:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -4931,7 +4738,7 @@ function getIteratorFn(maybeIterable) {
 }
 
 module.exports = getIteratorFn;
-},{}],46:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 /**
  * Copyright 2014-2015, Facebook, Inc.
  * All rights reserved.
@@ -4996,7 +4803,7 @@ if ("production" !== 'production') {
 }
 
 module.exports = lowPriorityWarning;
-},{}],47:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -5034,7 +4841,7 @@ function onlyChild(children) {
 }
 
 module.exports = onlyChild;
-},{"./ReactElement":34,"./reactProdInvariant":48,"fbjs/lib/invariant":4}],48:[function(require,module,exports){
+},{"./ReactElement":33,"./reactProdInvariant":47,"fbjs/lib/invariant":4}],47:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -5073,7 +4880,7 @@ function reactProdInvariant(code) {
 }
 
 module.exports = reactProdInvariant;
-},{}],49:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -5249,12 +5056,12 @@ function traverseAllChildren(children, callback, traverseContext) {
 }
 
 module.exports = traverseAllChildren;
-},{"./KeyEscapeUtils":26,"./ReactCurrentOwner":32,"./ReactElementSymbol":35,"./getIteratorFn":45,"./reactProdInvariant":48,"fbjs/lib/invariant":4,"fbjs/lib/warning":5}],50:[function(require,module,exports){
+},{"./KeyEscapeUtils":25,"./ReactCurrentOwner":31,"./ReactElementSymbol":34,"./getIteratorFn":44,"./reactProdInvariant":47,"fbjs/lib/invariant":4,"fbjs/lib/warning":5}],49:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./lib/React');
 
-},{"./lib/React":28}],51:[function(require,module,exports){
+},{"./lib/React":27}],50:[function(require,module,exports){
 (function() {
   var URL, URL_PATTERN, defaults, urllite,
     __hasProp = {}.hasOwnProperty;
@@ -5321,7 +5128,7 @@ module.exports = require('./lib/React');
 
 }).call(this);
 
-},{}],52:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 // Returns a wrapper function that returns a wrapped callback
 // The wrapper function should do some stuff, and return a
 // presumably different callback function.
@@ -5356,7 +5163,7 @@ function wrappy (fn, cb) {
   }
 }
 
-},{}],53:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 module.exports = extend
 
 function extend() {
@@ -5375,7 +5182,7 @@ function extend() {
     return target
 }
 
-},{}],54:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -5391,10 +5198,6 @@ var _react2 = _interopRequireDefault(_react);
 var _propTypes = require('prop-types');
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _reactDomFactories = require('react-dom-factories');
-
-var _reactDomFactories2 = _interopRequireDefault(_reactDomFactories);
 
 var _once = require('once');
 
@@ -5723,7 +5526,7 @@ InlineSVG.propTypes = {
   wrapper: _propTypes2.default.func
 };
 InlineSVG.defaultProps = {
-  wrapper: _reactDomFactories2.default.span,
+  wrapper: _react2.default.createFactory('span'),
   supportTest: isSupportedEnvironment,
   uniquifyIDs: true,
   cacheGetRequests: false
@@ -5731,5 +5534,5 @@ InlineSVG.defaultProps = {
 exports.default = InlineSVG;
 module.exports = exports['default'];
 
-},{"httpplease":7,"httpplease/plugins/oldiexdomain":15,"once":17,"prop-types":23,"react":50,"react-dom-factories":25}]},{},[54])(54)
+},{"httpplease":7,"httpplease/plugins/oldiexdomain":15,"once":17,"prop-types":23,"react":49}]},{},[53])(53)
 });
