@@ -1,11 +1,9 @@
-import DOM from 'react-dom-factories';
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
+import DOM from 'react-dom-factories';
 import once from 'once';
 import httpplease from 'httpplease';
 import ieXDomain from 'httpplease/plugins/oldiexdomain';
-
-import { shouldComponentUpdate } from './shouldComponentUpdate';
 
 const http = httpplease.use(ieXDomain);
 
@@ -142,7 +140,7 @@ const configurationError = message => createError(message, {
   isConfigurationError: true
 });
 
-export default class InlineSVG extends React.Component {
+export default class InlineSVG extends React.PureComponent {
   constructor(props) {
     super(props);
 
@@ -174,8 +172,6 @@ export default class InlineSVG extends React.Component {
     uniquifyIDs: true,
     cacheGetRequests: false
   };
-
-  shouldComponentUpdate = shouldComponentUpdate;
 
   componentWillMount() {
     this.isActive = true;
