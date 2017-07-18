@@ -128,9 +128,16 @@
     "react/forbid-prop-types": 0,
     "react/jsx-closing-bracket-location": [
       1,
-      "after-props"
+      "line-aligned"
     ],
-    "react/jsx-filename-extension": 0,
+    "react/jsx-first-prop-new-line": [
+      1,
+      "multiline"
+    ],
+    "react/jsx-indent": [
+      1,
+      2
+    ],
     "react/jsx-indent-props": [
       1,
       2
@@ -142,12 +149,18 @@
         "maximum": 4
       }
     ],
-    "react/jsx-boolean-value": 0,
-    "react/jsx-no-duplicate-props": 1,
-    "react/jsx-pascal-case": 1,
+    "react/jsx-no-target-blank": 0,
+    "react/no-array-index-key": 0,
+    "react/no-danger": 0,
     "react/no-did-mount-set-state": 1,
     "react/no-did-update-set-state": 1,
+    "react/jsx-boolean-value": 0,
+    "react/jsx-filename-extension": 0,
+    "react/jsx-no-duplicate-props": 1,
+    "react/jsx-pascal-case": 1,
     "react/no-direct-mutation-state": 1,
+    "react/no-unused-prop-types": 1,
+    "react/no-unescaped-entities": 0,
     "react/prefer-stateless-function": 0,
     "react/prop-types": 2,
     "react/require-default-props": 0,
