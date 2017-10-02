@@ -20,7 +20,8 @@
   "main": "./lib/index.js",
   "dependencies": {
     "httpplease": "^0.16",
-    "once": "^1.4"
+    "once": "^1.4",
+    "prop-types": "^15.5.7"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",
@@ -35,7 +36,8 @@
     "browserify": "^14.4",
     "browserify-shim": "^3.8",
     "cors": "^2.8",
-    "enzyme": "^2.9",
+    "enzyme": "^3.0.0",
+    "enzyme-adapter-react-16": "^1.0.0",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^15.0.2",
     "eslint-plugin-import": "^2.7.0",
@@ -51,14 +53,16 @@
     "gulp-util": "^3.0",
     "jsdom": "^11.1.0",
     "mocha": "^3.4",
-    "prop-types": "^15.5.10",
-    "react": "^15.6",
+    "react": "^16.0",
     "react-addons-test-utils": "^15.6",
+    "react-dom": "^16.0",
+    "react-dom-factories": "^1.0.2",
+    "react-test-renderer": "^16.0.0",
     "vinyl-source-stream": "^1.1"
   },
   "peerDependencies": {
-    "react": "^0.14 || ^15.0",
-    "prop-types": "^15.5"
+    "react": "^16.0",
+    "react-dom": "^16.0"
   },
   "scripts": {
     "build": "gulp build",

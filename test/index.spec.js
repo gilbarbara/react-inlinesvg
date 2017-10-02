@@ -1,9 +1,13 @@
 /*eslint-disable no-console, no-underscore-dangle */
 import expect from 'expect';
 import React from 'react';
-import { mount } from 'enzyme';
+import ReactDOM from 'react-dom-factories';
+import Enzyme, { mount } from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
 
 import ReactInlineSVG from '../src';
+
+Enzyme.configure({ adapter: new Adapter() });
 
 const svgResponse = { text: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>' };
 
@@ -136,7 +140,7 @@ describe('react-inlinesvg', () => {
     it('should show children if loading not supported', () => {
       const props = {
         src: 'DOESNOTEXIST.svg',
-        children: [React.DOM.span({ key: 1 }, ''), React.DOM.span({ key: 2 }, 'MISSINGNO')],
+        children: [ReactDOM.span({ key: 1 }, ''), ReactDOM.span({ key: 2 }, 'MISSINGNO')],
         supportTest: () => false
       };
 
@@ -147,7 +151,7 @@ describe('react-inlinesvg', () => {
     it('should show a single children if loading not supported', () => {
       const props = {
         src: 'DOESNOTEXIST.svg',
-        children: React.DOM.img({ src: '/test/tiger.png' }),
+        children: ReactDOM.img({ src: '/test/tiger.png' }),
         supportTest: () => false
       };
 
@@ -161,7 +165,7 @@ describe('react-inlinesvg', () => {
     it('should NOT show children on error', () => {
       const props = {
         src: 'DOESNOTEXIST.svg',
-        children: [React.DOM.span({ key: 1 }, ''), React.DOM.span({ key: 2 }, 'MISSINGNO')]
+        children: [ReactDOM.span({ key: 1 }, ''), ReactDOM.span({ key: 2 }, 'MISSINGNO')]
       };
 
       const wrapper = setup(props);
