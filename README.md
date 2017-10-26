@@ -104,11 +104,12 @@ Props
   </tr>
   <tr>
     <td><code>uniquifyIDs</code></td>
-    <td>boolean</td>
+    <td>boolean | string</td>
     <td>
       A boolean that tells Isvg to create unique IDs for each icon by hashing it. Default is <code>true</code> but you can alter the behaviour by setting the boolean to <code>false</code>.
 
       <code>&lt;Isvg uniquifyIDs={false}&gt;&lt;/Isvg&gt;</code>
+      A string that tells Isvg to use it as postFix for each icon.
     </td>
   </tr>
   <tr>
