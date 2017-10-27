@@ -161,7 +161,7 @@ export default class InlineSVG extends React.PureComponent {
     src: PropTypes.string.isRequired,
     style: PropTypes.object,
     supportTest: PropTypes.func,
-    uniquifyIDs: PropTypes.bool,
+    uniquifyIDs: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
     wrapper: PropTypes.func
   };
 
@@ -259,7 +259,8 @@ export default class InlineSVG extends React.PureComponent {
 
   processSVG(svgText) {
     if (this.props.uniquifyIDs) {
-      return uniquifyIDs(svgText, getHash(this.props.src));
+      const postFix = typeof this.props.uniquifyIDs === 'string' ? this.props.uniquifyIDs : getHash(this.props.src);
+      return uniquifyIDs(svgText, postFix);
     }
 
     return svgText;
