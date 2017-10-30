@@ -1,5 +1,5 @@
-react-inlinesvg
-===============
+# react-inlinesvg
+
 <a href="https://www.npmjs.com/package/react-inlinesvg" target="_blank">![](https://badge.fury.io/js/react-inlinesvg.svg)</a>
 
 One of the reasons SVGs are awesome is because you can style them with CSS.
@@ -34,97 +34,79 @@ information and [this table][use-support] for browser support and caveats.
 
 
 Usage
------
+----
 
-```
-var Isvg = require('react-inlinesvg');
+```jsx
+import SVG  from 'react-inlinesvg';
 
-<Isvg src="/path/to/myfile.svg">
+<SVG
+    src="/path/to/myfile.svg"
+    preload={<Loader />}
+    onLoad: src => {
+        myOnLoadHandler(src);
+    }
+>
   Here's some optional content for browsers that don't support XHR or inline
   SVGs. You can use other React components here too. Here, I'll show you.
   <img src="/path/to/myfile.png" />
-</Isvg>
+</SVG>
 ```
 
 
 Props
------
+----
 
-<table>
-  <tr>
-    <th>Name</th>
-    <th>Type</th>
-    <th>Description</th>
-  </tr>
-  <tr>
-    <td><code>src</code></td>
-    <td>string</td>
-    <td>
-      The URL of the SVG file you want to load.
-    </td>
-  </tr>
-  <tr>
-    <td><code>wrapper</code></td>
-    <td>function</td>
-    <td>
-      A React class or other function that returns a component instance to be
-      used as the wrapper component. Defaults to <code>React.DOM.span</code>.
-    </td>
-  </tr>
-  <tr>
-    <td><code>preloader</code></td>
-    <td>function</td>
-    <td>
-      A React class or other function that returns a component instance to be
-      shown while the SVG is loaded.
-    </td>
-  </tr>
-  <tr>
-    <td><code>onLoad</code></td>
-    <td>function</td>
-    <td>
-      A callback to be invoked upon successful load.
-    </td>
-  </tr>
-  <tr>
-    <td><code>onError</code></td>
-    <td>function</td>
-    <td>
-      A callback to be invoked if loading the SVG fails. This will receive a
-      single argument: an instance of <code>InlineSVGError</code>, which has
-      the following properties:
+**src** `string`  
+The SVG file you want to load. It can be an `url` or a string (base64 or encoded)
 
-      <ul>
-        <li><code>isHttpError</code></li>
-        <li><code>isSupportedBrowser</code></li>
-        <li><code>isConfigurationError</code></li>
-        <li><code>statusCode</code> (present only if <code>isHttpError</code> is true)</li>
-      </ul>
-    </td>
-  </tr>
-  <tr>
-    <td><code>uniquifyIDs</code></td>
-    <td>boolean</td>
-    <td>
-      A boolean that tells Isvg to create unique IDs for each icon by hashing it. Default is <code>true</code> but you can alter the behaviour by setting the boolean to <code>false</code>.
+**wrapper** `function`  
+A React class or a function that returns a component instance to be used as the wrapper component. Defaults to `React.createFactory('span')`
 
-      <code>&lt;Isvg uniquifyIDs={false}&gt;&lt;/Isvg&gt;</code>
-    </td>
-  </tr>
-  <tr>
-    <td><code>cacheGetRequests</code></td>
-    <td>boolean</td>
-    <td>
-      A boolean that tells Isvg to only request svgs once. Default is <code>false</code> but you can alter the behaviour by setting the boolean to <code>true</code>.
+**preloader** `node`  
+A component to be shown while the SVG is loading.
 
-      <code>&lt;Isvg cacheGetRequests={true}&gt;&lt;/Isvg&gt;</code>
-    </td>
-  </tr>
-</table>
+**cacheGetRequests** `boolean`  
+A boolean to only request SVGs once. Default is `false`.  
+
+**uniquifyIDs** `boolean`  
+A boolean that create unique IDs for each icon by hashing it. Default is `true`.  
+
+**uniqueHash** `string`  
+A string to use with `uniquifyIDs`. Default to a random 8 characters string `[A-Za-z0-9]`
+
+**onLoad** `function`  
+A callback to be invoked upon successful load.  
+This will receive 2 arguments: the `src` prop and a `isCached` boolean 
+
+**onError** `function`  
+A callback to be invoked if loading the SVG fails.  
+This will receive a single argument:
+
+- a xhr `RequestError` with:
+
+```js
+{
+    ...,
+    isHttpError: bool,
+    status: number
+}
+``` 
+
+- or an `InlineSVGError`, which has the following properties:
+
+```js
+{
+    name: 'InlineSVGError',
+    isSupportedBrowser: bool,
+    isConfigurationError: bool,
+    isUnsupportedBrowserError: bool,
+    message: string
+}
+```
 
 
 Browser Support
----------------
+----
 
 Any browsers that support inlining SVGs and XHR will work. The component goes out of its way to handle IE9's weird XHR support so, IE9 and up get your SVG;
 lesser browsers get the fallback.  
@@ -137,7 +119,7 @@ If loading SVGs from another domain, you'll need to make sure it allows [CORS].
 
 
 XSS Warning
------------
+----
 
 This component places the loaded file into your DOM, so you need to be careful
 about XSS attacks. Only load trusted content, and don't use unsanitized user
