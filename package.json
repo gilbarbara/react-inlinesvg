@@ -61,6 +61,7 @@
     "gulp-load-plugins": "^1.5.0",
     "gulp-rename": "^1.2.2",
     "gulp-util": "^3.0.8",
+    "husky": "^0.14.3",
     "jest-cli": "^21.2.1",
     "jest-enzyme": "^4.0.1",
     "jsdom": "^11.3.0",
