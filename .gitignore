@@ -1,1 +1,9 @@
-node_modules
+.idea/
+.tmp/
+coverage/
+dist/
+documentation/
+node_modules/
+reports/
+selenium-debug.log
+webpack.stats.json

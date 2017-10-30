@@ -1,9 +1,9 @@
-/*eslint-disable no-var, one-var, func-names, indent, prefer-arrow-callback, object-shorthand, no-console, newline-per-chained-call, one-var-declaration-per-line, vars-on-top  */
-var gulp       = require('gulp'),
-    browserify = require('browserify'),
-    $          = require('gulp-load-plugins')(),
-    cors       = require('cors'),
-    source     = require('vinyl-source-stream');
+/*eslint-disable no-var, func-names, prefer-arrow-callback, object-shorthand, require-jsdoc, vars-on-top  */
+var gulp = require('gulp');
+var browserify = require('browserify');
+var $ = require('gulp-load-plugins')();
+var cors = require('cors');
+var source = require('vinyl-source-stream');
 
 function bump(type) {
   return gulp.src(['./bower.json', './package.json'])
@@ -29,6 +29,7 @@ gulp.task('watch', function() {
 
 gulp.task('build:node', function() {
   process.env.NODE_ENV = 'production';
+
   return gulp.src('./src/**/*.js')
     .pipe($.babel({}))
     .pipe(gulp.dest('./lib'));
@@ -36,12 +37,16 @@ gulp.task('build:node', function() {
 
 gulp.task('build:browser', function() {
   process.env.NODE_ENV = 'production';
-  var bundler, stream;
+  var bundler;
+  var stream;
+
   bundler = browserify({
     entries: './src/index.js',
     standalone: 'ReactInlineSVG'
   });
+
   stream = bundler.bundle();
+
   return stream
     .pipe(source('react-inlinesvg.js'))
     .pipe(gulp.dest('./standalone/'));
