@@ -10,12 +10,5 @@
   ],
   "plugins": [
     "add-module-exports"
-  ],
-  "env": {
-    "development": {
-      "plugins": [
-        "babel-plugin-rewire"
-      ]
-    }
-  }
+  ]
 }
