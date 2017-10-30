@@ -1,8 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import once from 'once';
 import httpplease from 'httpplease';
 import ieXDomain from 'httpplease/plugins/oldiexdomain';
+
+import {
+  configurationError,
+  isSupportedEnvironment,
+  randomString, uniquifySVGIDs,
+  unsupportedBrowserError,
+} from './utils';
 
 const http = httpplease.use(ieXDomain);
 
@@ -37,108 +43,6 @@ const createGetOrUseCacheForUrl = (url, callback) => {
 
   getRequestsByUrl[url].push(callback);
 };
-
-const supportsInlineSVG = once(() => {
-  if (!document) {
-    return false;
-  }
-
-  const div = document.createElement('div');
-  div.innerHTML = '<svg />';
-  return div.firstChild && div.firstChild.namespaceURI === 'http://www.w3.org/2000/svg';
-});
-
-const isSupportedEnvironment = once(() =>
-  (
-    (typeof window !== 'undefined' && window !== null ? window.XMLHttpRequest : false) ||
-    (typeof window !== 'undefined' && window !== null ? window.XDomainRequest : false)
-  ) &&
-  supportsInlineSVG()
-);
-
-const uniquifyIDs = (() => {
-  const mkAttributePattern = attr => `(?:(?:\\s|\\:)${attr})`;
-
-  const idPattern = new RegExp(`(?:(${(mkAttributePattern('id'))})="([^"]+)")|(?:(${(mkAttributePattern('href'))}|${(mkAttributePattern('role'))}|${(mkAttributePattern('arcrole'))})="\\#([^"]+)")|(?:="url\\(\\#([^\\)]+)\\)")`, 'g');
-
-  return (svgText, svgID) => {
-    const uniquifyID = id => `${id}___${svgID}`;
-
-    return svgText.replace(idPattern, (m, p1, p2, p3, p4, p5) => { //eslint-disable-line consistent-return
-      if (p2) {
-        return `${p1}="${(uniquifyID(p2))}"`;
-      }
-      else if (p4) {
-        return `${p3}="#${(uniquifyID(p4))}"`;
-      }
-      else if (p5) {
-        return `="url(#${(uniquifyID(p5))})"`;
-      }
-    });
-  };
-})();
-
-const getHash = str => {
-  let chr;
-  let hash = 0;
-  let i;
-  let j;
-  let ref;
-
-  if (!str) {
-    return hash;
-  }
-
-  for (i = j = 0, ref = str.length; ref >= 0 ? j < ref : j > ref; i = ref >= 0 ? ++j : --j) {
-    chr = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + chr;
-    hash &= hash;
-  }
-
-  return hash;
-};
-
-class InlineSVGError extends Error {
-  constructor(message) {
-    super();
-
-    this.name = 'InlineSVGError';
-    this.isSupportedBrowser = true;
-    this.isConfigurationError = false;
-    this.isUnsupportedBrowserError = false;
-    this.message = message;
-
-    return this;
-  }
-}
-
-const createError = (message, attrs) => {
-  const err = new InlineSVGError(message);
-
-  Object.keys(attrs).forEach(k => {
-    err[k] = attrs[k];
-  });
-
-  return err;
-};
-
-const unsupportedBrowserError = message => {
-  let newMessage = message;
-
-  if (newMessage === null) {
-    newMessage = 'Unsupported Browser';
-  }
-
-  return createError(newMessage, {
-    isSupportedBrowser: false,
-    isUnsupportedBrowserError: true
-  });
-};
-
-const configurationError = message => createError(message, {
-  isConfigurationError: true
-});
-
 export default class InlineSVG extends React.PureComponent {
   constructor(props) {
     super(props);
