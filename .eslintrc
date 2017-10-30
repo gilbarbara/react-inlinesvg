@@ -3,7 +3,7 @@
   "parser": "babel-eslint",
   "env": {
     "browser": true,
-    "mocha": true
+    "jest": true
   },
   "globals": {
     "$": true
@@ -24,13 +24,8 @@
     "camelcase": 0,
     "comma-dangle": 0,
     "dot-notation": 1,
-    "indent": [
-      1,
-      2,
-      {
-        "SwitchCase": 1
-      }
-    ],
+    "indent": [1, 2, { "SwitchCase": 1 }],
+    "function-paren-newline": 0,
     "max-len": 0,
     "newline-per-chained-call": [
       1,
