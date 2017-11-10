@@ -74,7 +74,7 @@
   "scripts": {
     "build": "gulp build",
     "serve": "gulp test-server",
-    "test": "npm run serve & jest --config config/jest.config.js --bail --coverage; kill %1",
+    "test": "npm run serve & SERVE_PID=$! && jest --config config/jest.config.js --bail --coverage && kill $SERVE_PID",
     "test:watch": "jest --config config/jest.config.js --watch",
     "lint": "eslint -c ./.eslintrc $(find src -name '*.js')",
     "precommit": "npm run lint && npm test",
