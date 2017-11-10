@@ -1,6 +1,5 @@
 language: node_js
 node_js:
-- '6'
 - '8'
 script:
 - npm test
@@ -12,6 +11,6 @@ deploy:
   on:
     tags: true
     node: '8'
-    repo: matthewwithanm/react-inlinesvg
+    repo: gilbarbara/react-inlinesvg
 addons:
   code_climate: true

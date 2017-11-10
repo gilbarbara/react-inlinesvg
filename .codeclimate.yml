@@ -1,0 +1,29 @@
+---
+engines:
+  eslint:
+    enabled: true
+    channel: "eslint-4"
+    config:
+      extensions:
+        - .js
+        - .jsx
+    checks:
+      import/no-duplicates:
+        enabled: false
+      no-template-curly-in-string:
+        enabled: false
+      import/no-unresolved:
+        enabled: false
+      import/no-extraneous-dependencies:
+        enabled: false
+      import/no-named-as-default-member:
+        enabled: false
+ratings:
+  paths:
+  - "**.js"
+  - "**.jsx"
+exclude_paths:
+  - lib/**/*
+  - node_modules/**/*
+  - standalone/**/*
+  - tests/**/*
