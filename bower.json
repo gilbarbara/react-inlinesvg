@@ -1,9 +1,9 @@
 {
   "name": "react-inlinesvg",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "authors": [
-    "Matthew Dapena-Tretter <m@tthewwithanm.com>",
-    "Gil Barbara <gilbarbara@gmail.com>"
+    "Gil Barbara <gilbarbara@gmail.com>",
+    "Matthew Dapena-Tretter <m@tthewwithanm.com>"
   ],
   "description": "An SVG loader for React",
   "main": "./standalone/react-inlinesvg.js",
@@ -17,9 +17,11 @@
   "homepage": "https://github.com/matthewwithanm/react-inlinesvg",
   "ignore": [
     "**/.*",
+    "coverage",
+    "gulpfile.js",
+    "jest.config.js",
     "node_modules",
-    "bower_components",
-    "test",
-    "tests"
+    "lib",
+    "test"
   ]
 }

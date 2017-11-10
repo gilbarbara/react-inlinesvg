@@ -1,9 +1,11 @@
 .babelrc
+.codeclimate.yml
 .editorconfig
 .eslintrc
+.gitignore
+.travis.yml
 bower.json
 gulpfile.js
 node_modules
-src
 standalone
 test

@@ -52,7 +52,9 @@ gulp.task('build:browser', function() {
     .pipe(gulp.dest('./standalone/'));
 });
 
-gulp.task('localserver', function() {
+gulp.task('server', ['server:local', 'server:xdomain']);
+
+gulp.task('server:local', function() {
   return $.connect.server({
     root: [__dirname],
     port: 1337,
@@ -63,7 +65,7 @@ gulp.task('localserver', function() {
   });
 });
 
-gulp.task('xdomainserver', function() {
+gulp.task('server:xdomain', function() {
   return $.connect.server({
     root: [__dirname],
     port: 1338,
@@ -75,5 +77,3 @@ gulp.task('xdomainserver', function() {
 });
 
 gulp.task('build', ['build:node', 'build:browser']);
-
-gulp.task('test-server', ['localserver', 'xdomainserver']);

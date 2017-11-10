@@ -1,5 +1,4 @@
 module.exports = {
-  rootDir: '../',
   transform: {
     '.*': '<rootDir>/node_modules/babel-jest',
   },
@@ -13,7 +12,7 @@ module.exports = {
     'src',
     './',
   ],
-  setupTestFrameworkScriptFile: './node_modules/jest-enzyme/lib/index.js',
+  setupTestFrameworkScriptFile: '<rootDir>/node_modules/jest-enzyme/lib/index.js',
   setupFiles: [
     '<rootDir>/test/__setup__/shim.js',
     '<rootDir>/test/__setup__/index.js',

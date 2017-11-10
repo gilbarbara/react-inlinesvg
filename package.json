@@ -62,7 +62,7 @@
     "gulp-rename": "^1.2.2",
     "gulp-util": "^3.0.8",
     "husky": "^0.14.3",
-    "jest-cli": "^21.2.1",
+    "jest": "^21.2.1",
     "jest-enzyme": "^4.0.1",
     "jsdom": "^11.3.0",
     "react": "^16.1.0",
@@ -73,12 +73,12 @@
   },
   "scripts": {
     "build": "gulp build",
-    "serve": "gulp test-server",
-    "test": "npm run serve & SERVE_PID=$! && jest --config config/jest.config.js --bail --coverage && kill $SERVE_PID",
-    "test:watch": "jest --config config/jest.config.js --watch",
+    "server": "gulp server",
+    "test": "npm run server & SERVE_PID=$! && jest --bail --coverage && kill $SERVE_PID",
+    "test:watch": "jest --watch",
     "lint": "eslint -c ./.eslintrc $(find src -name '*.js')",
     "precommit": "npm run lint && npm test",
-    "prepublish": "npm run build"
+    "prepare": "npm run build"
   },
   "browserify": {
     "transform": [
