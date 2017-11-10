@@ -130,3 +130,9 @@ input to generate the `src`!
 [svg-use-external-source]: http://css-tricks.com/svg-use-external-source
 [use-article]: http://taye.me/blog/svg/a-guide-to-svg-use-elements/
 [use-support]: https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use#Browser_compatibility
+
+
+Credits
+----
+Thanks to [@matthewwithanm](https://github.com/matthewwithanm) for creating this component and so kindly transfer it to me.  
+I'll definitely keep the good work! ❤️
