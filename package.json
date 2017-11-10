@@ -1,10 +1,10 @@
 {
   "name": "react-inlinesvg",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "An SVG loader for React",
   "repository": {
     "type": "git",
-    "url": "git://github.com/matthewwithanm/react-inlinesvg.git"
+    "url": "git://github.com/gilbarbara/react-inlinesvg.git"
   },
   "keywords": [
     "react",
@@ -12,16 +12,16 @@
     "component",
     "svg"
   ],
-  "author": "Matthew Dapena-Tretter <m@tthewwithanm.com>",
+  "author": "Gil Barbara <gilbarbara@gmail.com>",
   "contributors": [
     {
-      "name": "Gil Barbara",
-      "email": "gilbarbara@gmail.com"
+      "name": "Matthew Dapena-Tretter",
+      "email": "m@tthewwithanm.com"
     }
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/matthewwithanm/react-inlinesvg/issues"
+    "url": "https://github.com/gilbarbara/react-inlinesvg/issues"
   },
   "main": "./lib/index.js",
   "peerDependencies": {
@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
-    "babel-eslint": "^8.0.1",
+    "babel-eslint": "^8.0.2",
     "babel-jest": "^21.2.0",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-preset-env": "^1.6.1",
@@ -46,8 +46,8 @@
     "browserify": "^14.5.0",
     "browserify-shim": "^3.8.14",
     "cors": "^2.8.4",
-    "enzyme": "^3.1.0",
-    "enzyme-adapter-react-16": "^1.0.2",
+    "enzyme": "^3.1.1",
+    "enzyme-adapter-react-16": "^1.0.4",
     "eslint": "^4.10.0",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.8.0",
@@ -65,10 +65,10 @@
     "jest-cli": "^21.2.1",
     "jest-enzyme": "^4.0.1",
     "jsdom": "^11.3.0",
-    "react": "^16.0.0",
+    "react": "^16.1.0",
     "react-addons-test-utils": "^15.6.2",
-    "react-dom": "^16.0.0",
-    "react-test-renderer": "^16.0.0",
+    "react-dom": "^16.1.0",
+    "react-test-renderer": "^16.1.0",
     "vinyl-source-stream": "^1.1.0"
   },
   "scripts": {
