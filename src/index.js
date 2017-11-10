@@ -105,7 +105,7 @@ export default class InlineSVG extends React.PureComponent {
       }
 
       if (!getRequestsByUrl[src]) {
-        getRequestsByUrl[src] = [callback];
+        getRequestsByUrl[src] = [];
 
         http.get(src, (err, res) => {
           getRequestsByUrl[src].forEach(cb => {
@@ -114,6 +114,8 @@ export default class InlineSVG extends React.PureComponent {
           });
         });
       }
+
+      getRequestsByUrl[src].push(callback);
     }
     else {
       http.get(src, (err, res) => {
