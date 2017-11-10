@@ -1,6 +1,9 @@
 # react-inlinesvg
 
-<a href="https://www.npmjs.com/package/react-inlinesvg" target="_blank">![](https://badge.fury.io/js/react-inlinesvg.svg)</a>
+[![NPM version](https://badge.fury.io/js/react-inlinesvg.svg)](https://badge.fury.io/js/react-inlinesvg.svg) 
+[![build status](https://travis-ci.org/gilbarbara/react-inlinesvg.svg)](https://travis-ci.org/gilbarbara/react-inlinesvg) 
+[![Maintainability](https://api.codeclimate.com/v1/badges/c7e42fe511b80cc25760/maintainability)](https://codeclimate.com/github/gilbarbara/react-inlinesvg/maintainability) 
+[![Test Coverage](https://api.codeclimate.com/v1/badges/c7e42fe511b80cc25760/test_coverage)](https://codeclimate.com/github/gilbarbara/react-inlinesvg/test_coverage)
 
 One of the reasons SVGs are awesome is because you can style them with CSS.
 Unfortunately, this winds up not being too useful in practice because the style
@@ -56,30 +59,30 @@ import SVG  from 'react-inlinesvg';
 Props
 ----
 
-**src** `string`  
+**src** `string`
 The SVG file you want to load. It can be an `url` or a string (base64 or encoded)
 
-**wrapper** `function`  
+**wrapper** `function`
 A React class or a function that returns a component instance to be used as the wrapper component. Defaults to `React.createFactory('span')`
 
-**preloader** `node`  
+**preloader** `node`
 A component to be shown while the SVG is loading.
 
-**cacheGetRequests** `boolean`  
-A boolean to only request SVGs once. Default is `false`.  
+**cacheGetRequests** `boolean`
+A boolean to only request SVGs once. Default is `false`.
 
-**uniquifyIDs** `boolean`  
-A boolean that create unique IDs for each icon by hashing it. Default is `true`.  
+**uniquifyIDs** `boolean`
+A boolean that create unique IDs for each icon by hashing it. Default is `true`.
 
-**uniqueHash** `string`  
+**uniqueHash** `string`
 A string to use with `uniquifyIDs`. Default to a random 8 characters string `[A-Za-z0-9]`
 
-**onLoad** `function`  
-A callback to be invoked upon successful load.  
-This will receive 2 arguments: the `src` prop and a `isCached` boolean 
+**onLoad** `function`
+A callback to be invoked upon successful load.
+This will receive 2 arguments: the `src` prop and a `isCached` boolean
 
-**onError** `function`  
-A callback to be invoked if loading the SVG fails.  
+**onError** `function`
+A callback to be invoked if loading the SVG fails.
 This will receive a single argument:
 
 - a xhr `RequestError` with:
@@ -90,7 +93,7 @@ This will receive a single argument:
     isHttpError: bool,
     status: number
 }
-``` 
+```
 
 - or an `InlineSVGError`, which has the following properties:
 
@@ -109,7 +112,7 @@ Browser Support
 ----
 
 Any browsers that support inlining SVGs and XHR will work. The component goes out of its way to handle IE9's weird XHR support so, IE9 and up get your SVG;
-lesser browsers get the fallback.  
+lesser browsers get the fallback.
 We use [httpplease](https://github.com/matthewwithanm/httpplease.js) for XHR requests.
 
 CORS
@@ -134,5 +137,5 @@ input to generate the `src`!
 
 Credits
 ----
-Thanks to [@matthewwithanm](https://github.com/matthewwithanm) for creating this component and so kindly transfer it to me.  
+Thanks to [@matthewwithanm](https://github.com/matthewwithanm) for creating this component and so kindly transfer it to me.
 I'll definitely keep the good work! ❤️
