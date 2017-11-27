@@ -35,11 +35,14 @@ The SVG [`<use>`][svg-use-external-source] element can be used to achieve
 something similar to this component. See [this article][use-article] for more
 information and [this table][use-support] for browser support and caveats.
 
-[![Code Sponsor](https://app.codesponsor.io/embed/aVyak7F2JA5ZCo4usjUoY8he/gilbarbara/react-inlinesvg.svg)](https://app.codesponsor.io/link/aVyak7F2JA5ZCo4usjUoY8he/gilbarbara/react-inlinesvg)
-
-
 Usage
 ----
+First install it.
+
+`npm install --save react-inlinesvg`
+
+And import it into your code:
+
 
 ```jsx
 import SVG  from 'react-inlinesvg';
