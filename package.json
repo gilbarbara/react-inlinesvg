@@ -1,6 +1,6 @@
 {
   "name": "react-inlinesvg",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "An SVG loader for React",
   "repository": {
     "type": "git",
@@ -23,7 +23,13 @@
   "bugs": {
     "url": "https://github.com/gilbarbara/react-inlinesvg/issues"
   },
-  "main": "./lib/index.js",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "files": [
+    "es",
+    "lib",
+    "src"
+  ],
   "peerDependencies": {
     "react": "^15.0.0 || ^16.0.0",
     "react-dom": "^15.0.0 || ^16.0.0",
