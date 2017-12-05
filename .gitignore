@@ -1,8 +1,9 @@
 .idea/
 .tmp/
 coverage/
-dist/
+es/
 documentation/
+lib/
 node_modules/
 reports/
 selenium-debug.log

@@ -1,14 +1,34 @@
 {
   "presets": [
-    ["env", {
+    [
+      "env", {
+      "useBuiltIns": true,
+      "modules": false,
       "targets": {
-        "browsers": ["last 2 versions", "safari >= 7"]
+        "node": "8"
       }
-    }],
+    }
+    ],
     "react",
     "stage-1"
   ],
-  "plugins": [
-    "add-module-exports"
-  ]
+  "env": {
+    "production": {
+      "plugins": [
+        "array-includes",
+        "transform-flow-strip-types"
+      ]
+    },
+    "commonjs": {
+      "plugins": [
+        ["transform-es2015-modules-commonjs", { "loose": true }]
+      ]
+    },
+    "test": {
+      "plugins": [
+        "transform-es2015-modules-commonjs"
+      ],
+      "sourceMaps": "both"
+    }
+  }
 }

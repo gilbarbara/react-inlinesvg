@@ -23,20 +23,10 @@ gulp.task('bump:patch', function() {
   return bump('patch');
 });
 
-gulp.task('watch', function() {
-  gulp.watch('./src/**/*', ['build']);
-});
-
-gulp.task('build:node', function() {
+gulp.task('build', function() {
   process.env.NODE_ENV = 'production';
+  process.env.BABEL_ENV = 'commonjs';
 
-  return gulp.src('./src/**/*.js')
-    .pipe($.babel({}))
-    .pipe(gulp.dest('./lib'));
-});
-
-gulp.task('build:browser', function() {
-  process.env.NODE_ENV = 'production';
   var bundler;
   var stream;
 
@@ -75,5 +65,3 @@ gulp.task('server:xdomain', function() {
     }
   });
 });
-
-gulp.task('build', ['build:node', 'build:browser']);

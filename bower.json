@@ -10,18 +10,19 @@
   "keywords": [
     "react-component",
     "react",
-    "svg",
-    "component"
+    "component",
+    "svg"
   ],
   "license": "MIT",
   "homepage": "https://github.com/matthewwithanm/react-inlinesvg",
   "ignore": [
     "**/.*",
     "coverage",
+    "es",
     "gulpfile.js",
+    "lib",
     "jest.config.js",
     "node_modules",
-    "lib",
     "test"
   ]
 }
