@@ -1,13 +1,11 @@
 {
   "presets": [
     [
-      "env", {
-      "useBuiltIns": true,
-      "modules": false,
-      "targets": {
-        "node": "8"
+      "env",
+      {
+        "useBuiltIns": true,
+        "modules": false
       }
-    }
     ],
     "react",
     "stage-1"
@@ -16,12 +14,16 @@
     "production": {
       "plugins": [
         "array-includes",
-        "transform-flow-strip-types"
+        "transform-flow-strip-types",
+        "transform-object-assign"
       ]
     },
     "commonjs": {
       "plugins": [
-        ["transform-es2015-modules-commonjs", { "loose": true }]
+        "array-includes",
+        ["transform-es2015-modules-commonjs", { "loose": true }],
+        "transform-flow-strip-types",
+        "transform-object-assign"
       ]
     },
     "test": {

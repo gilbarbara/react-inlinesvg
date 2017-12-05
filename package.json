@@ -45,6 +45,7 @@
     "babel-jest": "^21.2.0",
     "babel-plugin-array-includes": "^2.0.3",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
+    "babel-plugin-transform-object-assign": "^6.22.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-1": "^6.24.1",
@@ -97,6 +98,7 @@
     "postmerge": "node tasks update",
     "prepublishOnly": "npm run build"
   },
+  "browserslist": ["last 2 versions", "safari >= 8", "ios > 8"],
   "browserify": {
     "transform": [
       [
