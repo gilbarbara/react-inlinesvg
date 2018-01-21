@@ -101,7 +101,7 @@ export default class InlineSVG extends React.PureComponent {
       if (loadedIcons[src]) {
         const [err, res] = loadedIcons[src];
 
-        setTimeout(() => callback(err, res, true), 0);
+        callback(err, res, true);
       }
 
       if (!getRequestsByUrl[src]) {
@@ -169,7 +169,9 @@ export default class InlineSVG extends React.PureComponent {
         loadedText: res.text,
         status: Status.LOADED
       }, () => {
-        this.props.onLoad(this.props.src, isCached);
+        setTimeout(() => {
+          this.props.onLoad(this.props.src, isCached);
+        }, 0);
       });
     }
   };
