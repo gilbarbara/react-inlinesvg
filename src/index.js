@@ -169,9 +169,7 @@ export default class InlineSVG extends React.PureComponent {
         loadedText: res.text,
         status: Status.LOADED
       }, () => {
-        setTimeout(() => {
-          this.props.onLoad(this.props.src, isCached);
-        }, 0);
+        this.props.onLoad(this.props.src, isCached);
       });
     }
   };
