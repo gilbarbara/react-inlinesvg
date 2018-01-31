@@ -42,6 +42,7 @@ describe('react-inlinesvg', () => {
         src: fixtures.base64,
       });
 
+      expect(wrapper.props().uniqueHash).toBe(undefined);
       expect(wrapper.find('.isvg')).toHaveClassName('loaded');
     });
 
@@ -143,6 +144,7 @@ describe('react-inlinesvg', () => {
           wrapper.update();
           const html = wrapper.find('.isvg').html();
 
+          expect(wrapper.props().uniqueHash).toBe('test');
           expect(wrapper.find('.isvg')).toHaveClassName('loaded');
           expect(/linearGradient-1___test/.test(html)).toBe(true);
           done();
