@@ -54,7 +54,6 @@ export default class InlineSVG extends React.PureComponent {
     onLoad: () => {},
     supportTest: isSupportedEnvironment,
     uniquifyIDs: true,
-    uniqueHash: randomString(),
     wrapper: React.createFactory('span'),
   };
 
@@ -188,7 +187,7 @@ export default class InlineSVG extends React.PureComponent {
     const { uniquifyIDs, uniqueHash } = this.props;
 
     if (uniquifyIDs) {
-      return uniquifySVGIDs(svgText, uniqueHash);
+      return uniquifySVGIDs(svgText, uniqueHash || randomString());
     }
 
     return svgText;
