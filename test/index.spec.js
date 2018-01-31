@@ -169,9 +169,7 @@ describe('react-inlinesvg', () => {
     });
 
     it('should call error and render fallback for a 404', done => {
-      let wrapper;
-
-      wrapper = mount(
+      const wrapper = mount(
         <ReactInlineSVG
           src="DOESNOTEXIST.svg"
           onError={
