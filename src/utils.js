@@ -36,12 +36,12 @@ export const randomString = (length = 8) => {
 export const uniquifySVGIDs = (() => {
   const mkAttributePattern = attr => `(?:(?:\\s|\\:)${attr})`;
 
-  const idPattern = new RegExp(`(?:(${(mkAttributePattern('id'))})="([^"]+)")|(?:(${(mkAttributePattern('href'))}|${(mkAttributePattern('role'))}|${(mkAttributePattern('arcrole'))})="\\#([^"]+)")|(?:="url\\(\\#([^\\)]+)\\)")`, 'g');
+  const idPattern = new RegExp(`(?:(${(mkAttributePattern('id'))})="([^"]+)")|(?:(${(mkAttributePattern('href'))}|${(mkAttributePattern('role'))}|${(mkAttributePattern('arcrole'))})="\\#([^"]+)")|(?:="url\\(\\#([^\\)]+)\\)")|(?:url\\(\\#([^\\)]+)\\))`, 'g');
 
   return (svgText, svgID) => {
     const uniquifyID = id => `${id}___${svgID}`;
 
-    return svgText.replace(idPattern, (m, p1, p2, p3, p4, p5) => { //eslint-disable-line consistent-return
+    return svgText.replace(idPattern, (m, p1, p2, p3, p4, p5, p6) => { //eslint-disable-line consistent-return
       /* istanbul ignore else */
       if (p2) {
         return `${p1}="${(uniquifyID(p2))}"`;
@@ -51,6 +51,9 @@ export const uniquifySVGIDs = (() => {
       }
       else if (p5) {
         return `="url(#${(uniquifyID(p5))})"`;
+      }
+      else if (p6) {
+        return `url(#${uniquifyID(p6)})`;
       }
     });
   };
