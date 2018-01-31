@@ -13,10 +13,11 @@ export const supportsInlineSVG = once(() => {
 
 export const isSupportedEnvironment = once(() =>
   (
-    (typeof window !== 'undefined' && window !== null ? window.XMLHttpRequest : false) ||
-    (typeof window !== 'undefined' && window !== null ? window.XDomainRequest : false)
+    supportsInlineSVG() &&
+    typeof window !== 'undefined' && window !== null
+      ? window.XMLHttpRequest || window.XDomainRequest
+      : false
   )
-  && supportsInlineSVG()
 );
 
 export const randomString = (length = 8) => {
