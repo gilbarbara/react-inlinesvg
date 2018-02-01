@@ -100,7 +100,7 @@ export default class InlineSVG extends React.PureComponent {
       if (loadedIcons[src]) {
         const [err, res] = loadedIcons[src];
 
-        setTimeout(() => callback(err, res, true), 0);
+        callback(err, res, true);
       }
 
       if (!getRequestsByUrl[src]) {
