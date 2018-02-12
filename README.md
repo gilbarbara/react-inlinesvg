@@ -50,7 +50,7 @@ import SVG  from 'react-inlinesvg';
 
 <SVG
     src="/path/to/myfile.svg"
-    preload={<Loader />}
+    preloader={<Loader />}
     onLoad={(src) => {
         myOnLoadHandler(src);
     }}
