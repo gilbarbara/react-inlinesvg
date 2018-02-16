@@ -56,6 +56,9 @@ export const uniquifySVGIDs = (() => {
       else if (p6) {
         return `url(${baseURL}#${uniquifyID(p6)})`;
       }
+      else if (p6) {
+        return `url(#${uniquifyID(p6)})`;
+      }
     });
   };
 })();
