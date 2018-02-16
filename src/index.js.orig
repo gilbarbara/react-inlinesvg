@@ -189,7 +189,11 @@ export default class InlineSVG extends React.PureComponent {
     const { uniquifyIDs, uniqueHash, baseURL } = this.props;
 
     if (uniquifyIDs) {
-      return uniquifySVGIDs(svgText, uniqueHash || randomString(), baseURL);
+<<<<<<< HEAD
+      return uniquifySVGIDs(svgText, uniqueHash, baseURL);
+=======
+      return uniquifySVGIDs(svgText, uniqueHash || randomString());
+>>>>>>> 4c110d0df697431a34de6bb61f6bd0951e82690f
     }
 
     return svgText;

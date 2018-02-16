@@ -3134,9 +3134,7 @@ var InlineSVG = function (_React$PureComponent) {
               err = _loadedIcons$src[0],
               res = _loadedIcons$src[1];
 
-          setTimeout(function () {
-            return callback(err, res, true);
-          }, 0);
+          callback(err, res, true);
         }
 
         if (!getRequestsByUrl[src]) {
@@ -3217,7 +3215,7 @@ var InlineSVG = function (_React$PureComponent) {
 
 
       if (uniquifyIDs) {
-        return (0, _utils.uniquifySVGIDs)(svgText, uniqueHash, baseURL);
+        return (0, _utils.uniquifySVGIDs)(svgText, uniqueHash || (0, _utils.randomString)(), baseURL);
       }
 
       return svgText;
@@ -3259,6 +3257,7 @@ var InlineSVG = function (_React$PureComponent) {
 }(_react2.default.PureComponent);
 
 InlineSVG.propTypes = {
+  baseURL: _propTypes2.default.string,
   cacheGetRequests: _propTypes2.default.bool,
   children: _propTypes2.default.node,
   className: _propTypes2.default.string,
@@ -3270,17 +3269,15 @@ InlineSVG.propTypes = {
   supportTest: _propTypes2.default.func,
   uniqueHash: _propTypes2.default.string,
   uniquifyIDs: _propTypes2.default.bool,
-  wrapper: _propTypes2.default.func,
-  baseURL: _propTypes2.default.string
+  wrapper: _propTypes2.default.func
 };
 InlineSVG.defaultProps = {
+  baseURL: '',
   cacheGetRequests: false,
   onLoad: function onLoad() {},
   supportTest: _utils.isSupportedEnvironment,
   uniquifyIDs: true,
-  uniqueHash: (0, _utils.randomString)(),
-  wrapper: _react2.default.createFactory('span'),
-  baseURL: ''
+  wrapper: _react2.default.createFactory('span')
 };
 exports.default = InlineSVG;
 
@@ -3316,7 +3313,7 @@ var supportsInlineSVG = exports.supportsInlineSVG = (0, _once2.default)(function
 });
 
 var isSupportedEnvironment = exports.isSupportedEnvironment = (0, _once2.default)(function () {
-  return ((typeof window !== 'undefined' && window !== null ? window.XMLHttpRequest : false) || (typeof window !== 'undefined' && window !== null ? window.XDomainRequest : false)) && supportsInlineSVG();
+  return supportsInlineSVG() && typeof window !== 'undefined' && window !== null ? window.XMLHttpRequest || window.XDomainRequest : false;
 });
 
 var randomString = exports.randomString = function randomString() {

@@ -2,6 +2,7 @@
 
 [![NPM version](https://badge.fury.io/js/react-inlinesvg.svg)](https://www.npmjs.com/package/react-inlinesvg) 
 [![build status](https://travis-ci.org/gilbarbara/react-inlinesvg.svg)](https://travis-ci.org/gilbarbara/react-inlinesvg) 
+[![dependencies Status](https://david-dm.org/gilbarbara/react-inlinesvg/status.svg)](https://david-dm.org/gilbarbara/react-inlinesvg) 
 [![Maintainability](https://api.codeclimate.com/v1/badges/c7e42fe511b80cc25760/maintainability)](https://codeclimate.com/github/gilbarbara/react-inlinesvg/maintainability) 
 [![Test Coverage](https://api.codeclimate.com/v1/badges/c7e42fe511b80cc25760/test_coverage)](https://codeclimate.com/github/gilbarbara/react-inlinesvg/test_coverage)
 
@@ -49,7 +50,7 @@ import SVG  from 'react-inlinesvg';
 
 <SVG
     src="/path/to/myfile.svg"
-    preload={<Loader />}
+    preloader={<Loader />}
     onLoad={(src) => {
         myOnLoadHandler(src);
     }}
