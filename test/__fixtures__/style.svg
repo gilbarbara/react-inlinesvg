@@ -1,0 +1,12 @@
+<svg baseProfile="basic" width="223" height="222" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="a" gradientUnits="userSpaceOnUse" x1="185.5" y1="145.75" x2="199.5" y2="145.75">
+      <stop offset="0%" stop-color="#FFF" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#FFF"/>
+    </linearGradient>
+  </defs>
+  <g overflow="visible">
+    <path fill="#3D91DF" d="M185.5 90.75v110h14v-110h-14z"/>
+    <path d="M199.5 200.75v-110h-14v110h14z" style="fill:url(#a)"/>
+  </g>
+</svg>
