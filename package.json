@@ -98,7 +98,11 @@
     "postmerge": "node tasks update",
     "prepublishOnly": "npm run build"
   },
-  "browserslist": ["last 2 versions", "safari >= 8", "ios > 8"],
+  "browserslist": [
+    "last 2 versions",
+    "safari >= 8",
+    "ios > 8"
+  ],
   "browserify": {
     "transform": [
       [

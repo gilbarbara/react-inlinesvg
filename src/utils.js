@@ -38,7 +38,7 @@ export const uniquifySVGIDs = (() => {
 
   const idPattern = new RegExp(`(?:(${(mkAttributePattern('id'))})="([^"]+)")|(?:(${(mkAttributePattern('href'))}|${(mkAttributePattern('role'))}|${(mkAttributePattern('arcrole'))})="\\#([^"]+)")|(?:="url\\(\\#([^\\)]+)\\)")|(?:url\\(\\#([^\\)]+)\\))`, 'g');
 
-  return (svgText, svgID) => {
+  return (svgText, svgID, baseURL) => {
     const uniquifyID = id => `${id}___${svgID}`;
 
     return svgText.replace(idPattern, (m, p1, p2, p3, p4, p5, p6) => { //eslint-disable-line consistent-return
@@ -47,13 +47,13 @@ export const uniquifySVGIDs = (() => {
         return `${p1}="${(uniquifyID(p2))}"`;
       }
       else if (p4) {
-        return `${p3}="#${(uniquifyID(p4))}"`;
+        return `${p3}="${baseURL}#${(uniquifyID(p4))}"`;
       }
       else if (p5) {
-        return `="url(#${(uniquifyID(p5))})"`;
+        return `="url(${baseURL}#${(uniquifyID(p5))})"`;
       }
       else if (p6) {
-        return `url(#${uniquifyID(p6)})`;
+        return `url(${baseURL}#${uniquifyID(p6)})`;
       }
     });
   };

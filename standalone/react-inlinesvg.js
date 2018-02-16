@@ -3006,6 +3006,10 @@ function extend() {
 
 exports.__esModule = true;
 
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
@@ -3026,9 +3030,15 @@ var _utils = require('./utils');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const http = _httpplease2.default.use(_oldiexdomain2.default);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-const Status = {
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var http = _httpplease2.default.use(_oldiexdomain2.default);
+
+var Status = {
   PENDING: 'pending',
   LOADING: 'loading',
   LOADED: 'loaded',
@@ -3036,182 +3046,218 @@ const Status = {
   UNSUPPORTED: 'unsupported'
 };
 
-const getRequestsByUrl = {};
-const loadedIcons = {};
+var getRequestsByUrl = {};
+var loadedIcons = {};
 
-class InlineSVG extends _react2.default.PureComponent {
-  constructor(props) {
-    super(props);
+var InlineSVG = function (_React$PureComponent) {
+  _inherits(InlineSVG, _React$PureComponent);
 
-    this.handleLoad = (err, res, isCached = false) => {
+  function InlineSVG(props) {
+    _classCallCheck(this, InlineSVG);
+
+    var _this = _possibleConstructorReturn(this, (InlineSVG.__proto__ || Object.getPrototypeOf(InlineSVG)).call(this, props));
+
+    _this.handleLoad = function (err, res) {
+      var isCached = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
       if (err) {
-        this.fail(err);
+        _this.fail(err);
         return;
       }
 
-      if (this.isActive) {
-        this.setState({
+      if (_this.isActive) {
+        _this.setState({
           loadedText: res.text,
           status: Status.LOADED
-        }, () => {
-          this.props.onLoad(this.props.src, isCached);
+        }, function () {
+          _this.props.onLoad(_this.props.src, isCached);
         });
       }
     };
 
-    this.state = {
+    _this.state = {
       status: Status.PENDING
     };
 
-    this.isActive = false;
+    _this.isActive = false;
+    return _this;
   }
 
-  componentWillMount() {
-    this.isActive = true;
-  }
-
-  componentDidMount() {
-    /* istanbul ignore else */
-    if (this.state.status === Status.PENDING) {
-      if (this.props.supportTest()) {
+  _createClass(InlineSVG, [{
+    key: 'componentWillMount',
+    value: function componentWillMount() {
+      this.isActive = true;
+    }
+  }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      /* istanbul ignore else */
+      if (this.state.status === Status.PENDING) {
+        if (this.props.supportTest()) {
+          if (this.props.src) {
+            this.startLoad();
+          } else {
+            this.fail((0, _utils.configurationError)('Missing source'));
+          }
+        } else {
+          this.fail((0, _utils.unsupportedBrowserError)());
+        }
+      }
+    }
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate(prevProps) {
+      if (prevProps.src !== this.props.src) {
         if (this.props.src) {
           this.startLoad();
         } else {
           this.fail((0, _utils.configurationError)('Missing source'));
         }
-      } else {
-        this.fail((0, _utils.unsupportedBrowserError)());
       }
     }
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps.src !== this.props.src) {
-      if (this.props.src) {
-        this.startLoad();
-      } else {
-        this.fail((0, _utils.configurationError)('Missing source'));
-      }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      this.isActive = false;
     }
-  }
+  }, {
+    key: 'getFile',
+    value: function getFile(callback) {
+      var _props = this.props,
+          cacheGetRequests = _props.cacheGetRequests,
+          src = _props.src;
 
-  componentWillUnmount() {
-    this.isActive = false;
-  }
 
-  getFile(callback) {
-    const { cacheGetRequests, src } = this.props;
+      if (cacheGetRequests) {
+        if (loadedIcons[src]) {
+          var _loadedIcons$src = _slicedToArray(loadedIcons[src], 2),
+              err = _loadedIcons$src[0],
+              res = _loadedIcons$src[1];
 
-    if (cacheGetRequests) {
-      if (loadedIcons[src]) {
-        const [err, res] = loadedIcons[src];
+          setTimeout(function () {
+            return callback(err, res, true);
+          }, 0);
+        }
 
-        setTimeout(() => callback(err, res, true), 0);
-      }
+        if (!getRequestsByUrl[src]) {
+          getRequestsByUrl[src] = [];
 
-      if (!getRequestsByUrl[src]) {
-        getRequestsByUrl[src] = [];
-
-        http.get(src, (err, res) => {
-          getRequestsByUrl[src].forEach(cb => {
-            loadedIcons[src] = [err, res];
-            cb(err, res);
+          http.get(src, function (err, res) {
+            getRequestsByUrl[src].forEach(function (cb) {
+              loadedIcons[src] = [err, res];
+              cb(err, res);
+            });
           });
+        }
+
+        getRequestsByUrl[src].push(callback);
+      } else {
+        http.get(src, function (err, res) {
+          callback(err, res);
+        });
+      }
+    }
+  }, {
+    key: 'fail',
+    value: function fail(error) {
+      var _this2 = this;
+
+      var status = error.isUnsupportedBrowserError ? Status.UNSUPPORTED : Status.FAILED;
+
+      /* istanbul ignore else */
+      if (this.isActive) {
+        this.setState({ status: status }, function () {
+          if (typeof _this2.props.onError === 'function') {
+            _this2.props.onError(error);
+          }
+        });
+      }
+    }
+  }, {
+    key: 'startLoad',
+    value: function startLoad() {
+      /* istanbul ignore else */
+      if (this.isActive) {
+        this.setState({
+          status: Status.LOADING
+        }, this.load);
+      }
+    }
+  }, {
+    key: 'load',
+    value: function load() {
+      var match = this.props.src.match(/data:image\/svg[^,]*?(;base64)?,(.*)/);
+
+      if (match) {
+        return this.handleLoad(null, {
+          text: match[1] ? atob(match[2]) : decodeURIComponent(match[2])
         });
       }
 
-      getRequestsByUrl[src].push(callback);
-    } else {
-      http.get(src, (err, res) => {
-        callback(err, res);
-      });
+      return this.getFile(this.handleLoad);
     }
-  }
+  }, {
+    key: 'getClassName',
+    value: function getClassName() {
+      var className = 'isvg ' + this.state.status;
 
-  fail(error) {
-    const status = error.isUnsupportedBrowserError ? Status.UNSUPPORTED : Status.FAILED;
+      if (this.props.className) {
+        className += ' ' + this.props.className;
+      }
 
-    /* istanbul ignore else */
-    if (this.isActive) {
-      this.setState({ status }, () => {
-        if (typeof this.props.onError === 'function') {
-          this.props.onError(error);
-        }
-      });
+      return className;
     }
-  }
+  }, {
+    key: 'processSVG',
+    value: function processSVG(svgText) {
+      var _props2 = this.props,
+          uniquifyIDs = _props2.uniquifyIDs,
+          uniqueHash = _props2.uniqueHash,
+          baseURL = _props2.baseURL;
 
-  startLoad() {
-    /* istanbul ignore else */
-    if (this.isActive) {
-      this.setState({
-        status: Status.LOADING
-      }, this.load);
+
+      if (uniquifyIDs) {
+        return (0, _utils.uniquifySVGIDs)(svgText, uniqueHash, baseURL);
+      }
+
+      return svgText;
     }
-  }
-
-  load() {
-    const match = this.props.src.match(/data:image\/svg[^,]*?(;base64)?,(.*)/);
-
-    if (match) {
-      return this.handleLoad(null, {
-        text: match[1] ? atob(match[2]) : decodeURIComponent(match[2])
-      });
+  }, {
+    key: 'renderContents',
+    value: function renderContents() {
+      switch (this.state.status) {
+        case Status.UNSUPPORTED:
+        case Status.FAILED:
+          return this.props.children;
+        default:
+          return this.props.preloader;
+      }
     }
+  }, {
+    key: 'render',
+    value: function render() {
+      var content = void 0;
+      var html = void 0;
 
-    return this.getFile(this.handleLoad);
-  }
+      if (this.state.loadedText) {
+        html = {
+          __html: this.processSVG(this.state.loadedText)
+        };
+      } else {
+        content = this.renderContents();
+      }
 
-  getClassName() {
-    let className = `isvg ${this.state.status}`;
-
-    if (this.props.className) {
-      className += ` ${this.props.className}`;
+      return this.props.wrapper({
+        style: this.props.style,
+        className: this.getClassName(),
+        dangerouslySetInnerHTML: html
+      }, content);
     }
+  }]);
 
-    return className;
-  }
+  return InlineSVG;
+}(_react2.default.PureComponent);
 
-  processSVG(svgText) {
-    const { uniquifyIDs, uniqueHash } = this.props;
-
-    if (uniquifyIDs) {
-      return (0, _utils.uniquifySVGIDs)(svgText, uniqueHash);
-    }
-
-    return svgText;
-  }
-
-  renderContents() {
-    switch (this.state.status) {
-      case Status.UNSUPPORTED:
-      case Status.FAILED:
-        return this.props.children;
-      default:
-        return this.props.preloader;
-    }
-  }
-
-  render() {
-    let content;
-    let html;
-
-    if (this.state.loadedText) {
-      html = {
-        __html: this.processSVG(this.state.loadedText)
-      };
-    } else {
-      content = this.renderContents();
-    }
-
-    return this.props.wrapper({
-      style: this.props.style,
-      className: this.getClassName(),
-      dangerouslySetInnerHTML: html
-    }, content);
-  }
-}
-exports.default = InlineSVG;
 InlineSVG.propTypes = {
   cacheGetRequests: _propTypes2.default.bool,
   children: _propTypes2.default.node,
@@ -3224,16 +3270,19 @@ InlineSVG.propTypes = {
   supportTest: _propTypes2.default.func,
   uniqueHash: _propTypes2.default.string,
   uniquifyIDs: _propTypes2.default.bool,
-  wrapper: _propTypes2.default.func
+  wrapper: _propTypes2.default.func,
+  baseURL: _propTypes2.default.string
 };
 InlineSVG.defaultProps = {
   cacheGetRequests: false,
-  onLoad: () => {},
+  onLoad: function onLoad() {},
   supportTest: _utils.isSupportedEnvironment,
   uniquifyIDs: true,
   uniqueHash: (0, _utils.randomString)(),
-  wrapper: _react2.default.createFactory('span')
+  wrapper: _react2.default.createFactory('span'),
+  baseURL: ''
 };
+exports.default = InlineSVG;
 
 },{"./utils":29,"httpplease":6,"httpplease/plugins/oldiexdomain":14,"prop-types":20,"react":24}],29:[function(require,module,exports){
 'use strict';
@@ -3249,77 +3298,103 @@ var _once2 = _interopRequireDefault(_once);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const supportsInlineSVG = exports.supportsInlineSVG = (0, _once2.default)(() => {
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var supportsInlineSVG = exports.supportsInlineSVG = (0, _once2.default)(function () {
   /* istanbul ignore next */
   if (!document) {
     return false;
   }
 
-  const div = document.createElement('div');
+  var div = document.createElement('div');
   div.innerHTML = '<svg />';
   return div.firstChild && div.firstChild.namespaceURI === 'http://www.w3.org/2000/svg';
 });
 
-const isSupportedEnvironment = exports.isSupportedEnvironment = (0, _once2.default)(() => ((typeof window !== 'undefined' && window !== null ? window.XMLHttpRequest : false) || (typeof window !== 'undefined' && window !== null ? window.XDomainRequest : false)) && supportsInlineSVG());
+var isSupportedEnvironment = exports.isSupportedEnvironment = (0, _once2.default)(function () {
+  return ((typeof window !== 'undefined' && window !== null ? window.XMLHttpRequest : false) || (typeof window !== 'undefined' && window !== null ? window.XDomainRequest : false)) && supportsInlineSVG();
+});
 
-const randomString = exports.randomString = (length = 8) => {
-  const letters = 'abcdefghijklmnopqrstuvwxyz';
-  const numbers = '1234567890';
-  const charset = letters + letters.toUpperCase() + numbers;
+var randomString = exports.randomString = function randomString() {
+  var length = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 8;
 
-  const randomCharacter = array => array[Math.floor(Math.random() * array.length)];
+  var letters = 'abcdefghijklmnopqrstuvwxyz';
+  var numbers = '1234567890';
+  var charset = letters + letters.toUpperCase() + numbers;
 
-  let R = '';
-  for (let i = 0; i < length; i++) {
+  var randomCharacter = function randomCharacter(array) {
+    return array[Math.floor(Math.random() * array.length)];
+  };
+
+  var R = '';
+  for (var i = 0; i < length; i++) {
     R += randomCharacter(charset);
   }
   return R;
 };
 
-const uniquifySVGIDs = exports.uniquifySVGIDs = (() => {
-  const mkAttributePattern = attr => `(?:(?:\\s|\\:)${attr})`;
+var uniquifySVGIDs = exports.uniquifySVGIDs = function () {
+  var mkAttributePattern = function mkAttributePattern(attr) {
+    return '(?:(?:\\s|\\:)' + attr + ')';
+  };
 
-  const idPattern = new RegExp(`(?:(${mkAttributePattern('id')})="([^"]+)")|(?:(${mkAttributePattern('href')}|${mkAttributePattern('role')}|${mkAttributePattern('arcrole')})="\\#([^"]+)")|(?:="url\\(\\#([^\\)]+)\\)")`, 'g');
+  var idPattern = new RegExp('(?:(' + mkAttributePattern('id') + ')="([^"]+)")|(?:(' + mkAttributePattern('href') + '|' + mkAttributePattern('role') + '|' + mkAttributePattern('arcrole') + ')="\\#([^"]+)")|(?:="url\\(\\#([^\\)]+)\\)")|(?:url\\(\\#([^\\)]+)\\))', 'g');
 
-  return (svgText, svgID) => {
-    const uniquifyID = id => `${id}___${svgID}`;
+  return function (svgText, svgID, baseURL) {
+    var uniquifyID = function uniquifyID(id) {
+      return id + '___' + svgID;
+    };
 
-    return svgText.replace(idPattern, (m, p1, p2, p3, p4, p5) => {
+    return svgText.replace(idPattern, function (m, p1, p2, p3, p4, p5, p6) {
       //eslint-disable-line consistent-return
       /* istanbul ignore else */
       if (p2) {
-        return `${p1}="${uniquifyID(p2)}"`;
+        return p1 + '="' + uniquifyID(p2) + '"';
       } else if (p4) {
-        return `${p3}="#${uniquifyID(p4)}"`;
+        return p3 + '="' + baseURL + '#' + uniquifyID(p4) + '"';
       } else if (p5) {
-        return `="url(#${uniquifyID(p5)})"`;
+        return '="url(' + baseURL + '#' + uniquifyID(p5) + ')"';
+      } else if (p6) {
+        return 'url(' + baseURL + '#' + uniquifyID(p6) + ')';
       }
     });
   };
-})();
+}();
 
-class InlineSVGError extends Error {
-  constructor(message) {
-    super();
+var InlineSVGError = function (_Error) {
+  _inherits(InlineSVGError, _Error);
 
-    this.name = 'InlineSVGError';
-    this.isSupportedBrowser = true;
-    this.isConfigurationError = false;
-    this.isUnsupportedBrowserError = false;
-    this.message = message;
+  function InlineSVGError(message) {
+    var _ret;
 
-    return this;
+    _classCallCheck(this, InlineSVGError);
+
+    var _this = _possibleConstructorReturn(this, (InlineSVGError.__proto__ || Object.getPrototypeOf(InlineSVGError)).call(this));
+
+    _this.name = 'InlineSVGError';
+    _this.isSupportedBrowser = true;
+    _this.isConfigurationError = false;
+    _this.isUnsupportedBrowserError = false;
+    _this.message = message;
+
+    return _ret = _this, _possibleConstructorReturn(_this, _ret);
   }
-}
 
-const createError = (message, attrs) => {
-  const err = new InlineSVGError(message);
+  return InlineSVGError;
+}(Error);
+
+var createError = function createError(message, attrs) {
+  var err = new InlineSVGError(message);
 
   return _extends({}, err, attrs);
 };
 
-const unsupportedBrowserError = exports.unsupportedBrowserError = message => {
-  let newMessage = message;
+var unsupportedBrowserError = exports.unsupportedBrowserError = function unsupportedBrowserError(message) {
+  var newMessage = message;
 
   /* istanbul ignore else */
   if (!newMessage) {
@@ -3332,9 +3407,11 @@ const unsupportedBrowserError = exports.unsupportedBrowserError = message => {
   });
 };
 
-const configurationError = exports.configurationError = message => createError(message, {
-  isConfigurationError: true
-});
+var configurationError = exports.configurationError = function configurationError(message) {
+  return createError(message, {
+    isConfigurationError: true
+  });
+};
 
 },{"once":16}]},{},[28])(28)
 });
