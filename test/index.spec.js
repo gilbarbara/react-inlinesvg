@@ -172,13 +172,13 @@ describe('react-inlinesvg', () => {
       const wrapper = setup({
         src: '/test/__fixtures__/style.svg',
         preloader: (<div className="loader">loading</div>),
-        baseURL: 'testing',
+        baseURL: 'https://github.com/gilbarbara/react-inlinesvg/',
         onError: done,
         onLoad: () => {
           wrapper.update();
           const html = wrapper.find('.isvg').html();
 
-          expect(/fill:url\(testing#a___/.test(html)).toBe(true);
+          expect(/fill:url\(https:\/\/github\.com\/gilbarbara\/react-inlinesvg\/#a___/.test(html)).toBe(true);
 
           done();
         }

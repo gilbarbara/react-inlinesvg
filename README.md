@@ -84,15 +84,7 @@ A boolean that create unique IDs for each icon by hashing it. Default is `true`.
 A string to use with `uniquifyIDs`. Default to a random 8 characters string `[A-Za-z0-9]`
 
 **baseURL** `string`
-A string to prefix each ID with a baseURL. Use this in case you are embedding the SVGs on a page that uses the `base` tag.
-
-Most common usecase:
-
-```js
-<SVG
-  baseURL={document.location.pathname}
-/>
-```
+An URL to prefix each ID in case you are using the `base` tag.
 
 **onLoad** `function`
 A callback to be invoked upon successful load.
