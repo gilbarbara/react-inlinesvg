@@ -168,6 +168,23 @@ describe('react-inlinesvg', () => {
       });
     });
 
+    it('should prefix the ids with the baseURL', done => {
+      const wrapper = setup({
+        src: '/test/__fixtures__/style.svg',
+        preloader: (<div className="loader">loading</div>),
+        baseURL: 'https://github.com/gilbarbara/react-inlinesvg/',
+        onError: done,
+        onLoad: () => {
+          wrapper.update();
+          const html = wrapper.find('.isvg').html();
+
+          expect(/fill:url\(https:\/\/github\.com\/gilbarbara\/react-inlinesvg\/#a___/.test(html)).toBe(true);
+
+          done();
+        }
+      });
+    });
+
     it('should not uniquify ids if it\'s disabled', done => {
       const wrapper = setup({
         src: 'https://raw.githubusercontent.com/gilbarbara/logos/00cf8501d18b9e377ec0227b915a6f74ab4bd18f/logos/apiary.svg',

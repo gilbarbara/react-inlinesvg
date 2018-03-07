@@ -35,6 +35,7 @@ export default class InlineSVG extends React.PureComponent {
   }
 
   static propTypes = {
+    baseURL: PropTypes.string,
     cacheGetRequests: PropTypes.bool,
     children: PropTypes.node,
     className: PropTypes.string,
@@ -46,10 +47,11 @@ export default class InlineSVG extends React.PureComponent {
     supportTest: PropTypes.func,
     uniqueHash: PropTypes.string,
     uniquifyIDs: PropTypes.bool,
-    wrapper: PropTypes.func
+    wrapper: PropTypes.func,
   };
 
   static defaultProps = {
+    baseURL: '',
     cacheGetRequests: false,
     onLoad: () => {},
     supportTest: isSupportedEnvironment,
@@ -189,10 +191,10 @@ export default class InlineSVG extends React.PureComponent {
   }
 
   processSVG(svgText) {
-    const { uniquifyIDs, uniqueHash } = this.props;
+    const { uniquifyIDs, uniqueHash, baseURL } = this.props;
 
     if (uniquifyIDs) {
-      return uniquifySVGIDs(svgText, uniqueHash || randomString());
+      return uniquifySVGIDs(svgText, uniqueHash || randomString(), baseURL);
     }
 
     return svgText;

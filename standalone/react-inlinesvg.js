@@ -3134,9 +3134,7 @@ var InlineSVG = function (_React$PureComponent) {
               err = _loadedIcons$src[0],
               res = _loadedIcons$src[1];
 
-          setTimeout(function () {
-            return callback(err, res, true);
-          }, 0);
+          callback(err, res, true);
         }
 
         if (!getRequestsByUrl[src]) {
@@ -3212,11 +3210,12 @@ var InlineSVG = function (_React$PureComponent) {
     value: function processSVG(svgText) {
       var _props2 = this.props,
           uniquifyIDs = _props2.uniquifyIDs,
-          uniqueHash = _props2.uniqueHash;
+          uniqueHash = _props2.uniqueHash,
+          baseURL = _props2.baseURL;
 
 
       if (uniquifyIDs) {
-        return (0, _utils.uniquifySVGIDs)(svgText, uniqueHash || (0, _utils.randomString)());
+        return (0, _utils.uniquifySVGIDs)(svgText, uniqueHash || (0, _utils.randomString)(), baseURL);
       }
 
       return svgText;
@@ -3258,6 +3257,7 @@ var InlineSVG = function (_React$PureComponent) {
 }(_react2.default.PureComponent);
 
 InlineSVG.propTypes = {
+  baseURL: _propTypes2.default.string,
   cacheGetRequests: _propTypes2.default.bool,
   children: _propTypes2.default.node,
   className: _propTypes2.default.string,
@@ -3272,6 +3272,7 @@ InlineSVG.propTypes = {
   wrapper: _propTypes2.default.func
 };
 InlineSVG.defaultProps = {
+  baseURL: '',
   cacheGetRequests: false,
   onLoad: function onLoad() {},
   supportTest: _utils.isSupportedEnvironment,
@@ -3338,22 +3339,24 @@ var uniquifySVGIDs = exports.uniquifySVGIDs = function () {
     return '(?:(?:\\s|\\:)' + attr + ')';
   };
 
-  var idPattern = new RegExp('(?:(' + mkAttributePattern('id') + ')="([^"]+)")|(?:(' + mkAttributePattern('href') + '|' + mkAttributePattern('role') + '|' + mkAttributePattern('arcrole') + ')="\\#([^"]+)")|(?:="url\\(\\#([^\\)]+)\\)")', 'g');
+  var idPattern = new RegExp('(?:(' + mkAttributePattern('id') + ')="([^"]+)")|(?:(' + mkAttributePattern('href') + '|' + mkAttributePattern('role') + '|' + mkAttributePattern('arcrole') + ')="\\#([^"]+)")|(?:="url\\(\\#([^\\)]+)\\)")|(?:url\\(\\#([^\\)]+)\\))', 'g');
 
-  return function (svgText, svgID) {
+  return function (svgText, svgID, baseURL) {
     var uniquifyID = function uniquifyID(id) {
       return id + '___' + svgID;
     };
 
-    return svgText.replace(idPattern, function (m, p1, p2, p3, p4, p5) {
+    return svgText.replace(idPattern, function (m, p1, p2, p3, p4, p5, p6) {
       //eslint-disable-line consistent-return
       /* istanbul ignore else */
       if (p2) {
         return p1 + '="' + uniquifyID(p2) + '"';
       } else if (p4) {
-        return p3 + '="#' + uniquifyID(p4) + '"';
+        return p3 + '="' + baseURL + '#' + uniquifyID(p4) + '"';
       } else if (p5) {
-        return '="url(#' + uniquifyID(p5) + ')"';
+        return '="url(' + baseURL + '#' + uniquifyID(p5) + ')"';
+      } else if (p6) {
+        return 'url(' + baseURL + '#' + uniquifyID(p6) + ')';
       }
     });
   };
