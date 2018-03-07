@@ -40,13 +40,13 @@ Usage
 ----
 First install it.
 
-`npm install --save react-inlinesvg`
+`npm i react-inlinesvg`
 
 And import it into your code:
 
 
 ```jsx
-import SVG  from 'react-inlinesvg';
+import SVG from 'react-inlinesvg';
 
 <SVG
     src="/path/to/myfile.svg"
@@ -65,33 +65,36 @@ import SVG  from 'react-inlinesvg';
 Props
 ----
 
-**src** `string`
+**src** {string}  
 The SVG file you want to load. It can be an `url` or a string (base64 or encoded)
 
-**wrapper** `function`
-A React class or a function that returns a component instance to be used as the wrapper component. Defaults to `React.createFactory('span')`
+**wrapper** {function} ▶︎ `React.createFactory('span')`  
+A React class or a function that returns a component instance to be used as the wrapper component.
 
-**preloader** `node`
+**preloader** {node}  
 A component to be shown while the SVG is loading.
 
-**cacheGetRequests** `boolean`
-A boolean to only request SVGs once. Default is `false`.
+**className** {string}  
+A class to add to the default wrapper.
 
-**uniquifyIDs** `boolean`
-A boolean that create unique IDs for each icon by hashing it. Default is `true`.
+**cacheGetRequests** {boolean} ▶︎ `false`
+Only request SVGs once.
 
-**uniqueHash** `string`
-A string to use with `uniquifyIDs`. Default to a random 8 characters string `[A-Za-z0-9]`
+**uniquifyIDs** {boolean} ▶︎ `true`  
+Create unique IDs for each icon.
 
-**baseURL** `string`
-An URL to prefix each ID in case you are using the `base` tag.
+**uniqueHash** {string}  
+A string to use with `uniquifyIDs`.
 
-**onLoad** `function`
-A callback to be invoked upon successful load.
+**baseURL** {string}
+An URL to prefix each ID in case you are using the `<base>` tag.
+
+**onLoad** {function} ▶︎ a random 8 characters string `[A-Za-z0-9]`  
+A callback to be invoked upon successful load.  
 This will receive 2 arguments: the `src` prop and a `isCached` boolean
 
-**onError** `function`
-A callback to be invoked if loading the SVG fails.
+**onError** {function}  
+A callback to be invoked if loading the SVG fails.  
 This will receive a single argument:
 
 - a xhr `RequestError` with:
