@@ -3123,6 +3123,8 @@ var InlineSVG = function (_React$PureComponent) {
   }, {
     key: 'getFile',
     value: function getFile(callback) {
+      var _this2 = this;
+
       var _props = this.props,
           cacheGetRequests = _props.cacheGetRequests,
           src = _props.src;
@@ -3143,7 +3145,10 @@ var InlineSVG = function (_React$PureComponent) {
           http.get(src, function (err, res) {
             getRequestsByUrl[src].forEach(function (cb) {
               loadedIcons[src] = [err, res];
-              cb(err, res);
+
+              if (src === _this2.props.src) {
+                cb(err, res);
+              }
             });
           });
         }
@@ -3151,22 +3156,24 @@ var InlineSVG = function (_React$PureComponent) {
         getRequestsByUrl[src].push(callback);
       } else {
         http.get(src, function (err, res) {
-          callback(err, res);
+          if (src === _this2.props.src) {
+            callback(err, res);
+          }
         });
       }
     }
   }, {
     key: 'fail',
     value: function fail(error) {
-      var _this2 = this;
+      var _this3 = this;
 
       var status = error.isUnsupportedBrowserError ? Status.UNSUPPORTED : Status.FAILED;
 
       /* istanbul ignore else */
       if (this.isActive) {
         this.setState({ status: status }, function () {
-          if (typeof _this2.props.onError === 'function') {
-            _this2.props.onError(error);
+          if (typeof _this3.props.onError === 'function') {
+            _this3.props.onError(error);
           }
         });
       }
