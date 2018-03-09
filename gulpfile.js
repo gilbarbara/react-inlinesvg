@@ -5,24 +5,6 @@ var $ = require('gulp-load-plugins')();
 var cors = require('cors');
 var source = require('vinyl-source-stream');
 
-function bump(type) {
-  return gulp.src(['./bower.json', './package.json'])
-    .pipe($.bump({ type: type }))
-    .pipe(gulp.dest('./'));
-}
-
-gulp.task('bump:major', function() {
-  return bump('major');
-});
-
-gulp.task('bump:minor', function() {
-  return bump('minor');
-});
-
-gulp.task('bump:patch', function() {
-  return bump('patch');
-});
-
 gulp.task('build', function() {
   process.env.NODE_ENV = 'production';
   process.env.BABEL_ENV = 'commonjs';
