@@ -108,8 +108,7 @@
       [
         "babelify",
         {
-          "ignore": "/bower_components/",
-          "sourceMapRelative": "."
+          "ignore": "/bower_components/"
         }
       ]
     ]
