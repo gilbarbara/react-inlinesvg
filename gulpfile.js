@@ -1,28 +1,7 @@
 /*eslint-disable no-var, func-names, prefer-arrow-callback, object-shorthand, require-jsdoc, vars-on-top  */
 var gulp = require('gulp');
-var browserify = require('browserify');
 var $ = require('gulp-load-plugins')();
 var cors = require('cors');
-var source = require('vinyl-source-stream');
-
-gulp.task('build', function() {
-  process.env.NODE_ENV = 'production';
-  process.env.BABEL_ENV = 'commonjs';
-
-  var bundler;
-  var stream;
-
-  bundler = browserify({
-    entries: './src/index.js',
-    standalone: 'ReactInlineSVG'
-  });
-
-  stream = bundler.bundle();
-
-  return stream
-    .pipe(source('react-inlinesvg.js'))
-    .pipe(gulp.dest('./standalone/'));
-});
 
 gulp.task('server', ['server:local', 'server:xdomain']);
 
