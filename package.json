@@ -73,7 +73,7 @@
     "yargs": "^11.0.0"
   },
   "scripts": {
-    "build": "npm run clean && npm run build:commonjs && npm run build:es && npm run build:standalone",
+    "build": "npm run clean && npm run build:commonjs && npm run build:es",
     "build:commonjs": "cross-env BABEL_ENV=commonjs babel src -d lib",
     "build:es": "cross-env NODE_ENV=production babel src -d es",
     "watch": "npm run build:commonjs -- -w",
