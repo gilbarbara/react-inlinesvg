@@ -82,8 +82,8 @@
     "test": "npm run start & SERVE_PID=$! && jest --bail --coverage && kill $SERVE_PID",
     "test:watch": "jest --watch",
     "lint": "eslint -c ./.eslintrc $(find src -name '*.js')",
-    "precommit": "node tasks has-commits && npm run lint && npm test",
-    "postmerge": "node tasks update",
+    "precommit": "node tools has-commits && npm run lint && npm test",
+    "postmerge": "node tools update",
     "prepublishOnly": "npm run build"
   },
   "browserslist": [
