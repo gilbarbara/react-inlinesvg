@@ -4,6 +4,8 @@ import { mount } from 'enzyme';
 import ReactInlineSVG from '../src';
 
 const fixtures = {
+  tiger: '/tiger.svg',
+  style: '/style.svg',
   url: 'https://raw.githubusercontent.com/google/material-design-icons/master/av/svg/production/ic_play_arrow_24px.svg',
   base64: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxwYXRoIGQ9Ik04IDV2MTRsMTEtN3oiLz4KICAgIDxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4KPC9zdmc+Cg==',
   inline: 'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M8%205v14l11-7z%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22%2F%3E%0A%3C%2Fsvg%3E%0A',
@@ -22,15 +24,13 @@ describe('react-inlinesvg', () => {
     });
 
     it('should load a relative svg', done => {
-      const src = '/test/__fixtures__/tiger.svg';
-
       const wrapper = setup({
-        src,
+        src: fixtures.tiger,
         onError: done,
         onLoad: value => {
           wrapper.update();
 
-          expect(value).toBe(src);
+          expect(value).toBe(fixtures.tiger);
           expect(wrapper.find('.isvg')).toHaveClassName('loaded');
           done();
         }
@@ -154,7 +154,7 @@ describe('react-inlinesvg', () => {
 
     it('should uniquify ids in the style attribute', done => {
       const wrapper = setup({
-        src: '/test/__fixtures__/style.svg',
+        src: fixtures.style,
         preloader: (<div className="loader">loading</div>),
         onError: done,
         onLoad: () => {
@@ -170,7 +170,7 @@ describe('react-inlinesvg', () => {
 
     it('should prefix the ids with the baseURL', done => {
       const wrapper = setup({
-        src: '/test/__fixtures__/style.svg',
+        src: fixtures.style,
         preloader: (<div className="loader">loading</div>),
         baseURL: 'https://github.com/gilbarbara/react-inlinesvg/',
         onError: done,
@@ -223,10 +223,10 @@ describe('react-inlinesvg', () => {
 
     it('should load SVGs from a CORS-enabled domain', done => {
       setup({
-        src: 'http://localhost:1338/test/__fixtures__/tiger.svg',
+        src: 'http://localhost:1337/tiger.svg',
         onError: done,
         onLoad: src => {
-          expect(src).toBe('http://localhost:1338/test/__fixtures__/tiger.svg');
+          expect(src).toBe('http://localhost:1337/tiger.svg');
           done();
         }
       });

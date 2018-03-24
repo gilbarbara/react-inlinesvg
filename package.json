@@ -69,6 +69,7 @@
     "react-dom": "^16.2.0",
     "react-test-renderer": "^16.2.0",
     "rimraf": "^2.6.2",
+    "serve": "^6.5.3",
     "yargs": "^11.0.0"
   },
   "scripts": {
@@ -77,7 +78,7 @@
     "build:es": "cross-env NODE_ENV=production babel src -d es",
     "watch": "npm run build:commonjs -- -w",
     "clean": "rimraf es && rimraf lib",
-    "start": "gulp server",
+    "start": "serve -p 1337 test/__fixtures__",
     "test": "npm run start & SERVE_PID=$! && jest --bail --coverage && kill $SERVE_PID",
     "test:watch": "jest --watch",
     "lint": "eslint -c ./.eslintrc $(find src -name '*.js')",
