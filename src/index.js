@@ -39,6 +39,7 @@ export default class InlineSVG extends React.PureComponent {
     cacheGetRequests: PropTypes.bool,
     children: PropTypes.node,
     className: PropTypes.string,
+    onClick: PropTypes.func,
     onError: PropTypes.func,
     onLoad: PropTypes.func,
     preloader: PropTypes.node,
@@ -227,6 +228,7 @@ export default class InlineSVG extends React.PureComponent {
       style: this.props.style,
       className: this.getClassName(),
       dangerouslySetInnerHTML: html,
+      onClick: this.props.onClick
     }, content);
   }
 }
