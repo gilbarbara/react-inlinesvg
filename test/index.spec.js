@@ -175,7 +175,6 @@ describe('react-inlinesvg', () => {
           wrapper.update();
           const html = wrapper.find('.isvg').html();
 
-          console.log(html);
           expect(/<title>/.test(html)).toBe(false);
 
           done();
@@ -191,7 +190,6 @@ describe('react-inlinesvg', () => {
           wrapper.update();
           const html = wrapper.find('.isvg').html();
 
-          console.log(html);
           expect(/<title>test title<\/title>/.test(html)).toBe(true);
 
           done();
