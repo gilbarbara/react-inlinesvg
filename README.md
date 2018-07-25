@@ -51,6 +51,7 @@ import SVG from 'react-inlinesvg';
 <SVG
     src="/path/to/myfile.svg"
     preloader={<Loader />}
+    title="React inline SVG title"
     onLoad={(src) => {
         myOnLoadHandler(src);
     }}
@@ -88,6 +89,9 @@ A string to use with `uniquifyIDs`.
 
 **baseURL** {string}
 An URL to prefix each ID in case you are using the `<base>` tag.
+
+**title** {string}  
+A string to set title in svg
 
 **onLoad** {function} ▶︎ a random 8 characters string `[A-Za-z0-9]`  
 A callback to be invoked upon successful load.  

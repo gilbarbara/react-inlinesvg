@@ -168,6 +168,35 @@ describe('react-inlinesvg', () => {
       });
     });
 
+    it('doesn\'t render title attribute when is not provided', done => {
+      const wrapper = setup({
+        src: fixtures.style,
+        onLoad: () => {
+          wrapper.update();
+          const html = wrapper.find('.isvg').html();
+
+          expect(/<title>/.test(html)).toBe(false);
+
+          done();
+        }
+      });
+    });
+
+    it('should render title attribute', done => {
+      const wrapper = setup({
+        src: fixtures.style,
+        title: 'test title',
+        onLoad: () => {
+          wrapper.update();
+          const html = wrapper.find('.isvg').html();
+
+          expect(/<title>test title<\/title>/.test(html)).toBe(true);
+
+          done();
+        }
+      });
+    });
+
     it('should prefix the ids with the baseURL', done => {
       const wrapper = setup({
         src: fixtures.style,

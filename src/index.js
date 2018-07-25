@@ -45,9 +45,10 @@ export default class InlineSVG extends React.PureComponent {
     src: PropTypes.string.isRequired,
     style: PropTypes.object,
     supportTest: PropTypes.func,
+    title: PropTypes.string,
     uniqueHash: PropTypes.string,
     uniquifyIDs: PropTypes.bool,
-    wrapper: PropTypes.func,
+    wrapper: PropTypes.func
   };
 
   static defaultProps = {
@@ -55,8 +56,9 @@ export default class InlineSVG extends React.PureComponent {
     cacheGetRequests: false,
     onLoad: () => {},
     supportTest: isSupportedEnvironment,
+    title: '',
     uniquifyIDs: true,
-    wrapper: React.createFactory('span'),
+    wrapper: React.createFactory('span')
   };
 
   componentWillMount() {
@@ -172,13 +174,18 @@ export default class InlineSVG extends React.PureComponent {
 
     if (this.isActive) {
       this.setState({
-        loadedText: res.text,
+        loadedText: this.injectTitle(res.text),
         status: Status.LOADED
       }, () => {
         this.props.onLoad(this.props.src, isCached);
       });
     }
   };
+
+  injectTitle(svgText) {
+    return this.props.title ?
+      svgText.replace(/<svg([^>]+)>/, svgPart => `${svgPart}<title>${this.props.title}</title>`) : svgText;
+  }
 
   getClassName() {
     let className = `isvg ${this.state.status}`;
