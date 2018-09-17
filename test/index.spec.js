@@ -6,6 +6,7 @@ import ReactInlineSVG from '../src';
 const fixtures = {
   tiger: '/tiger.svg',
   style: '/style.svg',
+  className: 'isvg',
   url: 'https://raw.githubusercontent.com/google/material-design-icons/master/av/svg/production/ic_play_arrow_24px.svg',
   base64: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxwYXRoIGQ9Ik04IDV2MTRsMTEtN3oiLz4KICAgIDxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4KPC9zdmc+Cg==',
   inline: 'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M8%205v14l11-7z%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22%2F%3E%0A%3C%2Fsvg%3E%0A',
@@ -26,12 +27,13 @@ describe('react-inlinesvg', () => {
     it('should load a relative svg', done => {
       const wrapper = setup({
         src: fixtures.tiger,
+        className: fixtures.className,
         onError: done,
         onLoad: value => {
           wrapper.update();
 
           expect(value).toBe(fixtures.tiger);
-          expect(wrapper.find('.isvg')).toHaveClassName('loaded');
+          expect(wrapper.find('span')).toHaveClassName('loaded');
           done();
         }
       });
@@ -40,30 +42,33 @@ describe('react-inlinesvg', () => {
     it('should load a base64 data-uri', () => {
       const wrapper = setup({
         src: fixtures.base64,
+        className: fixtures.className,
       });
 
       expect(wrapper.props().uniqueHash).toBe(undefined);
-      expect(wrapper.find('.isvg')).toHaveClassName('loaded');
+      expect(wrapper.find('span')).toHaveClassName('loaded');
     });
 
     it('should load a non-base64 data-uri', () => {
       const wrapper = setup({
         src: fixtures.inline,
+        className: fixtures.className,
       });
 
-      expect(wrapper.find('.isvg')).toHaveClassName('loaded');
+      expect(wrapper.find('span')).toHaveClassName('loaded');
     });
 
     it('should handle `src` prop changes', done => {
       const wrapper = setup({
         src: fixtures.inline,
+        className: fixtures.className,
         onError: done,
         onLoad: src => {
           expect(src).toBe(fixtures.inline);
         },
       });
 
-      expect(wrapper.find('.isvg')).toHaveClassName('loaded');
+      expect(wrapper.find('span')).toHaveClassName('loaded');
 
       wrapper.setProps({
         ...wrapper.props(),
@@ -77,15 +82,16 @@ describe('react-inlinesvg', () => {
       });
 
       wrapper.update();
-      expect(wrapper.find('.isvg')).toHaveClassName('loading');
+      expect(wrapper.find('span')).toHaveClassName('loading');
     });
 
     it('should dispatch an error on empty `src` prop changes ', done => {
       const wrapper = setup({
         src: fixtures.inline,
+        className: fixtures.className,
       });
 
-      expect(wrapper.find('.isvg')).toHaveClassName('loaded');
+      expect(wrapper.find('span')).toHaveClassName('loaded');
 
       wrapper.setProps({
         ...wrapper.props(),
@@ -101,11 +107,12 @@ describe('react-inlinesvg', () => {
     it('should handle a custom wrapper', () => {
       const wrapper = setup({
         src: fixtures.url,
+        className: 'mumu',
         preloader: (<div className="loader">loading</div>),
-        wrapper: React.createFactory('div'),
+        wrapper: React.createFactory('main'),
       });
 
-      expect(wrapper.find('.isvg')).toHaveTagName('div');
+      expect(wrapper.find('.mumu').first()).toHaveTagName('main');
       expect(wrapper.find('.loader')).toBePresent();
     });
 
@@ -121,13 +128,14 @@ describe('react-inlinesvg', () => {
     it('should uniquify ids with the default uniqueHash', done => {
       const wrapper = setup({
         src: 'https://raw.githubusercontent.com/gilbarbara/logos/00cf8501d18b9e377ec0227b915a6f74ab4bd18f/logos/apiary.svg',
+        className: fixtures.className,
         preloader: (<div className="loader">loading</div>),
         onError: done,
         onLoad: () => {
           wrapper.update();
-          const html = wrapper.find('.isvg').html();
+          const html = wrapper.find('span').html();
 
-          expect(wrapper.find('.isvg')).toHaveClassName('loaded');
+          expect(wrapper.find('span')).toHaveClassName('loaded');
           expect(/linearGradient-1___/.test(html)).toBe(true);
           done();
         }
@@ -138,14 +146,15 @@ describe('react-inlinesvg', () => {
       const wrapper = setup({
         src: 'https://raw.githubusercontent.com/gilbarbara/logos/00cf8501d18b9e377ec0227b915a6f74ab4bd18f/logos/apiary.svg',
         preloader: (<div className="loader">loading</div>),
+        className: fixtures.className,
         uniqueHash: 'test',
         onError: done,
         onLoad: () => {
           wrapper.update();
-          const html = wrapper.find('.isvg').html();
+          const html = wrapper.find('span').html();
 
           expect(wrapper.props().uniqueHash).toBe('test');
-          expect(wrapper.find('.isvg')).toHaveClassName('loaded');
+          expect(wrapper.find('span')).toHaveClassName('loaded');
           expect(/linearGradient-1___test/.test(html)).toBe(true);
           done();
         }
@@ -156,10 +165,11 @@ describe('react-inlinesvg', () => {
       const wrapper = setup({
         src: fixtures.style,
         preloader: (<div className="loader">loading</div>),
+        className: fixtures.className,
         onError: done,
         onLoad: () => {
           wrapper.update();
-          const html = wrapper.find('.isvg').html();
+          const html = wrapper.find('span').html();
 
           expect(/fill:url\(#a___/.test(html)).toBe(true);
 
@@ -172,11 +182,12 @@ describe('react-inlinesvg', () => {
       const wrapper = setup({
         src: fixtures.style,
         preloader: (<div className="loader">loading</div>),
+        className: fixtures.className,
         baseURL: 'https://github.com/gilbarbara/react-inlinesvg/',
         onError: done,
         onLoad: () => {
           wrapper.update();
-          const html = wrapper.find('.isvg').html();
+          const html = wrapper.find('span').html();
 
           expect(/fill:url\(https:\/\/github\.com\/gilbarbara\/react-inlinesvg\/#a___/.test(html)).toBe(true);
 
@@ -188,13 +199,14 @@ describe('react-inlinesvg', () => {
     it('should not uniquify ids if it\'s disabled', done => {
       const wrapper = setup({
         src: 'https://raw.githubusercontent.com/gilbarbara/logos/00cf8501d18b9e377ec0227b915a6f74ab4bd18f/logos/apiary.svg',
+        className: fixtures.className,
         uniquifyIDs: false,
         onError: done,
         onLoad: () => {
           wrapper.update();
-          const html = wrapper.find('.isvg').html();
+          const html = wrapper.find('span').html();
 
-          expect(wrapper.find('.isvg')).toHaveClassName('loaded');
+          expect(wrapper.find('span')).toHaveClassName('loaded');
           expect(/linearGradient-1\b/.test(html)).toBe(true);
           done();
         }
@@ -238,12 +250,12 @@ describe('react-inlinesvg', () => {
         className: 'test'
       });
 
-      expect(wrapper.find('.isvg')).toHaveClassName('test');
-      expect(wrapper.find('.isvg')).toBePresent();
+      expect(wrapper.find('span')).toHaveClassName('test');
+      expect(wrapper.find('span')).toBePresent();
 
       wrapper.unmount();
 
-      expect(wrapper.find('.isvg')).not.toBePresent();
+      expect(wrapper.find('span')).not.toBePresent();
     });
   });
 
@@ -298,9 +310,10 @@ describe('react-inlinesvg', () => {
   });
 
   describe('with errors', () => {
-    it('should show children if loading not supported', done => {
+    xit('should show children if loading not supported', done => {
       const wrapper = setup({
         src: 'DOESNOTEXIST.svg',
+        className: fixtures.className,
         children: (
           <div className="missing">
             <span>MISSINGNO</span>
@@ -332,6 +345,7 @@ describe('react-inlinesvg', () => {
     it('should NOT show children on error', () => {
       const wrapper = setup({
         src: 'DOESNOTEXIST.svg',
+        className: fixtures.className,
         children: (
           <span>
             <span>MISSINGNO</span>
@@ -339,8 +353,8 @@ describe('react-inlinesvg', () => {
         ),
       });
 
-      expect(wrapper.find('.isvg')).toHaveClassName('loading');
-      expect(wrapper.find('.isvg > span')).not.toBePresent();
+      expect(wrapper.find('span')).toHaveClassName('loading');
+      expect(wrapper.find('span > span')).not.toBePresent();
     });
 
     it('should have a status code HTTP errors', done => {

@@ -35,6 +35,7 @@ export default class InlineSVG extends React.PureComponent {
   }
 
   static propTypes = {
+    addStatusClass: PropTypes.bool,
     baseURL: PropTypes.string,
     cacheGetRequests: PropTypes.bool,
     children: PropTypes.node,
@@ -51,12 +52,14 @@ export default class InlineSVG extends React.PureComponent {
   };
 
   static defaultProps = {
+    addStatusClass: true,
     baseURL: '',
     cacheGetRequests: false,
     onLoad: () => {},
     supportTest: isSupportedEnvironment,
     uniquifyIDs: true,
     wrapper: React.createFactory('span'),
+    className: 'isvg',
   };
 
   componentWillMount() {
@@ -181,10 +184,10 @@ export default class InlineSVG extends React.PureComponent {
   };
 
   getClassName() {
-    let className = `isvg ${this.state.status}`;
+    let { className } = this.props;
 
-    if (this.props.className) {
-      className += ` ${this.props.className}`;
+    if (this.props.addStatusClass) {
+      className += ` ${this.state.status}`;
     }
 
     return className;
@@ -212,10 +215,10 @@ export default class InlineSVG extends React.PureComponent {
 
   render() {
     let content;
-    let html;
+    let dangerouslySetInnerHTML;
 
     if (this.state.loadedText) {
-      html = {
+      dangerouslySetInnerHTML = {
         __html: this.processSVG(this.state.loadedText)
       };
     }
@@ -223,10 +226,8 @@ export default class InlineSVG extends React.PureComponent {
       content = this.renderContents();
     }
 
-    return this.props.wrapper({
-      style: this.props.style,
-      className: this.getClassName(),
-      dangerouslySetInnerHTML: html,
-    }, content);
+    const { wrapper, style } = this.props;
+    const className = this.getClassName();
+    return wrapper({ style, className, dangerouslySetInnerHTML }, content);
   }
 }
