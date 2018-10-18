@@ -191,9 +191,15 @@ export default class InlineSVG extends React.PureComponent {
     return className;
   }
 
-  processSVG(svgText) {
-    const { uniquifyIDs, uniqueHash, baseURL, processSVG } = this.props;
+  processSVG(text) {
+    const {
+      uniquifyIDs,
+      uniqueHash,
+      baseURL,
+      processSVG
+    } = this.props;
 
+    let svgText = text;
     if (processSVG) {
       svgText = processSVG(svgText);
     }
