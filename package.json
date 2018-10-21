@@ -42,35 +42,35 @@
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
-    "babel-eslint": "^8.2.1",
-    "babel-jest": "^22.1.0",
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^10.0.1",
+    "babel-jest": "^23.6.0",
     "babel-plugin-array-includes": "^2.0.3",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-plugin-transform-object-assign": "^6.22.0",
-    "babel-preset-env": "^1.6.1",
+    "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-1": "^6.24.1",
-    "chalk": "^2.3.0",
-    "cross-env": "^5.1.3",
-    "enzyme": "^3.3.0",
-    "enzyme-adapter-react-16": "^1.1.1",
-    "eslint": "^4.16.0",
-    "eslint-config-airbnb": "^16.1.0",
-    "eslint-plugin-import": "^2.8.0",
-    "eslint-plugin-jsx-a11y": "^6.0.3",
-    "eslint-plugin-react": "^7.6.1",
-    "husky": "^0.14.3",
-    "jest": "^22.1.4",
-    "jest-enzyme": "^4.1.1",
-    "jsdom": "^11.6.2",
-    "react": "^16.2.0",
+    "chalk": "^2.4.1",
+    "cross-env": "^5.2.0",
+    "enzyme": "^3.7.0",
+    "enzyme-adapter-react-16": "^1.6.0",
+    "eslint": "^5.7.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.2",
+    "eslint-plugin-react": "^7.11.1",
+    "husky": "^1.1.2",
+    "jest": "^23.6.0",
+    "jest-enzyme": "^7.0.0",
+    "jsdom": "^12.2.0",
+    "react": "^16.5.2",
     "react-addons-test-utils": "^15.6.2",
-    "react-dom": "^16.2.0",
-    "react-test-renderer": "^16.2.0",
+    "react-dom": "^16.5.2",
+    "react-test-renderer": "^16.5.2",
     "rimraf": "^2.6.2",
-    "serve": "^6.5.3",
-    "yargs": "^11.0.0"
+    "serve": "^10.0.2",
+    "yargs": "^12.0.2"
   },
   "scripts": {
     "build": "npm run clean && npm run build:commonjs && npm run build:es",
@@ -83,12 +83,17 @@
     "test:watch": "jest --watch",
     "lint": "eslint -c ./.eslintrc $(find src -name '*.js')",
     "precommit": "node tools has-commits && npm run lint && npm test",
-    "postmerge": "node tools update",
     "prepublishOnly": "npm run build"
   },
   "browserslist": [
-    "last 2 versions",
-    "safari >= 8",
-    "ios > 8"
-  ]
+    "> 0.2%",
+    "safari >= 9",
+    "ios >= 9"
+  ],
+  "husky": {
+    "hooks": {
+      "post-merge": "node tools update",
+      "pre-commit": "npm run precommit"
+    }
+  }
 }
