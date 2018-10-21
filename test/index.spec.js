@@ -106,7 +106,7 @@ describe('react-inlinesvg', () => {
       });
 
       expect(wrapper.find('.isvg')).toHaveTagName('div');
-      expect(wrapper.find('.loader')).toBePresent();
+      expect(wrapper.find('.loader')).toExist();
     });
 
     it('should handle a preloader', () => {
@@ -115,7 +115,7 @@ describe('react-inlinesvg', () => {
         preloader: (<div className="loader">loading</div>),
       });
 
-      expect(wrapper.find('.loader')).toBePresent();
+      expect(wrapper.find('.loader')).toExist();
     });
 
     it('should uniquify ids with the default uniqueHash', done => {
@@ -211,7 +211,7 @@ describe('react-inlinesvg', () => {
               expect(error.status).toBe(404);
 
               wrapper.update();
-              expect(wrapper.find('.fallback')).toBePresent();
+              expect(wrapper.find('.fallback')).toExist();
               done();
             }
           }
@@ -239,11 +239,11 @@ describe('react-inlinesvg', () => {
       });
 
       expect(wrapper.find('.isvg')).toHaveClassName('test');
-      expect(wrapper.find('.isvg')).toBePresent();
+      expect(wrapper.find('.isvg')).toExist();
 
       wrapper.unmount();
 
-      expect(wrapper.find('.isvg')).not.toBePresent();
+      expect(wrapper.find('.isvg')).not.toExist();
     });
   });
 
@@ -316,7 +316,7 @@ describe('react-inlinesvg', () => {
       });
 
       expect(wrapper.find('.isvg')).toHaveClassName('unsupported');
-      expect(wrapper.find('.missing')).toBePresent();
+      expect(wrapper.find('.missing')).toExist();
     });
 
     it('should show a single children if loading not supported', () => {
@@ -340,7 +340,7 @@ describe('react-inlinesvg', () => {
       });
 
       expect(wrapper.find('.isvg')).toHaveClassName('loading');
-      expect(wrapper.find('.isvg > span')).not.toBePresent();
+      expect(wrapper.find('.isvg > span')).not.toExist();
     });
 
     it('should have a status code HTTP errors', done => {

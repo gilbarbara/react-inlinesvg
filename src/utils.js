@@ -11,14 +11,12 @@ export const supportsInlineSVG = once(() => {
   return div.firstChild && div.firstChild.namespaceURI === 'http://www.w3.org/2000/svg';
 });
 
-export const isSupportedEnvironment = once(() =>
-  (
-    supportsInlineSVG() &&
-    typeof window !== 'undefined' && window !== null
-      ? window.XMLHttpRequest || window.XDomainRequest
-      : false
-  )
-);
+export const isSupportedEnvironment = once(() => (
+  supportsInlineSVG()
+    && typeof window !== 'undefined' && window !== null
+    ? window.XMLHttpRequest || window.XDomainRequest
+    : false
+));
 
 export const randomString = (length = 8) => {
   const letters = 'abcdefghijklmnopqrstuvwxyz';
@@ -47,13 +45,16 @@ export const uniquifySVGIDs = (() => {
       if (p2) {
         return `${p1}="${(uniquifyID(p2))}"`;
       }
-      else if (p4) {
+
+      if (p4) {
         return `${p3}="${baseURL}#${(uniquifyID(p4))}"`;
       }
-      else if (p5) {
+
+      if (p5) {
         return `="url(${baseURL}#${(uniquifyID(p5))})"`;
       }
-      else if (p6) {
+
+      if (p6) {
         return `url(${baseURL}#${uniquifyID(p6)})`;
       }
     });
