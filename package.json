@@ -1,6 +1,6 @@
 {
   "name": "react-inlinesvg",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "An SVG loader for React",
   "author": "Gil Barbara <gilbarbara@gmail.com>",
   "contributors": [
