@@ -77,6 +77,14 @@ A component to be shown while the SVG is loading.
 **className** {string}  
 A class to add to the default wrapper.
 
+**addStatusClass** {boolean}  
+A flag for adding a status class name to the wrapper element. Possible statuses are:
+ * pending
+ * loading
+ * loaded
+ * failed
+ * unsupported
+
 **cacheGetRequests** {boolean} ▶︎ `false`
 Only request SVGs once.
 

@@ -67,30 +67,35 @@ export default class InlineSVG extends React.PureComponent {
   }
 
   componentDidMount() {
+    const { status } = this.state;
+    const { src, supportTest } = this.props;
+
     /* istanbul ignore else */
-    if (this.state.status === Status.PENDING) {
-      if (this.props.supportTest()) {
-        if (this.props.src) {
+    if (status === Status.PENDING) {
+      if (supportTest()) {
+        if (src) {
           this.startLoad();
+          return;
         }
-        else {
-          this.fail(configurationError('Missing source'));
-        }
+
+        this.fail(configurationError('Missing source'));
+        return;
       }
-      else {
-        this.fail(unsupportedBrowserError());
-      }
+
+      this.fail(unsupportedBrowserError());
     }
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.src !== this.props.src) {
-      if (this.props.src) {
+    const { src } = this.props;
+
+    if (prevProps.src !== src) {
+      if (src) {
         this.startLoad();
+        return;
       }
-      else {
-        this.fail(configurationError('Missing source'));
-      }
+
+      this.fail(configurationError('Missing source'));
     }
   }
 
@@ -113,9 +118,10 @@ export default class InlineSVG extends React.PureComponent {
 
         http.get(src, (err, res) => {
           getRequestsByUrl[src].forEach(cb => {
+            const { src: currentSrc } = this.props;
             loadedIcons[src] = [err, res];
 
-            if (src === this.props.src) {
+            if (src === currentSrc) {
               cb(err, res);
             }
           });
@@ -126,7 +132,9 @@ export default class InlineSVG extends React.PureComponent {
     }
     else {
       http.get(src, (err, res) => {
-        if (src === this.props.src) {
+        const { src: currentSrc } = this.props;
+
+        if (src === currentSrc) {
           callback(err, res);
         }
       });
@@ -134,13 +142,14 @@ export default class InlineSVG extends React.PureComponent {
   }
 
   fail(error) {
+    const { onError } = this.props;
     const status = error.isUnsupportedBrowserError ? Status.UNSUPPORTED : Status.FAILED;
 
     /* istanbul ignore else */
     if (this.isActive) {
       this.setState({ status }, () => {
-        if (typeof this.props.onError === 'function') {
-          this.props.onError(error);
+        if (typeof onError === 'function') {
+          onError(error);
         }
       });
     }
@@ -156,7 +165,8 @@ export default class InlineSVG extends React.PureComponent {
   }
 
   load() {
-    const match = this.props.src.match(/data:image\/svg[^,]*?(;base64)?,(.*)/);
+    const { src } = this.props;
+    const match = src.match(/data:image\/svg[^,]*?(;base64)?,(.*)/);
 
     if (match) {
       return this.handleLoad(null, {
@@ -168,6 +178,7 @@ export default class InlineSVG extends React.PureComponent {
   }
 
   handleLoad = (err, res, isCached = false) => {
+    const { onLoad, src } = this.props;
     if (err) {
       this.fail(err);
       return;
@@ -178,19 +189,25 @@ export default class InlineSVG extends React.PureComponent {
         loadedText: res.text,
         status: Status.LOADED
       }, () => {
-        this.props.onLoad(this.props.src, isCached);
+        onLoad(src, isCached);
       });
     }
   };
 
   getClassName() {
-    let { className } = this.props;
+    const { className, addStatusClass } = this.props;
+    const { status } = this.state;
+    const classes = [];
 
-    if (this.props.addStatusClass) {
-      className += ` ${this.state.status}`;
+    if (addStatusClass) {
+      classes.push(status);
     }
 
-    return className;
+    if (className) {
+      classes.push(className);
+    }
+
+    return classes.join(' ');
   }
 
   processSVG(svgText) {
@@ -204,30 +221,37 @@ export default class InlineSVG extends React.PureComponent {
   }
 
   renderContents() {
-    switch (this.state.status) {
+    const { status } = this.state;
+    const { children, preloader } = this.props;
+
+    switch (status) {
       case Status.UNSUPPORTED:
       case Status.FAILED:
-        return this.props.children;
+        return children;
       default:
-        return this.props.preloader;
+        return preloader;
     }
   }
 
   render() {
+    const { loadedText } = this.state;
+    const { style, wrapper } = this.props;
     let content;
-    let dangerouslySetInnerHTML;
+    let html;
 
-    if (this.state.loadedText) {
-      dangerouslySetInnerHTML = {
-        __html: this.processSVG(this.state.loadedText)
+    if (loadedText) {
+      html = {
+        __html: this.processSVG(loadedText)
       };
     }
     else {
       content = this.renderContents();
     }
 
-    const { wrapper, style } = this.props;
-    const className = this.getClassName();
-    return wrapper({ style, className, dangerouslySetInnerHTML }, content);
+    return wrapper({
+      style,
+      className: this.getClassName(),
+      dangerouslySetInnerHTML: html,
+    }, content);
   }
 }

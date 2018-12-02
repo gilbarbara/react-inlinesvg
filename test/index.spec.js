@@ -107,13 +107,13 @@ describe('react-inlinesvg', () => {
     it('should handle a custom wrapper', () => {
       const wrapper = setup({
         src: fixtures.url,
-        className: 'mumu',
+        className: 'test',
         preloader: (<div className="loader">loading</div>),
-        wrapper: React.createFactory('main'),
+        wrapper: React.createFactory('div'),
       });
 
-      expect(wrapper.find('.mumu').first()).toHaveTagName('main');
-      expect(wrapper.find('.loader')).toBePresent();
+      expect(wrapper.find('div').first()).toHaveClassName('test');
+      expect(wrapper.find('.loader')).toExist();
     });
 
     it('should handle a preloader', () => {
@@ -122,7 +122,7 @@ describe('react-inlinesvg', () => {
         preloader: (<div className="loader">loading</div>),
       });
 
-      expect(wrapper.find('.loader')).toBePresent();
+      expect(wrapper.find('.loader')).toExist();
     });
 
     it('should uniquify ids with the default uniqueHash', done => {
@@ -223,7 +223,7 @@ describe('react-inlinesvg', () => {
               expect(error.status).toBe(404);
 
               wrapper.update();
-              expect(wrapper.find('.fallback')).toBePresent();
+              expect(wrapper.find('.fallback')).toExist();
               done();
             }
           }
@@ -251,11 +251,11 @@ describe('react-inlinesvg', () => {
       });
 
       expect(wrapper.find('span')).toHaveClassName('test');
-      expect(wrapper.find('span')).toBePresent();
+      expect(wrapper.find('span')).toExist();
 
       wrapper.unmount();
 
-      expect(wrapper.find('span')).not.toBePresent();
+      expect(wrapper.find('span')).not.toExist();
     });
   });
 
@@ -329,7 +329,7 @@ describe('react-inlinesvg', () => {
       });
 
       expect(wrapper.find('.isvg')).toHaveClassName('unsupported');
-      expect(wrapper.find('.missing')).toBePresent();
+      expect(wrapper.find('.missing')).toExist();
     });
 
     it('should show a single children if loading not supported', () => {
@@ -354,7 +354,7 @@ describe('react-inlinesvg', () => {
       });
 
       expect(wrapper.find('span')).toHaveClassName('loading');
-      expect(wrapper.find('span > span')).not.toBePresent();
+      expect(wrapper.find('span > span')).not.toExist();
     });
 
     it('should have a status code HTTP errors', done => {
