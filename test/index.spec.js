@@ -65,6 +65,7 @@ describe('react-inlinesvg', () => {
         onError: done,
         onLoad: src => {
           expect(src).toBe(fixtures.inline);
+          done();
         },
       });
 
@@ -76,7 +77,6 @@ describe('react-inlinesvg', () => {
         onError: done,
         onLoad: src => {
           expect(src).toBe(fixtures.url);
-
           done();
         },
       });
