@@ -232,6 +232,27 @@ describe('react-inlinesvg', () => {
       });
     });
 
+    it('should transform the SVG text when given the processSVG prop', done => {
+      const extraProp = 'data-isvg="test"';
+      const wrapper = setup({
+        src: fixtures.url,
+        processSVG: svgText =>
+          svgText.replace('<svg ', `<svg ${extraProp}`),
+        onError: done,
+        onLoad: () => {
+          wrapper.update();
+          const html = wrapper.find('.isvg').html();
+
+          const regexp = new RegExp(extraProp);
+          expect(!!regexp.exec(html)).toBe(true);
+
+          done();
+        }
+      });
+
+      expect(wrapper.instance() instanceof React.Component).toBe(true);
+    });
+
     it('should handle unmount', () => {
       const wrapper = setup({
         src: fixtures.url,

@@ -89,6 +89,9 @@ A string to use with `uniquifyIDs`.
 **baseURL** {string}
 An URL to prefix each ID in case you are using the `<base>` tag.
 
+**processSVG** {function} ▶︎ `string`
+A function to process the contents of the SVG text before rendering.
+
 **onLoad** {function} ▶︎ a random 8 characters string `[A-Za-z0-9]`  
 A callback to be invoked upon successful load.  
 This will receive 2 arguments: the `src` prop and a `isCached` boolean
