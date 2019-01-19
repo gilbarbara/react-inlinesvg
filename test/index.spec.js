@@ -236,8 +236,7 @@ describe('react-inlinesvg', () => {
       const extraProp = 'data-isvg="test"';
       const wrapper = setup({
         src: fixtures.url,
-        processSVG: svgText =>
-          svgText.replace('<svg ', `<svg ${extraProp}`),
+        processSVG: svgText => svgText.replace('<svg ', `<svg ${extraProp} `),
         onError: done,
         onLoad: () => {
           wrapper.update();
