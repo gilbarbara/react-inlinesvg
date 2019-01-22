@@ -1,6 +1,9 @@
 import once from 'once';
+import { canUseDOM as canUseDOMBool } from 'exenv';
 
-export const supportsInlineSVG = once(() => {
+export const canUseDOM = () => canUseDOMBool;
+
+export const supportsInlineSVG = () => {
   /* istanbul ignore next */
   if (!document) {
     return false;
@@ -9,13 +12,22 @@ export const supportsInlineSVG = once(() => {
   const div = document.createElement('div');
   div.innerHTML = '<svg />';
   return div.firstChild && div.firstChild.namespaceURI === 'http://www.w3.org/2000/svg';
-});
+};
+
+export class InlineSVGError extends Error {
+  constructor(message, data) {
+    super();
+
+    this.name = 'InlineSVGError';
+    this.message = message;
+    this.data = data;
+
+    return this;
+  }
+}
 
 export const isSupportedEnvironment = once(() => (
-  supportsInlineSVG()
-    && typeof window !== 'undefined' && window !== null
-    ? window.XMLHttpRequest || window.XDomainRequest
-    : false
+  supportsInlineSVG() && typeof window !== 'undefined' && window !== null
 ));
 
 export const randomString = (length = 8) => {
@@ -35,7 +47,7 @@ export const randomString = (length = 8) => {
 export const uniquifySVGIDs = (() => {
   const mkAttributePattern = attr => `(?:(?:\\s|\\:)${attr})`;
 
-  const idPattern = new RegExp(`(?:(${(mkAttributePattern('id'))})="([^"]+)")|(?:(${(mkAttributePattern('href'))}|${(mkAttributePattern('role'))}|${(mkAttributePattern('arcrole'))})="\\#([^"]+)")|(?:="url\\(\\#([^\\)]+)\\)")|(?:url\\(\\#([^\\)]+)\\))`, 'g');
+  const idPattern = new RegExp(`(?:(${(mkAttributePattern('id'))})="([^"]+)")|(?:(${(mkAttributePattern('href'))}|${(mkAttributePattern('role'))}|${(mkAttributePattern('arcrole'))})="#([^"]+)")|(?:="url\\(#([^)]+)\\)")|(?:url\\(#([^)]+)\\))`, 'g');
 
   return (svgText, svgID, baseURL) => {
     const uniquifyID = id => `${id}___${svgID}`;
@@ -60,44 +72,3 @@ export const uniquifySVGIDs = (() => {
     });
   };
 })();
-
-class InlineSVGError extends Error {
-  constructor(message) {
-    super();
-
-    this.name = 'InlineSVGError';
-    this.isSupportedBrowser = true;
-    this.isConfigurationError = false;
-    this.isUnsupportedBrowserError = false;
-    this.message = message;
-
-    return this;
-  }
-}
-
-const createError = (message, attrs) => {
-  const err = new InlineSVGError(message);
-
-  return {
-    ...err,
-    ...attrs,
-  };
-};
-
-export const unsupportedBrowserError = message => {
-  let newMessage = message;
-
-  /* istanbul ignore else */
-  if (!newMessage) {
-    newMessage = 'Unsupported Browser';
-  }
-
-  return createError(newMessage, {
-    isSupportedBrowser: false,
-    isUnsupportedBrowserError: true
-  });
-};
-
-export const configurationError = message => createError(message, {
-  isConfigurationError: true
-});
