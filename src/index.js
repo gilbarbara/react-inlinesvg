@@ -1,261 +1,354 @@
+/* eslint-disable no-underscore-dangle */
 import React from 'react';
 import PropTypes from 'prop-types';
-import httpplease from 'httpplease';
-import ieXDomain from 'httpplease/plugins/oldiexdomain';
+import DomToReact from 'dom-to-react';
 
 import {
-  configurationError,
+  canUseDOM,
+  InlineSVGError,
   isSupportedEnvironment,
-  randomString, uniquifySVGIDs,
-  unsupportedBrowserError,
+  randomString,
 } from './utils';
 
-const http = httpplease.use(ieXDomain);
-
-const Status = {
+const STATUS = {
   PENDING: 'pending',
   LOADING: 'loading',
   LOADED: 'loaded',
   FAILED: 'failed',
+  READY: 'ready',
   UNSUPPORTED: 'unsupported'
 };
 
-const getRequestsByUrl = {};
-const loadedIcons = {};
+export const storage = [];
 
 export default class InlineSVG extends React.PureComponent {
   constructor(props) {
     super(props);
 
     this.state = {
-      status: Status.PENDING
+      content: '',
+      element: null,
+      hasCache: props.cacheRequests && !!storage.find(s => s.url === props.src),
+      status: STATUS.PENDING
     };
 
-    this.isActive = false;
+    this._isMounted = false;
   }
 
   static propTypes = {
     baseURL: PropTypes.string,
-    cacheGetRequests: PropTypes.bool,
+    cacheRequests: PropTypes.bool,
     children: PropTypes.node,
-    className: PropTypes.string,
+    description: PropTypes.string,
+    loader: PropTypes.node,
     onError: PropTypes.func,
     onLoad: PropTypes.func,
-    preloader: PropTypes.node,
-    processSVG: PropTypes.func,
+    preProcessor: PropTypes.func,
     src: PropTypes.string.isRequired,
-    style: PropTypes.object,
-    supportTest: PropTypes.func,
+    title: PropTypes.string,
     uniqueHash: PropTypes.string,
-    uniquifyIDs: PropTypes.bool,
-    wrapper: PropTypes.func,
+    uniquifyIDs: PropTypes.bool
   };
 
   static defaultProps = {
-    baseURL: '',
-    cacheGetRequests: false,
+    cacheRequests: true,
     onLoad: () => {},
-    supportTest: isSupportedEnvironment,
-    uniquifyIDs: true,
-    wrapper: React.createFactory('span'),
+    uniquifyIDs: false
   };
 
-  componentWillMount() {
-    this.isActive = true;
-  }
-
   componentDidMount() {
+    this._isMounted = true;
+
+    if (!canUseDOM()) {
+      this.handleError(new InlineSVGError('No DOM'));
+      return;
+    }
+
     const { status } = this.state;
-    const { src, supportTest } = this.props;
+    const { src } = this.props;
 
-    /* istanbul ignore else */
-    if (status === Status.PENDING) {
-      if (supportTest()) {
-        if (src) {
-          this.startLoad();
-          return;
-        }
+    try {
+      /* istanbul ignore else */
+      if (status === STATUS.PENDING) {
+        /* istanbul ignore else */
+        if (!isSupportedEnvironment()) throw new InlineSVGError('Browser does not support SVG');
 
-        this.fail(configurationError('Missing source'));
-        return;
+        /* istanbul ignore else */
+        if (!src) throw new InlineSVGError('Missing src');
+
+        this.load();
       }
+    }
 
-      this.fail(unsupportedBrowserError());
+    catch (error) {
+      this.handleError(error);
     }
   }
 
-  componentDidUpdate(prevProps) {
-    const { src } = this.props;
+  componentDidUpdate(prevProps, prevState) {
+    if (!canUseDOM()) return;
+
+    const { hasCache, status } = this.state;
+    const { onLoad, src } = this.props;
+
+    if (prevState.status !== STATUS.READY && status === STATUS.READY) {
+      onLoad(src, hasCache);
+    }
 
     if (prevProps.src !== src) {
-      if (src) {
-        this.startLoad();
+      if (!src) {
+        this.handleError(new InlineSVGError('Missing src'));
         return;
       }
 
-      this.fail(configurationError('Missing source'));
+      this.load();
     }
   }
 
   componentWillUnmount() {
-    this.isActive = false;
+    this._isMounted = false;
   }
 
-  getFile(callback) {
-    const { cacheGetRequests, src } = this.props;
+  parseSVG() {
+    const { content } = this.state;
+    const { preProcessor } = this.props;
 
-    if (cacheGetRequests) {
-      if (loadedIcons[src]) {
-        const [err, res] = loadedIcons[src];
+    if (preProcessor) {
+      return preProcessor(content);
+    }
 
-        callback(err, res, true);
-      }
+    return content;
+  }
 
-      if (!getRequestsByUrl[src]) {
-        getRequestsByUrl[src] = [];
+  updateSVGAttributes(node) {
+    const { baseURL = '', uniquifyIDs, uniqueHash } = this.props;
+    const replaceableAttributes = [
+      'id',
+      'href',
+      'xlink:href',
+      'xlink:role',
+      'xlink:arcrole'
+    ];
 
-        http.get(src, (err, res) => {
-          getRequestsByUrl[src].forEach(cb => {
-            const { src: currentSrc } = this.props;
-            loadedIcons[src] = [err, res];
+    if (!uniquifyIDs) {
+      return node;
+    }
 
-            if (src === currentSrc) {
-              cb(err, res);
-            }
-          });
+    const hash = uniqueHash || randomString();
+
+    [...node.childNodes].forEach(d => {
+      if (d.attributes && d.attributes.length) {
+        const attributes = Object.values(d.attributes);
+
+        attributes.forEach(a => {
+          const match = a.value.match(/^url\((#[^)]+)/);
+
+          if (match && match[1]) {
+            a.value = `url(${baseURL}${match[1]}__${hash})`;
+          }
+        });
+
+        replaceableAttributes.forEach(r => {
+          const attribute = attributes.find(a => a.name === r);
+
+          if (attribute) {
+            attribute.value = `${attribute.value}__${hash}`;
+          }
         });
       }
 
-      getRequestsByUrl[src].push(callback);
-    }
-    else {
-      http.get(src, (err, res) => {
-        const { src: currentSrc } = this.props;
+      if (d.childNodes.length) {
+        d = this.updateSVGAttributes(d); // eslint-disable-line no-param-reassign
+      }
+    });
 
-        if (src === currentSrc) {
-          callback(err, res);
+    return node;
+  }
+
+  generateNode() {
+    const { description, title } = this.props;
+
+    try {
+      const svgText = this.parseSVG();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(svgText, 'image/svg+xml');
+      const svg = this.updateSVGAttributes(doc.querySelector('svg'));
+
+      if (description) {
+        const originalDesc = svg.querySelector('desc');
+
+        if (originalDesc) {
+          originalDesc.innerHTML = description;
         }
-      });
+        else {
+          const descElement = document.createElement('desc');
+          descElement.innerHTML = description;
+          svg.prepend(descElement);
+        }
+      }
+
+      if (title) {
+        const originalTitle = svg.querySelector('title');
+
+        if (originalTitle) {
+          originalTitle.innerHTML = title;
+        }
+        else {
+          const titleElement = document.createElement('title');
+          titleElement.innerHTML = title;
+          svg.prepend(titleElement);
+        }
+      }
+
+      return svg;
+    }
+    catch (error) {
+      return this.handleError(error);
     }
   }
 
-  fail(error) {
+  generateElement() {
+    const {
+      baseURL,
+      cacheRequests,
+      children,
+      description,
+      onError,
+      onLoad,
+      loader,
+      preProcessor,
+      src,
+      title,
+      uniqueHash,
+      uniquifyIDs,
+      ...rest
+    } = this.props;
+
+    try {
+      const node = this.generateNode();
+
+      /* istanbul ignore else */
+      if (node) {
+        const d2r = new DomToReact();
+
+        this.setState({
+          element: React.cloneElement(d2r.prepareNode(node), { ...rest }),
+          status: STATUS.READY
+        });
+      }
+    }
+    catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  load() {
+    /* istanbul ignore else */
+    if (this._isMounted) {
+      this.setState(
+        {
+          content: '',
+          element: null,
+          status: STATUS.LOADING
+        },
+        () => {
+          const { cacheRequests, src } = this.props;
+          const cache = cacheRequests && storage.find(d => d.url === src);
+
+          if (cache) {
+            this.handleLoad(cache.content);
+            return;
+          }
+
+          const dataURI = src.match(/data:image\/svg[^,]*?(;base64)?,(.*)/);
+          let inlineSrc;
+
+          if (dataURI) {
+            inlineSrc = dataURI[1]
+              ? atob(dataURI[2])
+              : decodeURIComponent(dataURI[2]);
+          }
+          else if (src.indexOf('<svg') >= 0) {
+            inlineSrc = src;
+          }
+
+          if (inlineSrc) {
+            this.handleLoad(inlineSrc);
+            return;
+          }
+
+          this.request();
+        }
+      );
+    }
+  }
+
+  handleLoad = content => {
+    /* istanbul ignore else */
+    if (this._isMounted) {
+      this.setState(
+        {
+          content,
+          status: STATUS.LOADED
+        },
+        this.generateElement
+      );
+    }
+  };
+
+  handleError = error => {
     const { onError } = this.props;
-    const status = error.isUnsupportedBrowserError ? Status.UNSUPPORTED : Status.FAILED;
+    const status = error.message === 'Browser does not support SVG'
+      ? STATUS.UNSUPPORTED
+      : STATUS.FAILED;
 
     /* istanbul ignore else */
-    if (this.isActive) {
+    if (this._isMounted) {
       this.setState({ status }, () => {
+        /* istanbul ignore else */
         if (typeof onError === 'function') {
           onError(error);
         }
       });
     }
-  }
-
-  startLoad() {
-    /* istanbul ignore else */
-    if (this.isActive) {
-      this.setState({
-        status: Status.LOADING
-      }, this.load);
-    }
-  }
-
-  load() {
-    const { src } = this.props;
-    const match = src.match(/data:image\/svg[^,]*?(;base64)?,(.*)/);
-
-    if (match) {
-      return this.handleLoad(null, {
-        text: match[1] ? atob(match[2]) : decodeURIComponent(match[2])
-      });
-    }
-
-    return this.getFile(this.handleLoad);
-  }
-
-  handleLoad = (err, res, isCached = false) => {
-    const { onLoad, src } = this.props;
-    if (err) {
-      this.fail(err);
-      return;
-    }
-
-    if (this.isActive) {
-      this.setState({
-        loadedText: res.text,
-        status: Status.LOADED
-      }, () => {
-        onLoad(src, isCached);
-      });
-    }
   };
 
-  getClassName() {
-    const { status } = this.state;
-    const { className } = this.props;
-    let nextClassName = `isvg ${status}`;
+  request = () => {
+    const { cacheRequests, src } = this.props;
 
-    if (className) {
-      nextClassName += ` ${className}`;
-    }
+    return fetch(src)
+      .then(response => {
+        if (response.status > 299) {
+          throw new InlineSVGError('request: Not found');
+        }
 
-    return nextClassName;
-  }
+        return response.text();
+      })
+      .then(content => {
+        /* istanbul ignore else */
+        if (cacheRequests) {
+          storage.push({ url: src, content });
+        }
 
-  processSVG(text) {
-    const {
-      uniquifyIDs,
-      uniqueHash,
-      baseURL,
-      processSVG
-    } = this.props;
-
-    let svgText = text;
-    if (processSVG) {
-      svgText = processSVG(svgText);
-    }
-
-    if (uniquifyIDs) {
-      return uniquifySVGIDs(svgText, uniqueHash || randomString(), baseURL);
-    }
-
-    return svgText;
-  }
-
-  renderContents() {
-    const { status } = this.state;
-    const { children, preloader } = this.props;
-
-    switch (status) {
-      case Status.UNSUPPORTED:
-      case Status.FAILED:
-        return children;
-      default:
-        return preloader;
-    }
-  }
+        this.handleLoad(content);
+      })
+      .catch(error => this.handleError(error));
+  };
 
   render() {
-    const { loadedText } = this.state;
-    const { style, wrapper } = this.props;
-    let content;
-    let html;
+    if (!canUseDOM()) return null;
 
-    if (loadedText) {
-      html = {
-        __html: this.processSVG(loadedText)
-      };
-    }
-    else {
-      content = this.renderContents();
+    const { element, status } = this.state;
+    const { children = null, loader = null } = this.props;
+
+    if (element) {
+      return element;
     }
 
-    return wrapper({
-      style,
-      className: this.getClassName(),
-      dangerouslySetInnerHTML: html,
-    }, content);
+    if ([STATUS.UNSUPPORTED, STATUS.FAILED].includes(status)) {
+      return children;
+    }
+
+    return loader;
   }
 }
