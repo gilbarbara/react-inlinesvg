@@ -1,35 +1,21 @@
 module.exports = {
-  transform: {
-    '.*': '<rootDir>/node_modules/babel-jest',
-  },
-  moduleFileExtensions: [
-    'js',
-    'jsx',
-    'json',
-  ],
-  moduleDirectories: [
-    'node_modules',
-    'src',
-    './',
-  ],
-  setupTestFrameworkScriptFile: '<rootDir>/node_modules/jest-enzyme/lib/index.js',
-  setupFiles: [
-    '<rootDir>/test/__setup__/shim.js',
-    '<rootDir>/test/__setup__/index.js',
-  ],
-  testRegex: '/test/.*?\\.(test|spec)\\.js$',
-  testURL: 'http://localhost:1337/',
   collectCoverage: false,
-  collectCoverageFrom: [
-    'src/**/*.{js,jsx}'
-  ],
+  collectCoverageFrom: ['src/**/*.{js,jsx}'],
   coverageThreshold: {
     global: {
       branches: 85,
-      functions: 90,
-      lines: 90,
-      statements: 90,
+      functions: 85,
+      lines: 85,
+      statements: 85,
     },
   },
-  verbose: true,
+  moduleDirectories: ['node_modules', 'src', './'],
+  moduleFileExtensions: ['js', 'jsx', 'json'],
+  setupFiles: ['<rootDir>/test/__setup__/setupFiles.js'],
+  setupTestFrameworkScriptFile: '<rootDir>/node_modules/jest-enzyme/lib/index.js',
+  testRegex: '/test/.*?\\.(test|spec)\\.js$',
+  testURL: 'http://localhost:1337/',
+  transform: { '^.+\\.jsx?$': 'babel-jest' },
+  verbose: false,
+  watchPlugins: ['jest-watch-typeahead/filename', 'jest-watch-typeahead/testname'],
 };
