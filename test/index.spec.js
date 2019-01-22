@@ -1,269 +1,195 @@
 import React from 'react';
-import { mount } from 'enzyme';
 
 import ReactInlineSVG from '../src';
+import { InlineSVGError } from '../src/utils';
+
+const Loader = () => <div id="loader" />;
 
 const fixtures = {
-  tiger: '/tiger.svg',
-  style: '/style.svg',
+  icons: 'http://localhost:1337/icons.svg',
+  play: 'http://localhost:1337/play.svg',
+  tiger: 'http://localhost:1337/tiger.svg',
+  react: 'http://localhost:1337/react.svg',
   url: 'https://raw.githubusercontent.com/google/material-design-icons/master/av/svg/production/ic_play_arrow_24px.svg',
   base64: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxwYXRoIGQ9Ik04IDV2MTRsMTEtN3oiLz4KICAgIDxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4KPC9zdmc+Cg==',
-  inline: 'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M8%205v14l11-7z%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22%2F%3E%0A%3C%2Fsvg%3E%0A',
+  urlEncoded: 'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M8%205v14l11-7z%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22%2F%3E%0A%3C%2Fsvg%3E%0A',
+  string: '<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid"><g> <polygon fill="#000000" points="7 5 7 19 18 12"></polygon></g></svg>',
 };
 
-function setup(ownProps = {}) {
-  return mount(<ReactInlineSVG {...ownProps} />);
+const mockOnError = jest.fn();
+let mockCanUseDOM;
+let mockIsSupportedEnvironment;
+
+jest.mock('../src/utils', () => {
+  const utils = require.requireActual('../src/utils');
+
+  return {
+    ...utils,
+    canUseDOM: typeof mockCanUseDOM !== 'undefined' ? () => mockCanUseDOM : utils.canUseDOM,
+    isSupportedEnvironment: typeof mockIsSupportedEnvironment !== 'undefined' ? () => mockIsSupportedEnvironment : utils.isSupportedEnvironment,
+  };
+});
+
+function setup({ onLoad, ...rest }) {
+  return new Promise(resolve => {
+    const wrapper = mount(<ReactInlineSVG
+      onLoad={(src, isCached) => {
+        setTimeout(() => {
+          if (onLoad) onLoad(src, isCached);
+
+          resolve(wrapper);
+        }, 0);
+      }}
+      onError={error => {
+        mockOnError(error);
+        setTimeout(() => resolve(wrapper), 0);
+      }}
+      {...rest}
+    />);
+
+    return wrapper;
+  });
 }
 
 describe('react-inlinesvg', () => {
   describe('basic functionality', () => {
-    it('should be a Component', () => {
-      const wrapper = setup({ src: '' });
-
-      expect(wrapper.instance() instanceof React.Component).toBe(true);
-    });
-
-    it('should load a relative svg', done => {
-      const wrapper = setup({
-        src: fixtures.tiger,
-        onError: done,
-        onLoad: value => {
-          wrapper.update();
-
-          expect(value).toBe(fixtures.tiger);
-          expect(wrapper.find('.isvg')).toHaveClassName('loaded');
-          done();
-        }
-      });
-    });
-
-    it('should load a base64 data-uri', () => {
-      const wrapper = setup({
-        src: fixtures.base64,
-      });
-
-      expect(wrapper.props().uniqueHash).toBe(undefined);
-      expect(wrapper.find('.isvg')).toHaveClassName('loaded');
-    });
-
-    it('should load a non-base64 data-uri', () => {
-      const wrapper = setup({
-        src: fixtures.inline,
-      });
-
-      expect(wrapper.find('.isvg')).toHaveClassName('loaded');
-    });
-
-    it('should handle `src` prop changes', done => {
-      const wrapper = setup({
-        src: fixtures.inline,
-        onError: done,
-        onLoad: src => {
-          expect(src).toBe(fixtures.inline);
-        },
-      });
-
-      expect(wrapper.find('.isvg')).toHaveClassName('loaded');
-
-      wrapper.setProps({
-        ...wrapper.props(),
-        src: fixtures.url,
-        onError: done,
-        onLoad: src => {
-          expect(src).toBe(fixtures.url);
-
-          done();
-        },
+    it('should load a relative svg with title and description', async() => {
+      const wrapper = await setup({
+        src: fixtures.react,
+        title: 'React',
+        description: 'React is a view library',
       });
 
       wrapper.update();
-      expect(wrapper.find('.isvg')).toHaveClassName('loading');
+      expect(wrapper).toMatchSnapshot();
     });
 
-    it('should dispatch an error on empty `src` prop changes ', done => {
-      const wrapper = setup({
-        src: fixtures.inline,
+    it('should load a base64 src', async() => {
+      const wrapper = await setup({
+        src: fixtures.base64,
+        title: 'base64'
       });
 
-      expect(wrapper.find('.isvg')).toHaveClassName('loaded');
+      expect(wrapper).toMatchSnapshot();
+    });
+
+    it('should load an urlEncoded src', async() => {
+      const wrapper = await setup({
+        src: fixtures.urlEncoded,
+        title: 'URL Encoded',
+      });
+
+      expect(wrapper).toMatchSnapshot();
+    });
+
+    it('should load an plain svg src', async() => {
+      const wrapper = await setup({
+        src: fixtures.string,
+        title: 'Plain',
+      });
+
+      expect(wrapper).toMatchSnapshot();
+    });
+
+    it('should handle src changes', async() => {
+      const wrapper = await setup({ src: '' });
+
+      expect(wrapper).toMatchSnapshot();
 
       wrapper.setProps({
         ...wrapper.props(),
-        src: '',
-        onError: error => {
-          expect(error.message).toBe('Missing source');
-
-          done();
-        },
-      });
-    });
-
-    it('should handle a custom wrapper', () => {
-      const wrapper = setup({
-        src: fixtures.url,
-        preloader: (<div className="loader">loading</div>),
-        wrapper: React.createFactory('div'),
+        src: fixtures.react,
+        title: 'Test',
       });
 
-      expect(wrapper.find('.isvg')).toHaveTagName('div');
-      expect(wrapper.find('.loader')).toExist();
+      wrapper.update();
+      expect(wrapper).toMatchSnapshot();
     });
 
-    it('should handle a preloader', () => {
-      const wrapper = setup({
-        src: fixtures.url,
-        preloader: (<div className="loader">loading</div>),
+    it('should handle a loader', async() => {
+      const wrapper = await setup({
+        src: fixtures.play,
+        loader: <Loader />,
       });
 
-      expect(wrapper.find('.loader')).toExist();
+      expect(wrapper.find('Loader')).toExist();
+      expect(wrapper).toMatchSnapshot();
+
+      wrapper.update();
+      expect(wrapper.find('Loader')).not.toExist();
+      expect(wrapper).toMatchSnapshot();
     });
 
-    it('should uniquify ids with the default uniqueHash', done => {
-      const wrapper = setup({
-        src: 'https://raw.githubusercontent.com/gilbarbara/logos/00cf8501d18b9e377ec0227b915a6f74ab4bd18f/logos/apiary.svg',
-        preloader: (<div className="loader">loading</div>),
-        onError: done,
-        onLoad: () => {
-          wrapper.update();
-          const html = wrapper.find('.isvg').html();
-
-          expect(wrapper.find('.isvg')).toHaveClassName('loaded');
-          expect(/linearGradient-1___/.test(html)).toBe(true);
-          done();
-        }
+    it('should uniquify ids with the default uniqueHash', async() => {
+      const wrapper = await setup({
+        src: fixtures.play,
+        uniquifyIDs: true,
       });
+
+      wrapper.update();
+
+      expect(wrapper.find('svg')).toExist();
+      expect(wrapper.find('radialgradient').prop('id')).toEqual(expect.stringMatching(/radialGradient-1__.*?/));
     });
 
-    it('should uniquify ids with the a custom uniqueHash', done => {
-      const wrapper = setup({
-        src: 'https://raw.githubusercontent.com/gilbarbara/logos/00cf8501d18b9e377ec0227b915a6f74ab4bd18f/logos/apiary.svg',
-        preloader: (<div className="loader">loading</div>),
+    it('should uniquify ids with a custom uniqueHash', async() => {
+      const wrapper = await setup({
+        src: fixtures.play,
         uniqueHash: 'test',
-        onError: done,
-        onLoad: () => {
-          wrapper.update();
-          const html = wrapper.find('.isvg').html();
-
-          expect(wrapper.props().uniqueHash).toBe('test');
-          expect(wrapper.find('.isvg')).toHaveClassName('loaded');
-          expect(/linearGradient-1___test/.test(html)).toBe(true);
-          done();
-        }
+        uniquifyIDs: true,
       });
+
+      wrapper.update();
+      expect(wrapper).toMatchSnapshot();
     });
 
-    it('should uniquify ids in the style attribute', done => {
-      const wrapper = setup({
-        src: fixtures.style,
-        preloader: (<div className="loader">loading</div>),
-        onError: done,
-        onLoad: () => {
-          wrapper.update();
-          const html = wrapper.find('.isvg').html();
-
-          expect(/fill:url\(#a___/.test(html)).toBe(true);
-
-          done();
-        }
-      });
-    });
-
-    it('should prefix the ids with the baseURL', done => {
-      const wrapper = setup({
-        src: fixtures.style,
-        preloader: (<div className="loader">loading</div>),
+    it('should prefix the ids with the baseURL', async() => {
+      const wrapper = await setup({
+        src: fixtures.play,
         baseURL: 'https://github.com/gilbarbara/react-inlinesvg/',
-        onError: done,
-        onLoad: () => {
-          wrapper.update();
-          const html = wrapper.find('.isvg').html();
-
-          expect(/fill:url\(https:\/\/github\.com\/gilbarbara\/react-inlinesvg\/#a___/.test(html)).toBe(true);
-
-          done();
-        }
+        uniquifyIDs: true,
       });
+
+      wrapper.update();
+
+      expect(wrapper.find('svg')).toExist();
+      expect(wrapper.find('circle').prop('fill'))
+        .toEqual(expect.stringMatching(/https:\/\/github\.com\/gilbarbara\/react-inlinesvg\/#radialGradient-1__.*?/));
     });
 
-    it('should not uniquify ids if it\'s disabled', done => {
-      const wrapper = setup({
-        src: 'https://raw.githubusercontent.com/gilbarbara/logos/00cf8501d18b9e377ec0227b915a6f74ab4bd18f/logos/apiary.svg',
-        uniquifyIDs: false,
-        onError: done,
-        onLoad: () => {
-          wrapper.update();
-          const html = wrapper.find('.isvg').html();
-
-          expect(wrapper.find('.isvg')).toHaveClassName('loaded');
-          expect(/linearGradient-1\b/.test(html)).toBe(true);
-          done();
-        }
+    it('should call error and render fallback for a 404', async() => {
+      const wrapper = await setup({
+        src: 'http://localhost:1337/DOESNOTEXIST.svg',
+        children: <div className="fallback">Load Fail</div>,
       });
+
+      expect(mockOnError).toHaveBeenCalledWith(new InlineSVGError('request: Not found'));
+
+      wrapper.update();
+      expect(wrapper).toMatchSnapshot();
     });
 
-    it('should call error and render fallback for a 404', done => {
-      const wrapper = mount(
-        <ReactInlineSVG
-          src="DOESNOTEXIST.svg"
-          onError={
-            error => {
-              expect(error.isHttpError).toBe(true);
-              expect(error.status).toBe(404);
-
-              wrapper.update();
-              expect(wrapper.find('.fallback')).toExist();
-              done();
-            }
-          }
-        >
-          <div className="fallback">Load Fail</div>
-        </ReactInlineSVG>
-      );
-    });
-
-    it('should load SVGs from a CORS-enabled domain', done => {
-      setup({
-        src: 'http://localhost:1337/tiger.svg',
-        onError: done,
-        onLoad: src => {
-          expect(src).toBe('http://localhost:1337/tiger.svg');
-          done();
-        }
-      });
-    });
-
-    it('should transform the SVG text when given the processSVG prop', done => {
+    it('should transform the SVG text when given the preProcessor prop', async() => {
       const extraProp = 'data-isvg="test"';
-      const wrapper = setup({
-        src: fixtures.url,
-        processSVG: svgText => svgText.replace('<svg ', `<svg ${extraProp} `),
-        onError: done,
-        onLoad: () => {
-          wrapper.update();
-          const html = wrapper.find('.isvg').html();
-
-          const regexp = new RegExp(extraProp);
-          expect(!!regexp.exec(html)).toBe(true);
-
-          done();
-        }
+      const wrapper = await setup({
+        src: fixtures.play,
+        preProcessor: svgText => svgText.replace('<svg ', `<svg ${extraProp} `),
       });
 
-      expect(wrapper.instance() instanceof React.Component).toBe(true);
+      wrapper.update();
+      expect(wrapper).toMatchSnapshot();
     });
 
-    it('should handle unmount', () => {
-      const wrapper = setup({
-        src: fixtures.url,
-        className: 'test'
+    it('should handle unmount', async() => {
+      const wrapper = await setup({
+        src: fixtures.play,
       });
 
-      expect(wrapper.find('.isvg')).toHaveClassName('test');
-      expect(wrapper.find('.isvg')).toExist();
+      wrapper.update();
+      expect(wrapper).toMatchSnapshot();
 
       wrapper.unmount();
-
-      expect(wrapper.find('.isvg')).not.toExist();
+      expect(wrapper.find('InlineSVG')).not.toExist();
     });
   });
 
@@ -272,109 +198,83 @@ describe('react-inlinesvg', () => {
       const second = () => {
         setup({
           src: fixtures.url,
-          onError: done,
           onLoad: (src, isCached) => {
             expect(isCached).toBe(true);
             done();
           },
-          cacheGetRequests: true
         });
       };
 
       setup({
         src: fixtures.url,
-        onError: done,
         onLoad: (src, isCached) => {
           expect(isCached).toBe(false);
           second();
         },
-        cacheGetRequests: true
       });
     });
 
     it('it should call load on newly instantiated icons even if cached', done => {
-      const second = () => {
-        setup({
-          src: fixtures.url,
-          onError: err => {
-            done(err);
-          },
-          onLoad: value => {
-            expect(value).toBe(fixtures.url);
-            done();
-          },
-          cacheGetRequests: true
-        });
-      };
+      const second = () => setup({
+        src: fixtures.url,
+        onLoad: value => {
+          expect(value).toBe(fixtures.url);
+          done();
+        },
+      });
 
       setup({
         src: fixtures.url,
         onLoad: () => {
           second();
         },
-        cacheGetRequests: true
       });
+    });
+
+    it('should skip the cache if `cacheRequest` is false', async() => {
+      const wrapper = await setup({
+        cacheRequests: false,
+        src: fixtures.url,
+        onLoad: (src, isCached) => {
+          expect(isCached).toBe(false);
+        },
+      });
+
+      expect(wrapper).toMatchSnapshot();
     });
   });
 
   describe('with errors', () => {
-    it('should show children if loading not supported', done => {
-      const wrapper = setup({
-        src: 'DOESNOTEXIST.svg',
+    it('should dispatch an error on empty `src` prop changes ', async() => {
+      const wrapper = await setup({
+        src: fixtures.urlEncoded,
+      });
+
+      wrapper.update();
+      expect(wrapper).toMatchSnapshot();
+
+      wrapper.setProps({
+        ...wrapper.props(),
+        src: '',
+      });
+
+      expect(mockOnError).toHaveBeenCalledWith(new InlineSVGError('Missing src'));
+    });
+
+    it('should show children if src is not found', async() => {
+      const wrapper = await setup({
+        src: 'http://localhost:1337/DOESNOTEXIST.svg',
         children: (
           <div className="missing">
-            <span>MISSINGNO</span>
+            <span>MISSING</span>
           </div>
         ),
-        supportTest: () => false,
-        onError: error => {
-          expect(error.isSupportedBrowser).toBe(false);
-          expect(error.message).toBe('Unsupported Browser');
-
-          done();
-        }
       });
 
-      expect(wrapper.find('.isvg')).toHaveClassName('unsupported');
+      wrapper.update();
+
+      expect(mockOnError).toHaveBeenCalledWith(new InlineSVGError('request: Not found'));
       expect(wrapper.find('.missing')).toExist();
-    });
-
-    it('should show a single children if loading not supported', () => {
-      const wrapper = setup({
-        src: 'DOESNOTEXIST.svg',
-        children: (<img src="/test/tiger.png" alt="tiger" />),
-        supportTest: () => false
-      });
-
-      expect(wrapper.find('img')).toHaveProp('src', '/test/tiger.png');
-    });
-
-    it('should NOT show children on error', () => {
-      const wrapper = setup({
-        src: 'DOESNOTEXIST.svg',
-        children: (
-          <span>
-            <span>MISSINGNO</span>
-          </span>
-        ),
-      });
-
-      expect(wrapper.find('.isvg')).toHaveClassName('loading');
-      expect(wrapper.find('.isvg > span')).not.toExist();
-    });
-
-    it('should have a status code HTTP errors', done => {
-      setup({
-        src: 'DOESNOTEXIST.svg',
-        onError: err => {
-          if (err.isHttpError && err.status === 404) {
-            done();
-            return;
-          }
-
-          done(new Error('Error missing information'));
-        }
-      });
     });
   });
 });

@@ -1,4 +1,10 @@
 {
+  "globals": {
+    "fetch": true,
+    "mount": true,
+    "render": true,
+    "shallow": true
+  },
   "rules": {
     "no-console": 0,
     "no-underscore-dangle": 0,
