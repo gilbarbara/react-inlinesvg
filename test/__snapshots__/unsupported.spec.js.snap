@@ -1,5 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`unsupported environments should warn the user if fetch is missing 1`] = `
+<InlineSVG
+  cacheRequests={true}
+  onError={[Function]}
+  onLoad={[Function]}
+  src="http://localhost:1337/play.svg"
+  uniquifyIDs={false}
+/>
+`;
+
 exports[`unsupported environments shouldn't break without DOM  1`] = `
 <InlineSVG
   cacheRequests={true}
