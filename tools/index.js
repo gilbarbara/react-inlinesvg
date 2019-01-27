@@ -1,4 +1,4 @@
-/*eslint-disable no-var, vars-on-top, no-console */
+/* eslint-disable no-var, vars-on-top, no-console */
 const { promisify } = require('util');
 const { exec } = require('child_process');
 const chalk = require('chalk');
@@ -25,8 +25,7 @@ module.exports = yargs
 
                   if ($local === $remote) {
                     console.log(chalk.green('✔ Repo is up-to-date!'));
-                  }
-                  else if ($local === $base) {
+                  } else if ($local === $base) {
                     console.log(chalk.red('⊘ Error'), 'You need to pull, there are new commits.');
                     process.exit(1);
                   }
@@ -38,10 +37,12 @@ module.exports = yargs
                   }
 
                   console.log(chalk.yellow('⚠ Warning'), err.message);
-                }))
+                }),
+            )
             .catch(err => {
               throw new Error(err);
-            }))
+            }),
+        )
         .catch(() => {
           console.log('not under git');
         });
@@ -55,11 +56,8 @@ module.exports = yargs
         .then(({ stdout }) => {
           if (stdout.match('package.json')) {
             console.log(chalk.yellow('▼ Updating...'));
-            exec('npm update')
-              .stdout
-              .pipe(process.stdout);
-          }
-          else {
+            exec('npm update').stdout.pipe(process.stdout);
+          } else {
             console.log(chalk.green('✔ Nothing to update'));
           }
         })
@@ -81,5 +79,4 @@ module.exports = yargs
     `);
     console.log(instance.help());
     process.exit(1);
-  })
-  .argv;
+  }).argv;
