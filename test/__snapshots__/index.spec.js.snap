@@ -90,19 +90,27 @@ exports[`react-inlinesvg basic functionality should handle a loader 2`] = `
     </defs>
     
     
-    <circle
-      cx="16"
-      cy="16"
-      fill="url(#radialGradient-1)"
+    <g
       key="1-3"
-      r="16"
-    />
+    >
+      
+      
+      <circle
+        cx="16"
+        cy="16"
+        fill="url(#radialGradient-1)"
+        key="2-1"
+        r="16"
+      />
+      
+      
+      <use
+        key="2-3"
+        xlinkHref="#triangle"
+      />
+      
     
-    
-    <use
-      key="1-5"
-      xlinkHref="#triangle"
-    />
+    </g>
     
 
   </svg>
@@ -159,97 +167,6 @@ exports[`react-inlinesvg basic functionality should handle src changes 2`] = `
       
     
     </g>
-    
-
-  </svg>
-</InlineSVG>
-`;
-
-exports[`react-inlinesvg basic functionality should handle unmount 1`] = `
-<InlineSVG
-  cacheRequests={true}
-  onError={[Function]}
-  onLoad={[Function]}
-  src="http://localhost:1337/play.svg"
-  uniquifyIDs={false}
->
-  <svg
-    height="32px"
-    key="0-0"
-    preserveAspectRatio="xMidYMid"
-    version="1.1"
-    viewBox="0 0 32 32"
-    width="32px"
-    xmlns="http://www.w3.org/2000/svg"
-    xmlnsXlink="http://www.w3.org/1999/xlink"
-  >
-    
-    
-    <defs
-      key="1-1"
-    >
-      
-        
-      <radialgradient
-        cx="50%"
-        cy="50%"
-        fx="50%"
-        fy="50%"
-        id="radialGradient-1"
-        key="2-1"
-        r="50%"
-      >
-        
-            
-        <stop
-          key="3-1"
-          offset="0%"
-          stopColor="#FFFFFF"
-        />
-        
-            
-        <stop
-          key="3-3"
-          offset="100%"
-          stopColor="#FF0000"
-        />
-        
-        
-      </radialgradient>
-      
-        
-      <g
-        id="triangle"
-        key="2-3"
-      >
-        
-          
-        <polygon
-          fill="#000"
-          key="3-1"
-          points="12 9 12 23 23 16"
-        />
-        
-        
-      </g>
-      
-    
-    </defs>
-    
-    
-    <circle
-      cx="16"
-      cy="16"
-      fill="url(#radialGradient-1)"
-      key="1-3"
-      r="16"
-    />
-    
-    
-    <use
-      key="1-5"
-      xlinkHref="#triangle"
-    />
     
 
   </svg>
@@ -2371,19 +2288,27 @@ exports[`react-inlinesvg basic functionality should transform the SVG text when 
     </defs>
     
     
-    <circle
-      cx="16"
-      cy="16"
-      fill="url(#radialGradient-1)"
+    <g
       key="1-3"
-      r="16"
-    />
+    >
+      
+      
+      <circle
+        cx="16"
+        cy="16"
+        fill="url(#radialGradient-1)"
+        key="2-1"
+        r="16"
+      />
+      
+      
+      <use
+        key="2-3"
+        xlinkHref="#triangle"
+      />
+      
     
-    
-    <use
-      key="1-5"
-      xlinkHref="#triangle"
-    />
+    </g>
     
 
   </svg>
@@ -2463,19 +2388,27 @@ exports[`react-inlinesvg basic functionality should uniquify ids with a custom u
     </defs>
     
     
-    <circle
-      cx="16"
-      cy="16"
-      fill="url(#radialGradient-1__test)"
+    <g
       key="1-3"
-      r="16"
-    />
+    >
+      
+      
+      <circle
+        cx="16"
+        cy="16"
+        fill="url(#radialGradient-1__test)"
+        key="2-1"
+        r="16"
+      />
+      
+      
+      <use
+        key="2-3"
+        xlinkHref="#triangle__test"
+      />
+      
     
-    
-    <use
-      key="1-5"
-      xlinkHref="#triangle__test"
-    />
+    </g>
     
 
   </svg>
