@@ -1,5 +1,5 @@
 import React from 'react';
-import { InlineSVGError } from '../src/utils';
+import { InlineSVGError } from '../src/utils.ts';
 
 const fixtures = {
   play: 'http://localhost:1337/play.svg',
@@ -21,30 +21,32 @@ jest.mock('../src/utils', () => {
 
 function setup({ onLoad, ...rest }) {
   // eslint-disable-next-line global-require
-  const ReactInlineSVG = require('../src').default;
+  const ReactInlineSVG = require('../src/index.tsx').default;
 
   return new Promise(resolve => {
-    const wrapper = mount(<ReactInlineSVG
-      onLoad={(src, isCached) => {
-        setTimeout(() => {
-          if (onLoad) onLoad(src, isCached);
+    const wrapper = mount(
+      <ReactInlineSVG
+        onLoad={(src, isCached) => {
+          setTimeout(() => {
+            if (onLoad) onLoad(src, isCached);
 
-          resolve(wrapper);
-        }, 0);
-      }}
-      onError={error => {
-        mockOnError(error);
-        setTimeout(() => resolve(wrapper), 0);
-      }}
-      {...rest}
-    />);
+            resolve(wrapper);
+          }, 0);
+        }}
+        onError={error => {
+          mockOnError(error);
+          setTimeout(() => resolve(wrapper), 0);
+        }}
+        {...rest}
+      />,
+    );
 
     return wrapper;
   });
 }
 
 describe('unsupported environments', () => {
-  it('shouldn\'t break without DOM ', async() => {
+  it("shouldn't break without DOM ", async () => {
     const wrapper = await setup({
       src: fixtures.play,
     });
@@ -55,11 +57,24 @@ describe('unsupported environments', () => {
     //  expect(wrapper.state('content')).toBe(fixtures.play);
   });
 
-  xit('should warn the user if fetch is missing', () => {
+  it('should warn the user if fetch is missing', async () => {
+    const globalFetch = fetch;
+    fetch = undefined;
 
+    mockCanUseDOM = true;
+    mockIsSupportedEnvironment = true;
+
+    const wrapper = await setup({
+      src: fixtures.play,
+    });
+
+    expect(mockOnError).toHaveBeenCalledWith(new InlineSVGError('fetch is not a function'));
+    expect(wrapper).toMatchSnapshot();
+
+    fetch = globalFetch;
   });
 
-  it('shouldn\'t not render anything if is an unsupported browser', async() => {
+  it("shouldn't not render anything if is an unsupported browser", async () => {
     mockCanUseDOM = true;
     mockIsSupportedEnvironment = false;
 
