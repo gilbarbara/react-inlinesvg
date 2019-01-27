@@ -6,11 +6,11 @@
 Before creating bug reports, please check this [list](https://github.com/gilbarbara/react-inlinesvg/issues) as you might find out that you don't need to create one. When you are creating a bug report, please include as many details as possible.
 
 **Pull Requests**  
-Before submitting a new pull request, open a new issue to discuss it. It may already been implemented but not published or we might have found the same situation before and decide against it.  
+Before submitting a new pull request, open a new issue to discuss it. It may already been implemented but not published or we might have found the same situation before and decide against it.
 
-In any case:  
+In any case:
+
 - Format files using these rules [EditorConfig](https://github.com/gilbarbara/react-inlinesvg/blob/master/.editorconfig)
-- Follow the [Javascript](https://github.com/gilbarbara/react-inlinesvg/blob/master/.eslintrc) (ESLint) and [CSS](https://github.com/gilbarbara/react-inlinesvg/blob/master/.scss-lint.yml) (scss-lint) styleguides.
-- Document new code with jsdoc.
+- Follow the [Typescript](https://github.com/gilbarbara/react-inlinesvg/blob/master/tslint.json) (TSLint) styleguide.
 
 Thank you!
