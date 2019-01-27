@@ -183,8 +183,7 @@ describe('react-inlinesvg', () => {
         src: fixtures.play,
       });
 
-      wrapper.update();
-      expect(wrapper).toMatchSnapshot();
+      expect(wrapper.find('InlineSVG')).toExist();
 
       wrapper.unmount();
       expect(wrapper.find('InlineSVG')).not.toExist();
