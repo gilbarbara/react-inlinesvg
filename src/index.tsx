@@ -163,7 +163,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
 
     const hash = uniqueHash || randomString();
 
-    [...node.children].forEach(d => {
+    [...node.children].map(d => {
       if (d.attributes && d.attributes.length) {
         const attributes = Object.values(d.attributes);
 
@@ -187,6 +187,8 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
       if (d.children.length) {
         d = this.updateSVGAttributes(d as SVGSVGElement);
       }
+
+      return d;
     });
 
     return node;

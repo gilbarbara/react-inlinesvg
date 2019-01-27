@@ -9,6 +9,8 @@
           <polygon fill="#000" points="12 9 12 23 23 16"></polygon>
         </g>
     </defs>
-    <circle fill="url(#radialGradient-1)" cx="16" cy="16" r="16"></circle>
-    <use xlink:href="#triangle" />
+    <g>
+      <circle fill="url(#radialGradient-1)" cx="16" cy="16" r="16"></circle>
+      <use xlink:href="#triangle" />
+    </g>
 </svg>

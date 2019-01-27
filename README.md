@@ -72,15 +72,13 @@ A function to process the contents of the SVG text before parsing.
 **title** {string}  
 A title for your SVG. It will override an existing `<title>` tag.
 
-**uniqueHash** {string} ▶︎ a random 8 characters string `[A-Za-z0-9]`   
+**uniqueHash** {string} ▶︎ a random 8 characters string `[A-Za-z0-9]`  
 A string to use with `uniquifyIDs`.
 
 **uniquifyIDs** {boolean} ▶︎ `false`  
 Create unique IDs for each icon.
 
 > Additional props will be spread over the SVG element.
-
-
 
 ### Example
 
@@ -114,8 +112,6 @@ If loading SVGs from another domain, you'll need to make sure it allows [CORS].
 [svg-use-external-source]: http://css-tricks.com/svg-use-external-source
 [use-article]: http://taye.me/blog/svg/a-guide-to-svg-use-elements/
 [use-support]: https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use#Browser_compatibility
-
-
 
 ## Why you need this package?
 
