@@ -10,7 +10,7 @@
 >React version
 
 
->React-Tooltips version
+>react-inlinesvg version
 
 
 >Error stack
