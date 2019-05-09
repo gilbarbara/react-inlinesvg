@@ -39,6 +39,8 @@ export interface FetchError extends Error {
 export interface StorageItem {
   url: string;
   content: string;
+  queue: any[];
+  loading: boolean;
 }
 
 export const STATUS = {
@@ -287,8 +289,12 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
           const cache = cacheRequests && storage.find(d => d.url === src);
 
           if (cache) {
-            cache.loading && cache.queue.push(this.handleLoad);
-            !cache.loading && this.handleLoad(cache.content);
+            if (cache.loading) {
+              cache.queue.push(this.handleLoad);
+            } else {
+              this.handleLoad(cache.content);
+            }
+
             return;
           }
 
@@ -348,10 +354,10 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
   private request = () => {
     const { cacheRequests, src } = this.props;
 
-    if (cacheRequests){
-      storage.push({url: src, loading: true, queue: []});
+    if (cacheRequests) {
+      storage.push({ url: src, content: '', loading: true, queue: [] });
     }
-    
+
     try {
       return fetch(src)
         .then(response => {
@@ -364,11 +370,13 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
         .then(content => {
           /* istanbul ignore else */
           if (cacheRequests) {
-            const cachedItem = storage.find(function (d) { return d.url === src; });
-            cachedItem.content = content;
-            cachedItem.loading = false;
+            const cachedItem = storage.find(d => d.url === src);
+            if (cachedItem) {
+              cachedItem.content = content;
+              cachedItem.loading = false;
 
-            cachedItem.queue.forEach(cb => cb(content))
+              cachedItem.queue.forEach((cb: any) => cb(content));
+            }
           }
 
           this.handleLoad(content);
