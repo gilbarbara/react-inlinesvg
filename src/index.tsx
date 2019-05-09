@@ -287,7 +287,8 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
           const cache = cacheRequests && storage.find(d => d.url === src);
 
           if (cache) {
-            this.handleLoad(cache.content);
+            cache.loading && cache.queue.push(this.handleLoad);
+            !cache.loading && this.handleLoad(cache.content);
             return;
           }
 
@@ -347,6 +348,10 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
   private request = () => {
     const { cacheRequests, src } = this.props;
 
+    if (cacheRequests){
+      storage.push({url: src, loading: true, queue: []});
+    }
+    
     try {
       return fetch(src)
         .then(response => {
@@ -359,7 +364,11 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
         .then(content => {
           /* istanbul ignore else */
           if (cacheRequests) {
-            storage.push({ url: src, content });
+            const cachedItem = storage.find(function (d) { return d.url === src; });
+            cachedItem.content = content;
+            cachedItem.loading = false;
+
+            cachedItem.queue.forEach(cb => cb(content))
           }
 
           this.handleLoad(content);
