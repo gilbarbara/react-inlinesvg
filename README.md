@@ -31,6 +31,9 @@ An URL to prefix each ID in case you are using the `<base>` tag and `uniquifyIDs
 **cacheRequests** {boolean} ▶︎ `true`  
 Cache remote SVGs.
 
+**cacheFailedRequests** {boolean} ▶︎ `false`  
+Needs to be enabled with `cacheRequests`. If set to `true`, caches urls of remote SVGs if request fails.
+
 **description** {string}  
 A description for your SVG. It will override an existing `<desc>` tag.
 
@@ -86,6 +89,7 @@ Create unique IDs for each icon.
 <SVG
   baseURL="/home"
   cacheRequests={true}
+  cacheFailedRequests={false}
   description="The React logo"
   loader={() => <span>Loading...</span>}
   onError={error => console.log(error.message)}
