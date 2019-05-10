@@ -42,6 +42,7 @@ export interface StorageItem {
   content: string;
   queue: any[];
   loading: boolean;
+  error: boolean;
 }
 
 export const STATUS = {
@@ -295,7 +296,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
           if (cache) {
             if (cache.loading) {
               cache.queue.push(this.handleLoad);
-            } else {
+            } else if (!cache.error) {
               this.handleLoad(cache.content);
             }
 
@@ -359,7 +360,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
     const { cacheRequests, cacheFailedRequests, src } = this.props;
 
     if (cacheRequests) {
-      storage[src] = { url: src, content: '', loading: true, queue: [] };
+      storage[src] = { url: src, content: '', loading: true, error: false, queue: [] };
     }
 
     try {
@@ -378,14 +379,24 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
             cachedItem.content = content;
             cachedItem.loading = false;
 
-            cachedItem.queue.forEach((cb: any) => cb(content));
+            cachedItem.queue.filter((cb: any) => {
+              cb(content);
+
+              return true;
+            });
           }
 
           this.handleLoad(content);
         })
         .catch(error => {
-          if (cacheRequests && !cacheFailedRequests) {
-            delete storage[src];
+          if (cacheRequests && src in storage) {
+            if (cacheFailedRequests) {
+              const cachedItem = storage[src];
+              cachedItem.loading = false;
+              cachedItem.error = true;
+            } else {
+              delete storage[src];
+            }
           }
 
           this.handleError(error);
