@@ -9,6 +9,7 @@ import { canUseDOM, InlineSVGError, isSupportedEnvironment, randomString } from 
 export interface Props {
   baseURL?: string;
   cacheRequests?: boolean;
+  cacheFailedRequests?: boolean;
   children?: React.ReactNode;
   description?: string;
   loader?: React.ReactNode;
@@ -57,6 +58,7 @@ export const storage: { [key: string]: StorageItem } = {};
 
 export default class InlineSVG extends React.PureComponent<Props, State> {
   private static defaultProps = {
+    cacheFailedRequests: false,
     cacheRequests: true,
     uniquifyIDs: false,
   };
@@ -246,6 +248,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
     const {
       baseURL,
       cacheRequests,
+      cacheFailedRequests,
       children,
       description,
       onError,
@@ -353,7 +356,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
   };
 
   private request = () => {
-    const { cacheRequests, src } = this.props;
+    const { cacheRequests, cacheFailedRequests, src } = this.props;
 
     if (cacheRequests) {
       storage[src] = { url: src, content: '', loading: true, queue: [] };
@@ -380,7 +383,13 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
 
           this.handleLoad(content);
         })
-        .catch(error => this.handleError(error));
+        .catch(error => {
+          if (cacheRequests && !cacheFailedRequests) {
+            delete storage[src];
+          }
+
+          this.handleError(error);
+        });
     } catch (error) {
       this.handleError(new InlineSVGError(error.message));
     }

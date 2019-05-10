@@ -2,6 +2,7 @@
 
 exports[`react-inlinesvg basic functionality should handle a loader 1`] = `
 <InlineSVG
+  cacheFailedRequests={false}
   cacheRequests={true}
   loader={<Loader />}
   onError={[Function]}
@@ -19,6 +20,7 @@ exports[`react-inlinesvg basic functionality should handle a loader 1`] = `
 
 exports[`react-inlinesvg basic functionality should handle a loader 2`] = `
 <InlineSVG
+  cacheFailedRequests={false}
   cacheRequests={true}
   loader={<Loader />}
   onError={[Function]}
@@ -119,6 +121,7 @@ exports[`react-inlinesvg basic functionality should handle a loader 2`] = `
 
 exports[`react-inlinesvg basic functionality should handle src changes 1`] = `
 <InlineSVG
+  cacheFailedRequests={false}
   cacheRequests={true}
   onError={[Function]}
   onLoad={[Function]}
@@ -129,6 +132,7 @@ exports[`react-inlinesvg basic functionality should handle src changes 1`] = `
 
 exports[`react-inlinesvg basic functionality should handle src changes 2`] = `
 <InlineSVG
+  cacheFailedRequests={false}
   cacheRequests={true}
   onError={[Function]}
   onLoad={[Function]}
@@ -175,6 +179,7 @@ exports[`react-inlinesvg basic functionality should handle src changes 2`] = `
 
 exports[`react-inlinesvg basic functionality should load a base64 src 1`] = `
 <InlineSVG
+  cacheFailedRequests={false}
   cacheRequests={true}
   onError={[Function]}
   onLoad={[Function]}
@@ -215,6 +220,7 @@ exports[`react-inlinesvg basic functionality should load a base64 src 1`] = `
 
 exports[`react-inlinesvg basic functionality should load an plain svg src 1`] = `
 <InlineSVG
+  cacheFailedRequests={false}
   cacheRequests={true}
   onError={[Function]}
   onLoad={[Function]}
@@ -252,6 +258,7 @@ exports[`react-inlinesvg basic functionality should load an plain svg src 1`] = 
 
 exports[`react-inlinesvg basic functionality should load an svg url and add title and description 1`] = `
 <InlineSVG
+  cacheFailedRequests={false}
   cacheRequests={true}
   description="React is a view library"
   onError={[Function]}
@@ -304,6 +311,7 @@ exports[`react-inlinesvg basic functionality should load an svg url and add titl
 
 exports[`react-inlinesvg basic functionality should load an svg url and replace existing title and description 1`] = `
 <InlineSVG
+  cacheFailedRequests={false}
   cacheRequests={true}
   description="Is this a tiger?"
   onError={[Function]}
@@ -2176,6 +2184,7 @@ exports[`react-inlinesvg basic functionality should load an svg url and replace 
 
 exports[`react-inlinesvg basic functionality should load an urlEncoded src 1`] = `
 <InlineSVG
+  cacheFailedRequests={false}
   cacheRequests={true}
   onError={[Function]}
   onLoad={[Function]}
@@ -2216,6 +2225,7 @@ exports[`react-inlinesvg basic functionality should load an urlEncoded src 1`] =
 
 exports[`react-inlinesvg basic functionality should transform the SVG text when given the preProcessor prop 1`] = `
 <InlineSVG
+  cacheFailedRequests={false}
   cacheRequests={true}
   onError={[Function]}
   onLoad={[Function]}
@@ -2317,6 +2327,7 @@ exports[`react-inlinesvg basic functionality should transform the SVG text when 
 
 exports[`react-inlinesvg basic functionality should uniquify ids with a custom uniqueHash 1`] = `
 <InlineSVG
+  cacheFailedRequests={false}
   cacheRequests={true}
   onError={[Function]}
   onLoad={[Function]}
@@ -2417,6 +2428,7 @@ exports[`react-inlinesvg basic functionality should uniquify ids with a custom u
 
 exports[`react-inlinesvg cached requests should skip the cache if \`cacheRequest\` is false 1`] = `
 <InlineSVG
+  cacheFailedRequests={false}
   cacheRequests={false}
   onError={[Function]}
   onLoad={[Function]}
@@ -2427,6 +2439,7 @@ exports[`react-inlinesvg cached requests should skip the cache if \`cacheRequest
 
 exports[`react-inlinesvg with errors should dispatch an error on empty \`src\` prop changes  1`] = `
 <InlineSVG
+  cacheFailedRequests={false}
   cacheRequests={true}
   onError={[Function]}
   onLoad={[Function]}

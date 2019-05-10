@@ -2,6 +2,7 @@
 
 exports[`unsupported environments should warn the user if fetch is missing 1`] = `
 <InlineSVG
+  cacheFailedRequests={false}
   cacheRequests={true}
   onError={[Function]}
   onLoad={[Function]}
@@ -12,6 +13,7 @@ exports[`unsupported environments should warn the user if fetch is missing 1`] =
 
 exports[`unsupported environments shouldn't break without DOM  1`] = `
 <InlineSVG
+  cacheFailedRequests={false}
   cacheRequests={true}
   onError={[Function]}
   onLoad={[Function]}
@@ -22,6 +24,7 @@ exports[`unsupported environments shouldn't break without DOM  1`] = `
 
 exports[`unsupported environments shouldn't not render anything if is an unsupported browser 1`] = `
 <InlineSVG
+  cacheFailedRequests={false}
   cacheRequests={true}
   onError={[Function]}
   onLoad={[Function]}

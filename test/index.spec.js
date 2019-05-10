@@ -191,7 +191,7 @@ describe('react-inlinesvg', () => {
   });
 
   describe('cached requests', () => {
-    it('should request an SVG only once when caching', async () => {
+    it('should request an SVG only once when caching and is successful fetch', async () => {
       const second = () =>
         setup({
           src: fixtures.url,
@@ -202,6 +202,49 @@ describe('react-inlinesvg', () => {
 
       await setup({
         src: fixtures.url,
+        onLoad: (src, isCached) => {
+          expect(isCached).toBe(false);
+        },
+      });
+
+      await second();
+    });
+
+    it('should request an SVG again when caching and is failed fetch', async () => {
+      const fixtureBadUrl = `${fixtures.url}lalala`;
+
+      const second = () =>
+        setup({
+          src: fixtureBadUrl,
+          onLoad: (src, isCached) => {
+            expect(isCached).toBe(false);
+          },
+        });
+
+      await setup({
+        src: fixtureBadUrl,
+        onLoad: (src, isCached) => {
+          expect(isCached).toBe(false);
+        },
+      });
+
+      await second();
+    });
+
+    it('should request an SVG only once when caching and `cacheFailedRequest` is true, and is failed fetch', async () => {
+      const fixtureBadUrl = `${fixtures.url}lalala`;
+
+      const second = () =>
+        setup({
+          src: fixtureBadUrl,
+          onLoad: (src, isCached) => {
+            expect(isCached).toBe(true);
+          },
+        });
+
+      await setup({
+        cacheFailedRequest: true,
+        src: fixtureBadUrl,
         onLoad: (src, isCached) => {
           expect(isCached).toBe(false);
         },
