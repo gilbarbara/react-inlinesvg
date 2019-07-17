@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 20 6" class="test">
+  <defs>
+    <path id="nav-settings-a" d="M5 15a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm7 0a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm7 0a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+  </defs>
+  <g fill="none" fill-rule="evenodd" transform="translate(-2 -9)">
+    <mask id="nav-settings-b">
+      <use xlink:href="#nav-settings-a"/>
+    </mask>
+    <g fill="#f04" class="icon-base" mask="url(#nav-settings-b)">
+      <path d="M0 0h24v24H0z"/>
+    </g>
+  </g>
+</svg>

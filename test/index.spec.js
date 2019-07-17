@@ -6,6 +6,7 @@ import { InlineSVGError } from '../src/utils.ts';
 const Loader = () => <div id="loader" />;
 
 const fixtures = {
+  circles: 'http://localhost:1337/circles.svg',
   icons: 'http://localhost:1337/icons.svg',
   play: 'http://localhost:1337/play.svg',
   react: 'http://localhost:1337/react.svg',
@@ -47,7 +48,7 @@ function setup({ onLoad, ...rest }) {
 
 describe('react-inlinesvg', () => {
   describe('basic functionality', () => {
-    it('should load a base64 src', async () => {
+    it('should handle a base64 src', async () => {
       const wrapper = await setup({
         src: fixtures.base64,
         title: 'base64',
@@ -56,7 +57,7 @@ describe('react-inlinesvg', () => {
       expect(wrapper).toMatchSnapshot();
     });
 
-    it('should load an urlEncoded src', async () => {
+    it('should handle an urlEncoded src', async () => {
       const wrapper = await setup({
         src: fixtures.urlEncoded,
         title: 'URL Encoded',
@@ -65,7 +66,7 @@ describe('react-inlinesvg', () => {
       expect(wrapper).toMatchSnapshot();
     });
 
-    it('should load an plain svg src', async () => {
+    it('should handle an plain svg src', async () => {
       const wrapper = await setup({
         src: fixtures.plain,
         title: 'Plain',
@@ -74,7 +75,17 @@ describe('react-inlinesvg', () => {
       expect(wrapper).toMatchSnapshot();
     });
 
-    it('should load an svg url and add title and description', async () => {
+    it('should handle a svg with mask and classes', async () => {
+      const wrapper = await setup({
+        src: fixtures.circles,
+        title: 'Circles',
+      });
+
+      wrapper.update();
+      expect(wrapper).toMatchSnapshot();
+    });
+
+    it('should handle an svg url and add title and description', async () => {
       const wrapper = await setup({
         src: fixtures.react,
         title: 'React',
@@ -85,7 +96,7 @@ describe('react-inlinesvg', () => {
       expect(wrapper).toMatchSnapshot();
     });
 
-    it('should load an svg url and replace existing title and description', async () => {
+    it('should handle an svg url and replace existing title and description', async () => {
       const wrapper = await setup({
         src: fixtures.tiger,
         title: 'The Tiger',
