@@ -6,13 +6,13 @@ import DomToReact from 'dom-to-react';
 
 import { canUseDOM, InlineSVGError, isSupportedEnvironment, randomString } from './utils';
 
-export interface Props {
+export interface IProps {
   baseURL?: string;
   cacheRequests?: boolean;
   children?: React.ReactNode;
   description?: string;
   loader?: React.ReactNode;
-  onError?: (error: InlineSVGError | FetchError) => void;
+  onError?: (error: InlineSVGError | IFetchError) => void;
   onLoad?: (src: URL | string, isCached: boolean) => void;
   preProcessor?: (code: string) => string;
   src: string;
@@ -22,21 +22,21 @@ export interface Props {
   [key: string]: any;
 }
 
-export interface State {
+export interface IState {
   content: string;
   element: React.ReactNode;
   hasCache: boolean;
   status: string;
 }
 
-export interface FetchError extends Error {
+export interface IFetchError extends Error {
   message: string;
   type: string;
   errno: string;
   code: string;
 }
 
-export interface StorageItem {
+export interface IStorageItem {
   url: string;
   content: string;
 }
@@ -50,32 +50,30 @@ export const STATUS = {
   UNSUPPORTED: 'unsupported',
 };
 
-export const storage: StorageItem[] = [];
+export const storage: IStorageItem[] = [];
 
-export default class InlineSVG extends React.PureComponent<Props, State> {
-  private static defaultProps = {
+export default class InlineSVG extends React.PureComponent<IProps, IState> {
+  public static defaultProps = {
     cacheRequests: true,
     uniquifyIDs: false,
   };
 
   // tslint:disable-next-line:variable-name
-  private _isMounted: boolean;
+  private _isMounted = false;
 
-  constructor(props: Props) {
+  constructor(props: IProps) {
     super(props);
 
     this.state = {
       content: '',
       element: null,
-      hasCache: !!props.cacheRequests && !!storage.find((s: StorageItem) => s.url === props.src),
+      hasCache: !!props.cacheRequests && !!storage.find((s: IStorageItem) => s.url === props.src),
       status: STATUS.PENDING,
     };
-
-    this._isMounted = false;
   }
 
   public componentDidMount() {
-    this.isMounted = true;
+    this._isMounted = true;
 
     if (!canUseDOM()) {
       this.handleError(new InlineSVGError('No DOM'));
@@ -105,7 +103,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
     }
   }
 
-  public componentDidUpdate(prevProps: Props, prevState: State) {
+  public componentDidUpdate(prevProps: IProps, prevState: IState) {
     if (!canUseDOM()) {
       return;
     }
@@ -132,14 +130,6 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
 
   public componentWillUnmount() {
     this._isMounted = false;
-  }
-
-  get isMounted() {
-    return this._isMounted;
-  }
-
-  set isMounted(value: boolean) {
-    this._isMounted = value;
   }
 
   private parseSVG() {
@@ -275,7 +265,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
 
   private load() {
     /* istanbul ignore else */
-    if (this.isMounted) {
+    if (this._isMounted) {
       this.setState(
         {
           content: '',
@@ -313,7 +303,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
 
   private handleLoad = (content: string) => {
     /* istanbul ignore else */
-    if (this.isMounted) {
+    if (this._isMounted) {
       this.setState(
         {
           content,
@@ -324,7 +314,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
     }
   };
 
-  private handleError = (error: InlineSVGError | FetchError) => {
+  private handleError = (error: InlineSVGError | IFetchError) => {
     const { onError } = this.props;
     const status =
       error.message === 'Browser does not support SVG' ? STATUS.UNSUPPORTED : STATUS.FAILED;
@@ -334,7 +324,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
     }
 
     /* istanbul ignore else */
-    if (this.isMounted) {
+    if (this._isMounted) {
       this.setState({ status }, () => {
         /* istanbul ignore else */
         if (typeof onError === 'function') {

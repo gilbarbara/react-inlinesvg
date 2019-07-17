@@ -1,7 +1,7 @@
 import once from 'once';
-import { canUseDOM as canUseDOMBool } from 'exenv';
+import { canUseDOM as canUseDOMFlag } from 'exenv';
 
-export const canUseDOM = () => canUseDOMBool;
+export const canUseDOM = () => canUseDOMFlag;
 
 export const supportsInlineSVG = () => {
   /* istanbul ignore next */
