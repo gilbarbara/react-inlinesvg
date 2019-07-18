@@ -1,7 +1,8 @@
 import React from 'react';
+import fetchMock from 'fetch-mock';
 
 import ReactInlineSVG from '../src/index.tsx';
-import { InlineSVGError } from '../src/utils.ts';
+import { InlineSVGError } from '../src/helpers.ts';
 
 const Loader = () => <div id="loader" />;
 
@@ -10,6 +11,7 @@ const fixtures = {
   icons: 'http://localhost:1337/icons.svg',
   play: 'http://localhost:1337/play.svg',
   react: 'http://localhost:1337/react.svg',
+  react_png: 'http://localhost:1337/react.png',
   tiger: 'http://localhost:1337/tiger.svg',
   url:
     'https://raw.githubusercontent.com/google/material-design-icons/master/av/svg/production/ic_play_arrow_24px.svg',
@@ -17,13 +19,13 @@ const fixtures = {
     'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxwYXRoIGQ9Ik04IDV2MTRsMTEtN3oiLz4KICAgIDxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4KPC9zdmc+Cg==',
   urlEncoded:
     'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M8%205v14l11-7z%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22%2F%3E%0A%3C%2Fsvg%3E%0A',
-  plain:
+  string:
     '<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid"><g> <polygon fill="#000000" points="7 5 7 19 18 12"></polygon></g></svg>',
 };
 
 const mockOnError = jest.fn();
 
-function setup({ onLoad, ...rest }) {
+function setup({ onLoad, ...rest } = {}) {
   return new Promise(resolve => {
     const wrapper = mount(
       <ReactInlineSVG
@@ -66,22 +68,12 @@ describe('react-inlinesvg', () => {
       expect(wrapper).toMatchSnapshot();
     });
 
-    it('should handle an plain svg src', async () => {
+    it('should handle a svg string src', async () => {
       const wrapper = await setup({
-        src: fixtures.plain,
-        title: 'Plain',
+        src: fixtures.string,
+        title: 'String',
       });
 
-      expect(wrapper).toMatchSnapshot();
-    });
-
-    it('should handle a svg with mask and classes', async () => {
-      const wrapper = await setup({
-        src: fixtures.circles,
-        title: 'Circles',
-      });
-
-      wrapper.update();
       expect(wrapper).toMatchSnapshot();
     });
 
@@ -90,6 +82,16 @@ describe('react-inlinesvg', () => {
         src: fixtures.react,
         title: 'React',
         description: 'React is a view library',
+      });
+
+      wrapper.update();
+      expect(wrapper).toMatchSnapshot();
+    });
+
+    it('should handle a svg url with mask and classes', async () => {
+      const wrapper = await setup({
+        src: fixtures.circles,
+        title: 'Circles',
       });
 
       wrapper.update();
@@ -202,12 +204,34 @@ describe('react-inlinesvg', () => {
   });
 
   describe('cached requests', () => {
-    it('should request an SVG only once when caching', done => {
+    beforeAll(() => {
+      fetchMock.get(
+        '*',
+        new Promise(res =>
+          setTimeout(
+            () =>
+              res({
+                body: '<svg><circle /></svg>',
+                headers: { 'Content-Type': 'image/svg+xml' },
+              }),
+            500,
+          ),
+        ),
+      );
+    });
+
+    afterAll(() => {
+      fetchMock.restore();
+    });
+
+    it('should request an SVG only once with cacheRequests prop', done => {
       const second = () => {
         setup({
           src: fixtures.url,
           onLoad: (src, isCached) => {
             expect(isCached).toBe(true);
+            expect(fetchMock.calls()).toHaveLength(1);
+
             done();
           },
         });
@@ -217,25 +241,17 @@ describe('react-inlinesvg', () => {
         src: fixtures.url,
         onLoad: (src, isCached) => {
           expect(isCached).toBe(false);
+          expect(fetchMock.calls()).toHaveLength(1);
+
           second();
         },
       });
-    });
-
-    it('it should call load on newly instantiated icons even if cached', done => {
-      const second = () =>
-        setup({
-          src: fixtures.url,
-          onLoad: value => {
-            expect(value).toBe(fixtures.url);
-            done();
-          },
-        });
 
       setup({
         src: fixtures.url,
-        onLoad: () => {
-          second();
+        onLoad: (src, isCached) => {
+          expect(isCached).toBe(true);
+          expect(fetchMock.calls()).toHaveLength(1);
         },
       });
     });
@@ -246,6 +262,7 @@ describe('react-inlinesvg', () => {
         src: fixtures.url,
         onLoad: (src, isCached) => {
           expect(isCached).toBe(false);
+          expect(fetchMock.calls()).toHaveLength(2);
         },
       });
 
@@ -254,7 +271,20 @@ describe('react-inlinesvg', () => {
   });
 
   describe('with errors', () => {
-    it('should dispatch an error on empty `src` prop changes ', async () => {
+    beforeEach(() => {
+      mockOnError.mockClear();
+    });
+
+    it('should trigger an error if empty', async () => {
+      const wrapper = await setup();
+
+      wrapper.update();
+      expect(wrapper).toMatchSnapshot();
+
+      expect(mockOnError).toHaveBeenCalledWith(new InlineSVGError('Missing src'));
+    });
+
+    it('should trigger an error on empty `src` prop changes', async () => {
       const wrapper = await setup({
         src: fixtures.urlEncoded,
       });
@@ -270,7 +300,7 @@ describe('react-inlinesvg', () => {
       expect(mockOnError).toHaveBeenCalledWith(new InlineSVGError('Missing src'));
     });
 
-    it('should dispatch an error and show the fallback children if src is not found', async () => {
+    it('should trigger an error and show the fallback children if src is not found', async () => {
       const wrapper = await setup({
         src: 'http://localhost:1337/DOESNOTEXIST.svg',
         children: (
@@ -284,6 +314,33 @@ describe('react-inlinesvg', () => {
 
       expect(mockOnError).toHaveBeenCalledWith(new InlineSVGError('Not Found'));
       expect(wrapper.find('.missing')).toExist();
+    });
+
+    it('should trigger an error if the request content-type is not valid', async () => {
+      await setup({
+        src: fixtures.react_png,
+      });
+
+      expect(mockOnError).toHaveBeenCalledWith(
+        new InlineSVGError("Content type isn't valid: image/png"),
+      );
+    });
+
+    it('should trigger an error if the content is not valid', async () => {
+      fetchMock.get('*', {
+        body: '<html lang="en"><body>Text</body></html>',
+        headers: { 'Content-Type': 'image/svg+xml' },
+      });
+
+      await setup({
+        src: fixtures.react_png,
+      });
+
+      expect(mockOnError).toHaveBeenCalledWith(
+        new InlineSVGError('Could not parse the loaded code'),
+      );
+
+      fetchMock.restore();
     });
   });
 });
