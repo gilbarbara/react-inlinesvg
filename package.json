@@ -24,8 +24,7 @@
   "types": "lib/index.d.ts",
   "keywords": [
     "react",
-    "svg",
-    "typescript"
+    "svg"
   ],
   "license": "MIT",
   "peerDependencies": {
@@ -78,6 +77,8 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-react": "^7.14.2",
+    "fetch-mock": "^7.3.6",
+    "http-server": "^0.11.1",
     "husky": "^3.0.0",
     "jest": "^24.8.0",
     "jest-chain": "^1.1.2",
@@ -86,12 +87,10 @@
     "jest-watch-typeahead": "^0.3.1",
     "node-fetch": "^2.6.0",
     "prettier": "^1.18.2",
-    "react": "^16.7.0",
-    "react-addons-test-utils": "^15.6.2",
-    "react-dom": "^16.7.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
     "react-test-renderer": "^16.8.6",
     "rimraf": "^2.6.3",
-    "serve": "^11.1.0",
     "start-server-and-test": "^1.9.1",
     "styled-components": "^4.3.2",
     "ts-jest": "^24.0.2",
@@ -106,7 +105,7 @@
     "build:ts": "tsc --outDir lib",
     "watch": "npm run build:ts -- -w",
     "clean": "rimraf lib",
-    "start": "serve -p 1337 test/__fixtures__",
+    "start": "http-server -p 1337 --cors test/__fixtures__",
     "test": "start-server-and-test start http://localhost:1337 test:coverage",
     "test:coverage": "jest --coverage --bail",
     "test:watch": "jest --watch --verbose",

@@ -4,7 +4,7 @@ import React from 'react';
 // @ts-ignore
 import DomToReact from 'dom-to-react';
 
-import { canUseDOM, InlineSVGError, isSupportedEnvironment, randomString } from './utils';
+import { canUseDOM, InlineSVGError, isSupportedEnvironment, randomString } from './helpers';
 
 export interface IProps {
   baseURL?: string;
@@ -30,15 +30,16 @@ export interface IState {
 }
 
 export interface IFetchError extends Error {
+  code: string;
+  errno: string;
   message: string;
   type: string;
-  errno: string;
-  code: string;
 }
 
 export interface IStorageItem {
-  url: string;
   content: string;
+  queue: any[];
+  status: string;
 }
 
 export const STATUS = {
@@ -50,7 +51,7 @@ export const STATUS = {
   UNSUPPORTED: 'unsupported',
 };
 
-export const storage: IStorageItem[] = [];
+const cacheStore: { [key: string]: IStorageItem } = Object.create(null);
 
 export default class InlineSVG extends React.PureComponent<IProps, IState> {
   public static defaultProps = {
@@ -67,7 +68,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
     this.state = {
       content: '',
       element: null,
-      hasCache: !!props.cacheRequests && !!storage.find((s: IStorageItem) => s.url === props.src),
+      hasCache: !!props.cacheRequests && !!cacheStore[props.src],
       status: STATUS.PENDING,
     };
   }
@@ -194,7 +195,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
       let svg = doc.querySelector('svg');
 
       if (!svg) {
-        throw new InlineSVGError('Could not parse the SVG code');
+        throw new InlineSVGError('Could not parse the loaded code');
       }
 
       svg = this.updateSVGAttributes(svg);
@@ -274,10 +275,15 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
         },
         () => {
           const { cacheRequests, src } = this.props;
-          const cache = cacheRequests && storage.find(d => d.url === src);
+          const cache = cacheRequests && cacheStore[src];
 
           if (cache) {
-            this.handleLoad(cache.content);
+            /* istanbul ignore else */
+            if (cache.status === STATUS.LOADING) {
+              cache.queue.push(this.handleLoad);
+            } else if (cache.status === STATUS.LOADED) {
+              this.handleLoad(cache.content);
+            }
             return;
           }
 
@@ -319,7 +325,8 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
     const status =
       error.message === 'Browser does not support SVG' ? STATUS.UNSUPPORTED : STATUS.FAILED;
 
-    if (process.env.NODE_ENV === 'development') {
+    /* istanbul ignore else */
+    if (process.env.NODE_ENV !== 'production') {
       console.error(error); // tslint:disable-line:no-console
     }
 
@@ -338,23 +345,52 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
     const { cacheRequests, src } = this.props;
 
     try {
+      if (cacheRequests) {
+        cacheStore[src] = { content: '', status: STATUS.LOADING, queue: [] };
+      }
+
       return fetch(src)
         .then(response => {
+          const contentType = response.headers.get('content-type');
+          const [fileType] = (contentType || '').split(/ ?; ?/);
+
           if (response.status > 299) {
             throw new InlineSVGError('Not Found');
+          }
+
+          if (!['image/svg+xml', 'text/plain'].some(d => fileType.indexOf(d) >= 0)) {
+            throw new InlineSVGError(`Content type isn't valid: ${fileType}`);
           }
 
           return response.text();
         })
         .then(content => {
+          this.handleLoad(content);
+
           /* istanbul ignore else */
           if (cacheRequests) {
-            storage.push({ url: src, content });
-          }
+            const cache = cacheStore[src];
 
-          this.handleLoad(content);
+            /* istanbul ignore else */
+            if (cache) {
+              cache.content = content;
+              cache.status = STATUS.LOADED;
+
+              cache.queue = cache.queue.filter((cb: (content: string) => void) => {
+                cb(content);
+
+                return false;
+              });
+            }
+          }
         })
-        .catch(error => this.handleError(error));
+        .catch(error => {
+          /* istanbul ignore else */
+          if (cacheRequests) {
+            delete cacheStore[src];
+          }
+          this.handleError(error);
+        });
     } catch (error) {
       this.handleError(new InlineSVGError(error.message));
     }

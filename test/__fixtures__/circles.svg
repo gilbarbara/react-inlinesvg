@@ -1,13 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 20 6" class="test">
-  <defs>
-    <path id="nav-settings-a" d="M5 15a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm7 0a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm7 0a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
-  </defs>
-  <g fill="none" fill-rule="evenodd" transform="translate(-2 -9)">
-    <mask id="nav-settings-b">
-      <use xlink:href="#nav-settings-a"/>
-    </mask>
-    <g fill="#f04" class="icon-base" mask="url(#nav-settings-b)">
-      <path d="M0 0h24v24H0z"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="6px" viewBox="0 0 20 6" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="menu">
+    <defs>
+        <path d="M3,6 C1.34314575,6 0,4.65685425 0,3 C0,1.34314575 1.34314575,0 3,0 C4.65685425,0 6,1.34314575 6,3 C6,4.65685425 4.65685425,6 3,6 Z M10,6 C8.34314575,6 7,4.65685425 7,3 C7,1.34314575 8.34314575,0 10,0 C11.6568542,0 13,1.34314575 13,3 C13,4.65685425 11.6568542,6 10,6 Z M17,6 C15.3431458,6 14,4.65685425 14,3 C14,1.34314575 15.3431458,0 17,0 C18.6568542,0 20,1.34314575 20,3 C20,4.65685425 18.6568542,6 17,6 Z" id="path-1"></path>
+    </defs>
+    <g class="dots">
+				<mask id="mask-1" fill="white">
+						<use xlink:href="#path-1"></use>
+				</mask>
+				<polygon fill="#FF0044" fill-rule="nonzero" mask="url(#mask-1)" points="0 0 20 0 20 6 0 6"></polygon>
     </g>
-  </g>
 </svg>

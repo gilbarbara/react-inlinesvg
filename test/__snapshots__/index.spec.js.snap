@@ -157,98 +157,13 @@ exports[`react-inlinesvg basic functionality should handle a loader 2`] = `
 </InlineSVG>
 `;
 
-exports[`react-inlinesvg basic functionality should handle a svg with mask and classes 1`] = `
-<InlineSVG
-  cacheRequests={true}
-  onError={[Function]}
-  onLoad={[Function]}
-  src="http://localhost:1337/circles.svg"
-  title="Circles"
-  uniquifyIDs={false}
->
-  <svg
-    className="test"
-    key="0-0"
-    viewBox="0 0 20 6"
-    xmlns="http://www.w3.org/2000/svg"
-    xmlnsXlink="http://www.w3.org/1999/xlink"
-  >
-    <title
-      key="1-0"
-    >
-      Circles
-    </title>
-    
-  
-    <defs
-      key="1-2"
-    >
-      
-    
-      <path
-        d="M5 15a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm7 0a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm7 0a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"
-        id="nav-settings-a"
-        key="2-1"
-      />
-      
-  
-    </defs>
-    
-  
-    <g
-      fill="none"
-      fillRule="evenodd"
-      key="1-4"
-      transform="translate(-2 -9)"
-    >
-      
-    
-      <mask
-        id="nav-settings-b"
-        key="2-1"
-      >
-        
-      
-        <use
-          key="3-1"
-          xlinkHref="#nav-settings-a"
-        />
-        
-    
-      </mask>
-      
-    
-      <g
-        className="icon-base"
-        fill="#f04"
-        key="2-3"
-        mask="url(#nav-settings-b)"
-      >
-        
-      
-        <path
-          d="M0 0h24v24H0z"
-          key="3-1"
-        />
-        
-    
-      </g>
-      
-  
-    </g>
-    
-
-  </svg>
-</InlineSVG>
-`;
-
-exports[`react-inlinesvg basic functionality should handle an plain svg src 1`] = `
+exports[`react-inlinesvg basic functionality should handle a svg string src 1`] = `
 <InlineSVG
   cacheRequests={true}
   onError={[Function]}
   onLoad={[Function]}
   src="<svg width=\\"24px\\" height=\\"24px\\" viewBox=\\"0 0 24 24\\" version=\\"1.1\\" xmlns=\\"http://www.w3.org/2000/svg\\" preserveAspectRatio=\\"xMidYMid\\"><g> <polygon fill=\\"#000000\\" points=\\"7 5 7 19 18 12\\"></polygon></g></svg>"
-  title="Plain"
+  title="String"
   uniquifyIDs={false}
 >
   <svg
@@ -263,7 +178,7 @@ exports[`react-inlinesvg basic functionality should handle an plain svg src 1`] 
     <title
       key="1-0"
     >
-      Plain
+      String
     </title>
     <g
       key="1-1"
@@ -275,6 +190,85 @@ exports[`react-inlinesvg basic functionality should handle an plain svg src 1`] 
         points="7 5 7 19 18 12"
       />
     </g>
+  </svg>
+</InlineSVG>
+`;
+
+exports[`react-inlinesvg basic functionality should handle a svg url with mask and classes 1`] = `
+<InlineSVG
+  cacheRequests={true}
+  onError={[Function]}
+  onLoad={[Function]}
+  src="http://localhost:1337/circles.svg"
+  title="Circles"
+  uniquifyIDs={false}
+>
+  <svg
+    className="menu"
+    height="6px"
+    key="0-0"
+    version="1.1"
+    viewBox="0 0 20 6"
+    width="20px"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlnsXlink="http://www.w3.org/1999/xlink"
+  >
+    <title
+      key="1-0"
+    >
+      Circles
+    </title>
+    
+    
+    <defs
+      key="1-2"
+    >
+      
+        
+      <path
+        d="M3,6 C1.34314575,6 0,4.65685425 0,3 C0,1.34314575 1.34314575,0 3,0 C4.65685425,0 6,1.34314575 6,3 C6,4.65685425 4.65685425,6 3,6 Z M10,6 C8.34314575,6 7,4.65685425 7,3 C7,1.34314575 8.34314575,0 10,0 C11.6568542,0 13,1.34314575 13,3 C13,4.65685425 11.6568542,6 10,6 Z M17,6 C15.3431458,6 14,4.65685425 14,3 C14,1.34314575 15.3431458,0 17,0 C18.6568542,0 20,1.34314575 20,3 C20,4.65685425 18.6568542,6 17,6 Z"
+        id="path-1"
+        key="2-1"
+      />
+      
+    
+    </defs>
+    
+    
+    <g
+      className="dots"
+      key="1-4"
+    >
+      
+				
+      <mask
+        fill="white"
+        id="mask-1"
+        key="2-1"
+      >
+        
+						
+        <use
+          key="3-1"
+          xlinkHref="#path-1"
+        />
+        
+				
+      </mask>
+      
+				
+      <polygon
+        fill="#FF0044"
+        fillRule="nonzero"
+        key="2-3"
+        mask="url(#mask-1)"
+        points="0 0 20 0 20 6 0 6"
+      />
+      
+    
+    </g>
+    
+
   </svg>
 </InlineSVG>
 `;
@@ -2510,7 +2504,16 @@ exports[`react-inlinesvg cached requests should skip the cache if \`cacheRequest
 />
 `;
 
-exports[`react-inlinesvg with errors should dispatch an error on empty \`src\` prop changes  1`] = `
+exports[`react-inlinesvg with errors should trigger an error if empty 1`] = `
+<InlineSVG
+  cacheRequests={true}
+  onError={[Function]}
+  onLoad={[Function]}
+  uniquifyIDs={false}
+/>
+`;
+
+exports[`react-inlinesvg with errors should trigger an error on empty \`src\` prop changes 1`] = `
 <InlineSVG
   cacheRequests={true}
   onError={[Function]}

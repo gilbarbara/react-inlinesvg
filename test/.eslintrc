@@ -1,13 +1,15 @@
 {
   "globals": {
+    "act": true,
     "fetch": true,
     "mount": true,
     "render": true,
-    "shallow": true
+    "shallow": true,
+    "skipEventLoop": true
   },
   "rules": {
     "no-console": 0,
     "no-underscore-dangle": 0,
-    "require-jsdoc": 0,
+    "require-jsdoc": 0
   }
 }

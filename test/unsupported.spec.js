@@ -1,5 +1,5 @@
 import React from 'react';
-import { InlineSVGError } from '../src/utils.ts';
+import { InlineSVGError } from '../src/helpers.ts';
 
 const fixtures = {
   play: 'http://localhost:1337/play.svg',
@@ -9,8 +9,8 @@ const mockOnError = jest.fn();
 let mockCanUseDOM = false;
 let mockIsSupportedEnvironment = true;
 
-jest.mock('../src/utils', () => {
-  const utils = require.requireActual('../src/utils');
+jest.mock('../src/helpers', () => {
+  const utils = require.requireActual('../src/helpers');
 
   return {
     ...utils,
