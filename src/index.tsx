@@ -1,8 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import React from 'react';
 
-// @ts-ignore
-import DomToReact from 'dom-to-react';
+import convert from 'react-from-dom';
 
 import { canUseDOM, InlineSVGError, isSupportedEnvironment, randomString } from './helpers';
 
@@ -136,7 +135,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
     this._isMounted = false;
   }
 
-  private parseSVG() {
+  private processSVG() {
     const { content } = this.state;
     const { preProcessor } = this.props;
 
@@ -186,23 +185,22 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
     return node;
   }
 
-  private generateNode() {
+  private getNode() {
     const { description, title } = this.props;
 
     try {
-      const svgText = this.parseSVG();
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(svgText, 'image/svg+xml');
-      let svg = doc.querySelector('svg');
+      const svgText = this.processSVG();
 
-      if (!svg) {
-        throw new InlineSVGError('Could not parse the loaded code');
+      let node = convert(svgText, { nodeOnly: true });
+
+      if (!node) {
+        throw new InlineSVGError('Could not convert the src to a DOM Node');
       }
 
-      svg = this.updateSVGAttributes(svg);
+      node = this.updateSVGAttributes(node);
 
       if (description) {
-        const originalDesc = svg.querySelector('desc');
+        const originalDesc = node.querySelector('desc');
 
         if (originalDesc && originalDesc.parentNode) {
           originalDesc.parentNode.removeChild(originalDesc);
@@ -210,11 +208,11 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
 
         const descElement = document.createElement('desc');
         descElement.innerHTML = description;
-        svg.prepend(descElement);
+        node.prepend(descElement);
       }
 
       if (title) {
-        const originalTitle = svg.querySelector('title');
+        const originalTitle = node.querySelector('title');
 
         if (originalTitle && originalTitle.parentNode) {
           originalTitle.parentNode.removeChild(originalTitle);
@@ -222,16 +220,16 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
 
         const titleElement = document.createElement('title');
         titleElement.innerHTML = title;
-        svg.prepend(titleElement);
+        node.prepend(titleElement);
       }
 
-      return svg;
+      return node;
     } catch (error) {
-      return this.handleError(error);
+      this.handleError(error);
     }
   }
 
-  private generateElement() {
+  private getElement() {
     const {
       baseURL,
       cacheRequests,
@@ -249,19 +247,19 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
     } = this.props;
 
     try {
-      const node = this.generateNode();
+      const node = this.getNode();
+      const element = convert(node);
 
-      /* istanbul ignore else */
-      if (node) {
-        const d2r = new DomToReact();
-
-        this.setState({
-          element: React.cloneElement(d2r.prepareNode(node), { ...rest }),
-          status: STATUS.READY,
-        });
+      if (!element) {
+        throw new InlineSVGError('Could not convert the src to a React element');
       }
+
+      this.setState({
+        element: React.cloneElement(element, rest),
+        status: STATUS.READY,
+      });
     } catch (error) {
-      this.handleError(error);
+      this.handleError(new InlineSVGError(error.message));
     }
   }
 
@@ -316,7 +314,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
           content,
           status: STATUS.LOADED,
         },
-        this.generateElement,
+        this.getElement,
       );
     }
   };
@@ -328,7 +326,8 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
 
     /* istanbul ignore else */
     if (process.env.NODE_ENV !== 'production') {
-      console.error(error); // tslint:disable-line:no-console
+      // tslint:disable-next-line:no-console
+      console.error(error);
     }
 
     /* istanbul ignore else */
