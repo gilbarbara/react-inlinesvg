@@ -31,10 +31,16 @@ window.matchMedia = () => ({
 });
 
 const consoleError = console.error;
-console.error = jest.fn(message => {
-  if (message instanceof InlineSVGError) {
+console.error = jest.fn(error => {
+  const skipMessages = ['Expected `%s` listener', 'Error parsing input'];
+
+  if (
+    error instanceof InlineSVGError ||
+    (typeof error === 'string' && skipMessages.some(d => error.indexOf(d) >= 0)) ||
+    (error instanceof Error && skipMessages.some(d => error.message.indexOf(d) >= 0))
+  ) {
     return;
   }
 
-  consoleError(message);
+  consoleError(error);
 });

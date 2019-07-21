@@ -8,6 +8,7 @@ const Loader = () => <div id="loader" />;
 
 const fixtures = {
   circles: 'http://localhost:1337/circles.svg',
+  dots: 'http://localhost:1337/dots.svg',
   icons: 'http://localhost:1337/icons.svg',
   play: 'http://localhost:1337/play.svg',
   react: 'http://localhost:1337/react.svg',
@@ -88,7 +89,17 @@ describe('react-inlinesvg', () => {
       expect(wrapper).toMatchSnapshot();
     });
 
-    it('should handle a svg url with mask and classes', async () => {
+    it('should handle a svg url with mask, gradient and classes', async () => {
+      const wrapper = await setup({
+        src: fixtures.dots,
+        title: 'Dots',
+      });
+
+      wrapper.update();
+      expect(wrapper).toMatchSnapshot();
+    });
+
+    it('should handle a svg url with external css, style and script', async () => {
       const wrapper = await setup({
         src: fixtures.circles,
         title: 'Circles',
@@ -129,7 +140,6 @@ describe('react-inlinesvg', () => {
       expect(wrapper).toMatchSnapshot();
 
       wrapper.setProps({
-        ...wrapper.props(),
         src: fixtures.react,
         title: 'Test',
       });
@@ -147,7 +157,7 @@ describe('react-inlinesvg', () => {
       wrapper.update();
 
       expect(wrapper.find('svg')).toExist();
-      expect(wrapper.find('radialgradient').prop('id')).toEqual(
+      expect(wrapper.find('radialGradient').prop('id')).toEqual(
         expect.stringMatching(/radialGradient-1__.*?/),
       );
     });
@@ -180,7 +190,7 @@ describe('react-inlinesvg', () => {
       );
     });
 
-    it('should transform the SVG text when given the preProcessor prop', async () => {
+    it('should transform the SVG text with the preProcessor prop', async () => {
       const extraProp = 'data-isvg="test"';
       const wrapper = await setup({
         src: fixtures.play,
@@ -337,7 +347,7 @@ describe('react-inlinesvg', () => {
       });
 
       expect(mockOnError).toHaveBeenCalledWith(
-        new InlineSVGError('Could not parse the loaded code'),
+        new InlineSVGError('Could not convert the src to a React element'),
       );
 
       fetchMock.restore();

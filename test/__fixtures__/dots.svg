@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="6px" viewBox="0 0 20 6" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+    <defs>
+        <path d="M3,6 C1.34314575,6 0,4.65685425 0,3 C0,1.34314575 1.34314575,0 3,0 C4.65685425,0 6,1.34314575 6,3 C6,4.65685425 4.65685425,6 3,6 Z M10,6 C8.34314575,6 7,4.65685425 7,3 C7,1.34314575 8.34314575,0 10,0 C11.6568542,0 13,1.34314575 13,3 C13,4.65685425 11.6568542,6 10,6 Z M17,6 C15.3431458,6 14,4.65685425 14,3 C14,1.34314575 15.3431458,0 17,0 C18.6568542,0 20,1.34314575 20,3 C20,4.65685425 18.6568542,6 17,6 Z" id="path-1"></path>
+        <radialGradient cx="50%" cy="50%" fx="50%" fy="50%" r="166.666667%" gradientTransform="translate(0.500000,0.500000),scale(0.300000,1.000000),rotate(180.000000),translate(-0.500000,-0.500000)" id="radialGradient-3">
+            <stop stop-color="#F8E71C" offset="0%"></stop>
+            <stop stop-color="#FF0044" offset="100%"></stop>
+        </radialGradient>
+    </defs>
+    <g>
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <g></g>
+        <polygon fill="url(#radialGradient-3)" fill-rule="nonzero" mask="url(#mask-2)" points="0 0 20 0 20 6 0 6"></polygon>
+    </g>
+</svg>
