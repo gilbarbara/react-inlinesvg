@@ -61,6 +61,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
 
   // tslint:disable-next-line:variable-name
   private _isMounted = false;
+  private readonly hash: string;
 
   constructor(props: IProps) {
     super(props);
@@ -71,6 +72,8 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
       hasCache: !!props.cacheRequests && !!cacheStore[props.src],
       status: STATUS.PENDING,
     };
+
+    this.hash = props.uniqueHash || randomString();
   }
 
   public componentDidMount() {
@@ -145,14 +148,12 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
   }
 
   private updateSVGAttributes(node: SVGSVGElement): SVGSVGElement {
-    const { baseURL = '', uniquifyIDs, uniqueHash } = this.props;
+    const { baseURL = '', uniquifyIDs } = this.props;
     const replaceableAttributes = ['id', 'href', 'xlink:href', 'xlink:role', 'xlink:arcrole'];
 
     if (!uniquifyIDs) {
       return node;
     }
-
-    const hash = uniqueHash || randomString();
 
     [...node.children].map(d => {
       if (d.attributes && d.attributes.length) {
@@ -162,7 +163,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
           const match = a.value.match(/^url\((#[^)]+)/);
 
           if (match && match[1]) {
-            a.value = `url(${baseURL}${match[1]}__${hash})`;
+            a.value = `url(${baseURL}${match[1]}__${this.hash})`;
           }
         });
 
@@ -170,7 +171,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
           const attribute = attributes.find(a => a.name === r);
 
           if (attribute) {
-            attribute.value = `${attribute.value}__${hash}`;
+            attribute.value = `${attribute.value}__${this.hash}`;
           }
         });
       }
