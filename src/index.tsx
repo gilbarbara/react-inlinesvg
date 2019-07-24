@@ -1,5 +1,4 @@
-/* eslint-disable no-underscore-dangle */
-import React from 'react';
+import * as React from 'react';
 
 import convert from 'react-from-dom';
 
