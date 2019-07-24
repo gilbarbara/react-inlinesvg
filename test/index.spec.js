@@ -109,6 +109,13 @@ describe('react-inlinesvg', () => {
       expect(wrapper).toMatchSnapshot();
     });
 
+    it('should handle a svg url with symbols', async () => {
+      const wrapper = await setup({ src: fixtures.icons });
+
+      wrapper.update();
+      expect(wrapper).toMatchSnapshot();
+    });
+
     it('should handle an svg url and replace existing title and description', async () => {
       const wrapper = await setup({
         src: fixtures.tiger,
