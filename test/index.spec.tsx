@@ -1,7 +1,7 @@
 /* tslint:disable:object-literal-sort-keys jsx-no-lambda */
 import React from 'react';
 import { mount, ReactWrapper } from 'enzyme';
-import fetchMock from 'fetch-mock';
+import { default as fetchMock } from 'fetch-mock';
 
 import ReactInlineSVG from '../src/index';
 import { InlineSVGError } from '../src/helpers';
@@ -10,6 +10,7 @@ interface IProps {
   src: string;
   onLoad?: (src: string, isCached: boolean) => void;
   preProcessor?: (input: string) => string;
+
   [key: string]: any;
 }
 

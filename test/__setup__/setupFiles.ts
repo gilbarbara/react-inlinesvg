@@ -1,14 +1,13 @@
 /* tslint:disable:no-console */
 declare var window: any;
 
-import Enzyme from 'enzyme';
-// @ts-ignore
-import Adapter from 'enzyme-adapter-react-16';
+import { configure } from 'enzyme';
+import { default as Adapter } from 'enzyme-adapter-react-16';
 import fetch from 'node-fetch';
 
 import { InlineSVGError } from '../../src/helpers';
 
-Enzyme.configure({ adapter: new Adapter() });
+configure({ adapter: new Adapter() });
 
 window.fetch = fetch;
 

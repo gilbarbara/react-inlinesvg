@@ -1,6 +1,6 @@
 /* tslint:disable:jsx-no-lambda */
 declare var window: any;
-import React from 'react';
+import * as React from 'react';
 import { mount, ReactWrapper } from 'enzyme';
 import ReactInlineSVG from '../src';
 import { InlineSVGError } from '../src/helpers';

@@ -32,18 +32,17 @@
     "react-dom": "^16.0.0"
   },
   "dependencies": {
-    "react-from-dom": "^0.2.3",
     "exenv": "^1.2.2",
-    "once": "^1.4.0"
+    "react-from-dom": "^0.2.3"
   },
   "devDependencies": {
     "@types/enzyme": "^3.10.3",
+    "@types/enzyme-adapter-react-16": "^1.0.5",
     "@types/exenv": "^1.2.0",
     "@types/fetch-mock": "^7.3.1",
     "@types/jest": "^24.0.15",
     "@types/node": "^12.6.8",
     "@types/node-fetch": "^2.5.0",
-    "@types/once": "^1.4.0",
     "@types/react": "^16.8.23",
     "@types/react-dom": "^16.8.5",
     "bundlesize": "^0.18.0",

@@ -1,5 +1,3 @@
-// @ts-ignore
-import once from 'once';
 import { canUseDOM as canUseDOMFlag } from 'exenv';
 
 export const canUseDOM = () => canUseDOMFlag;
@@ -32,9 +30,8 @@ export class InlineSVGError extends Error {
   }
 }
 
-export const isSupportedEnvironment = once(
-  () => supportsInlineSVG() && typeof window !== 'undefined' && window !== null,
-);
+export const isSupportedEnvironment = () =>
+  supportsInlineSVG() && typeof window !== 'undefined' && window !== null;
 
 export const randomString = (length: number) => {
   const letters = 'abcdefghijklmnopqrstuvwxyz';
