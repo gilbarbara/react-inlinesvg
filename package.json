@@ -32,6 +32,7 @@
     "react-dom": "^16.0.0"
   },
   "dependencies": {
+    "@types/once": "^1.4.0",
     "react-from-dom": "^0.2.2",
     "exenv": "^1.2.2",
     "once": "^1.4.0"
@@ -60,7 +61,6 @@
     "@babel/preset-typescript": "^7.3.3",
     "@types/exenv": "^1.2.0",
     "@types/node": "^12.6.8",
-    "@types/once": "^1.4.0",
     "@types/react": "^16.8.23",
     "@types/react-dom": "^16.8.4",
     "babel-eslint": "^10.0.2",
