@@ -1,3 +1,4 @@
+// @ts-ignore
 import once from 'once';
 import { canUseDOM as canUseDOMFlag } from 'exenv';
 
@@ -35,7 +36,7 @@ export const isSupportedEnvironment = once(
   () => supportsInlineSVG() && typeof window !== 'undefined' && window !== null,
 );
 
-export const randomString = (length = 8) => {
+export const randomString = (length: number) => {
   const letters = 'abcdefghijklmnopqrstuvwxyz';
   const numbers = '1234567890';
   const charset = `${letters}${letters.toUpperCase()}${numbers}`;

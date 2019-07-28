@@ -1,17 +1,16 @@
-import Enzyme, { shallow, mount, render } from 'enzyme';
+/* tslint:disable:no-console */
+declare var window: any;
+
+import Enzyme from 'enzyme';
+// @ts-ignore
 import Adapter from 'enzyme-adapter-react-16';
-import { act } from 'react-dom/test-utils';
 import fetch from 'node-fetch';
 
-import { InlineSVGError } from '../../src/helpers.ts';
+import { InlineSVGError } from '../../src/helpers';
 
 Enzyme.configure({ adapter: new Adapter() });
 
-global.act = act;
-global.fetch = fetch;
-global.shallow = shallow;
-global.mount = mount;
-global.render = render;
+window.fetch = fetch;
 
 const react = document.createElement('div');
 react.id = 'react';
@@ -20,14 +19,14 @@ document.body.appendChild(react);
 
 window.skipEventLoop = () => new Promise(resolve => setImmediate(resolve));
 
-window.requestAnimationFrame = callback => {
+window.requestAnimationFrame = (callback: () => void) => {
   setTimeout(callback, 0);
 };
 
 window.matchMedia = () => ({
+  addListener: () => undefined,
   matches: false,
-  addListener: () => {},
-  removeListener: () => {},
+  removeListener: () => undefined,
 });
 
 const consoleError = console.error;
@@ -35,9 +34,9 @@ console.error = jest.fn(error => {
   const skipMessages = ['Expected `%s` listener', 'Error parsing input'];
 
   if (
-    error instanceof InlineSVGError ||
     (typeof error === 'string' && skipMessages.some(d => error.indexOf(d) >= 0)) ||
-    (error instanceof Error && skipMessages.some(d => error.message.indexOf(d) >= 0))
+    (error instanceof Error &&
+      (error.name === 'InlineSVGError' || skipMessages.some(d => error.message.indexOf(d) >= 0)))
   ) {
     return;
   }

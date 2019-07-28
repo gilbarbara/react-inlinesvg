@@ -1,8 +1,17 @@
+/* tslint:disable:object-literal-sort-keys jsx-no-lambda */
 import React from 'react';
+import { mount, ReactWrapper } from 'enzyme';
 import fetchMock from 'fetch-mock';
 
-import ReactInlineSVG from '../src/index.tsx';
-import { InlineSVGError } from '../src/helpers.ts';
+import ReactInlineSVG from '../src/index';
+import { InlineSVGError } from '../src/helpers';
+
+interface IProps {
+  src: string;
+  onLoad?: (src: string, isCached: boolean) => void;
+  preProcessor?: (input: string) => string;
+  [key: string]: any;
+}
 
 const Loader = () => <div id="loader" />;
 
@@ -26,13 +35,15 @@ const fixtures = {
 
 const mockOnError = jest.fn();
 
-function setup({ onLoad, ...rest } = {}) {
+function setup({ onLoad, ...rest }: IProps): Promise<ReactWrapper> {
   return new Promise(resolve => {
     const wrapper = mount(
       <ReactInlineSVG
         onLoad={(src, isCached) => {
           setTimeout(() => {
-            if (onLoad) onLoad(src, isCached);
+            if (onLoad) {
+              onLoad(src, isCached);
+            }
 
             resolve(wrapper);
           }, 0);
@@ -293,7 +304,8 @@ describe('react-inlinesvg', () => {
     });
 
     it('should trigger an error if empty', async () => {
-      const wrapper = await setup();
+      // @ts-ignore
+      const wrapper = await setup({});
 
       wrapper.update();
       expect(wrapper).toMatchSnapshot();

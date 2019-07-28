@@ -11,7 +11,7 @@ export interface IProps {
   description?: string;
   loader?: React.ReactNode;
   onError?: (error: InlineSVGError | IFetchError) => void;
-  onLoad?: (src: URL | string, isCached: boolean) => void;
+  onLoad?: (src: string, isCached: boolean) => void;
   preProcessor?: (code: string) => string;
   src: string;
   title?: string;
@@ -71,7 +71,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
       status: STATUS.PENDING,
     };
 
-    this.hash = props.uniqueHash || randomString();
+    this.hash = props.uniqueHash || randomString(8);
   }
 
   public componentDidMount() {
@@ -189,17 +189,16 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
 
     try {
       const svgText = this.processSVG();
+      const node = convert(svgText, { nodeOnly: true });
 
-      let node = convert(svgText, { nodeOnly: true });
-
-      if (!node) {
+      if (!node || !(node instanceof SVGSVGElement)) {
         throw new InlineSVGError('Could not convert the src to a DOM Node');
       }
 
-      node = this.updateSVGAttributes(node);
+      const svg = this.updateSVGAttributes(node);
 
       if (description) {
-        const originalDesc = node.querySelector('desc');
+        const originalDesc = svg.querySelector('desc');
 
         if (originalDesc && originalDesc.parentNode) {
           originalDesc.parentNode.removeChild(originalDesc);
@@ -207,11 +206,11 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
 
         const descElement = document.createElement('desc');
         descElement.innerHTML = description;
-        node.prepend(descElement);
+        svg.prepend(descElement);
       }
 
       if (title) {
-        const originalTitle = node.querySelector('title');
+        const originalTitle = svg.querySelector('title');
 
         if (originalTitle && originalTitle.parentNode) {
           originalTitle.parentNode.removeChild(originalTitle);
@@ -219,10 +218,10 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
 
         const titleElement = document.createElement('title');
         titleElement.innerHTML = title;
-        node.prepend(titleElement);
+        svg.prepend(titleElement);
       }
 
-      return node;
+      return svg;
     } catch (error) {
       this.handleError(error);
     }
@@ -246,10 +245,10 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
     } = this.props;
 
     try {
-      const node = this.getNode();
+      const node = this.getNode() as Node;
       const element = convert(node);
 
-      if (!element) {
+      if (!element || !React.isValidElement(element)) {
         throw new InlineSVGError('Could not convert the src to a React element');
       }
 

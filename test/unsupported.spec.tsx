@@ -1,9 +1,9 @@
+/* tslint:disable:jsx-no-lambda */
+declare var window: any;
 import React from 'react';
-import { InlineSVGError } from '../src/helpers.ts';
-
-const fixtures = {
-  play: 'http://localhost:1337/play.svg',
-};
+import { mount, ReactWrapper } from 'enzyme';
+import ReactInlineSVG from '../src';
+import { InlineSVGError } from '../src/helpers';
 
 const mockOnError = jest.fn();
 let mockCanUseDOM = false;
@@ -19,17 +19,13 @@ jest.mock('../src/helpers', () => {
   };
 });
 
-function setup({ onLoad, ...rest }) {
-  // eslint-disable-next-line global-require
-  const ReactInlineSVG = require('../src/index.tsx').default;
-
+function setup(): Promise<ReactWrapper> {
   return new Promise(resolve => {
     const wrapper = mount(
       <ReactInlineSVG
-        onLoad={(src, isCached) => {
+        src="http://localhost:1337/play.svg"
+        onLoad={() => {
           setTimeout(() => {
-            if (onLoad) onLoad(src, isCached);
-
             resolve(wrapper);
           }, 0);
         }}
@@ -37,50 +33,40 @@ function setup({ onLoad, ...rest }) {
           mockOnError(error);
           setTimeout(() => resolve(wrapper), 0);
         }}
-        {...rest}
       />,
     );
 
     return wrapper;
   });
 }
-
 describe('unsupported environments', () => {
   it("shouldn't break without DOM ", async () => {
-    const wrapper = await setup({
-      src: fixtures.play,
-    });
+    const wrapper = await setup();
 
     expect(mockOnError).toHaveBeenCalledWith(new InlineSVGError('No DOM'));
     expect(wrapper).toMatchSnapshot();
-
-    //  expect(wrapper.state('content')).toBe(fixtures.play);
   });
 
   it('should warn the user if fetch is missing', async () => {
     const globalFetch = fetch;
-    fetch = undefined;
+    window.fetch = undefined;
 
     mockCanUseDOM = true;
     mockIsSupportedEnvironment = true;
 
-    const wrapper = await setup({
-      src: fixtures.play,
-    });
+    const wrapper = await setup();
 
     expect(mockOnError).toHaveBeenCalledWith(new InlineSVGError('fetch is not a function'));
     expect(wrapper).toMatchSnapshot();
 
-    fetch = globalFetch;
+    window.fetch = globalFetch;
   });
 
   it("shouldn't not render anything if is an unsupported browser", async () => {
     mockCanUseDOM = true;
     mockIsSupportedEnvironment = false;
 
-    const wrapper = await setup({
-      src: fixtures.play,
-    });
+    const wrapper = await setup();
 
     expect(mockOnError).toHaveBeenCalledWith(new InlineSVGError('Browser does not support SVG'));
     expect(wrapper).toMatchSnapshot();
