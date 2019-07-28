@@ -45,7 +45,6 @@
     "@types/node-fetch": "^2.5.0",
     "@types/react": "^16.8.23",
     "@types/react-dom": "^16.8.5",
-    "bundlesize": "^0.18.0",
     "chalk": "^2.4.2",
     "cross-env": "^5.2.0",
     "enzyme": "^3.10.0",
@@ -64,6 +63,7 @@
     "react-dom": "^16.8.6",
     "react-test-renderer": "^16.8.6",
     "rimraf": "^2.6.3",
+    "size-limit": "^1.3.8",
     "start-server-and-test": "^1.9.1",
     "styled-components": "^4.3.2",
     "ts-jest": "^24.0.2",
@@ -86,7 +86,7 @@
     "lint": "tslint 'src/**/*.ts?(x)' 'test/**/*.ts?(x)' 'tools/**/*.ts?(x)'",
     "format": "prettier \"**/*.{js,jsx,json,yml,yaml,css,less,scss,ts,tsx,md,graphql,mdx}\" --write",
     "validate": "npm run lint && npm run test && npm run build && npm run bundlesize",
-    "bundlesize": "bundlesize",
+    "bundlesize": "size-limit",
     "prepublishOnly": "npm run validate"
   },
   "browserslist": [
@@ -100,10 +100,10 @@
     "singleQuote": true,
     "trailingComma": "all"
   },
-  "bundlesize": [
+  "size-limit": [
     {
       "path": "./lib/index.js",
-      "maxSize": "5 kB"
+      "limit": "8 KB"
     }
   ],
   "husky": {
