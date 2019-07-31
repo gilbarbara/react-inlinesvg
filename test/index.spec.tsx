@@ -220,6 +220,20 @@ describe('react-inlinesvg', () => {
       expect(wrapper).toMatchSnapshot();
     });
 
+    it('should handle innerRef', async () => {
+      const innerRef = React.createRef();
+
+      const wrapper = await setup({
+        src: fixtures.play,
+        innerRef,
+      });
+
+      wrapper.update();
+
+      expect(innerRef.current).toMatchSnapshot();
+      expect(wrapper).toMatchSnapshot();
+    });
+
     it('should handle unmount', async () => {
       const wrapper = await setup({
         src: fixtures.play,

@@ -1858,6 +1858,180 @@ exports[`react-inlinesvg basic functionality should handle an urlEncoded src 1`]
 </InlineSVG>
 `;
 
+exports[`react-inlinesvg basic functionality should handle innerRef 1`] = `
+<svg
+  height="32px"
+  preserveAspectRatio="xMidYMid"
+  version="1.1"
+  viewBox="0 0 32 32"
+  width="32px"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+>
+  <defs>
+    <radialgradient
+      cx="50%"
+      cy="50%"
+      fx="50%"
+      fy="50%"
+      id="radialGradient-1"
+      r="50%"
+    >
+      <stop
+        offset="0%"
+        stop-color="#FFFFFF"
+      />
+      <stop
+        offset="100%"
+        stop-color="#FF0000"
+      />
+    </radialgradient>
+    <g
+      id="triangle"
+    >
+      <polygon
+        fill="#000"
+        points="12 9 12 23 23 16"
+      />
+    </g>
+  </defs>
+  <g>
+    <circle
+      cx="16"
+      cy="16"
+      fill="url(#radialGradient-1)"
+      r="16"
+    />
+    <use
+      xlink:href="#triangle"
+    />
+  </g>
+</svg>
+`;
+
+exports[`react-inlinesvg basic functionality should handle innerRef 2`] = `
+<InlineSVG
+  cacheRequests={true}
+  innerRef={
+    Object {
+      "current": <svg
+        height="32px"
+        preserveAspectRatio="xMidYMid"
+        version="1.1"
+        viewBox="0 0 32 32"
+        width="32px"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+      >
+        <defs>
+          <radialgradient
+            cx="50%"
+            cy="50%"
+            fx="50%"
+            fy="50%"
+            id="radialGradient-1"
+            r="50%"
+          >
+            <stop
+              offset="0%"
+              stop-color="#FFFFFF"
+            />
+            <stop
+              offset="100%"
+              stop-color="#FF0000"
+            />
+          </radialgradient>
+          <g
+            id="triangle"
+          >
+            <polygon
+              fill="#000"
+              points="12 9 12 23 23 16"
+            />
+          </g>
+        </defs>
+        <g>
+          <circle
+            cx="16"
+            cy="16"
+            fill="url(#radialGradient-1)"
+            r="16"
+          />
+          <use
+            xlink:href="#triangle"
+          />
+        </g>
+      </svg>,
+    }
+  }
+  onError={[Function]}
+  onLoad={[Function]}
+  src="http://localhost:1337/play.svg"
+  uniquifyIDs={false}
+>
+  <svg
+    height="32px"
+    key="0-0"
+    preserveAspectRatio="xMidYMid"
+    version="1.1"
+    viewBox="0 0 32 32"
+    width="32px"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlnsXlink="http://www.w3.org/1999/xlink"
+  >
+    <defs
+      key="1-1"
+    >
+      <radialGradient
+        cx="50%"
+        cy="50%"
+        fx="50%"
+        fy="50%"
+        id="radialGradient-1"
+        key="2-1"
+        r="50%"
+      >
+        <stop
+          key="3-1"
+          offset="0%"
+          stopColor="#FFFFFF"
+        />
+        <stop
+          key="3-3"
+          offset="100%"
+          stopColor="#FF0000"
+        />
+      </radialGradient>
+      <g
+        id="triangle"
+        key="2-3"
+      >
+        <polygon
+          fill="#000"
+          key="3-1"
+          points="12 9 12 23 23 16"
+        />
+      </g>
+    </defs>
+    <g
+      key="1-3"
+    >
+      <circle
+        cx="16"
+        cy="16"
+        fill="url(#radialGradient-1)"
+        key="2-1"
+        r="16"
+      />
+      <use
+        key="2-3"
+        xlinkHref="#triangle"
+      />
+    </g>
+  </svg>
+</InlineSVG>
+`;
+
 exports[`react-inlinesvg basic functionality should handle src changes 1`] = `
 <InlineSVG
   cacheRequests={true}

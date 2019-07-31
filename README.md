@@ -34,6 +34,9 @@ Cache remote SVGs.
 **description** {string}  
 A description for your SVG. It will override an existing `<desc>` tag.
 
+**innerRef** {React.Ref|function}  
+Get the SVG HTMLElement.
+
 **loader** {node}  
 A component to be shown while the SVG is loading.
 

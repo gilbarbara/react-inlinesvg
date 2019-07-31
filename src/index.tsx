@@ -10,6 +10,7 @@ export interface IProps {
   children?: React.ReactNode;
   description?: string;
   loader?: React.ReactNode;
+  innerRef?: React.Ref<HTMLElement>;
   onError?: (error: InlineSVGError | IFetchError) => void;
   onLoad?: (src: string, isCached: boolean) => void;
   preProcessor?: (code: string) => string;
@@ -233,6 +234,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
       cacheRequests,
       children,
       description,
+      innerRef,
       onError,
       onLoad,
       loader,
@@ -253,7 +255,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
       }
 
       this.setState({
-        element: React.cloneElement(element, rest),
+        element: React.cloneElement(element, { ref: innerRef, ...rest }),
         status: STATUS.READY,
       });
     } catch (error) {
