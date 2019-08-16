@@ -149,6 +149,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
   private updateSVGAttributes(node: SVGSVGElement): SVGSVGElement {
     const { baseURL = '', uniquifyIDs } = this.props;
     const replaceableAttributes = ['id', 'href', 'xlink:href', 'xlink:role', 'xlink:arcrole'];
+    const linkAttributes = ['href', 'xlink:href'];
 
     if (!uniquifyIDs) {
       return node;
@@ -169,7 +170,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
         replaceableAttributes.forEach(r => {
           const attribute = attributes.find(a => a.name === r);
 
-          if (attribute) {
+          if (attribute && !(linkAttributes.indexOf(r) >= 0 && attribute.value[0] !== '#')) {
             attribute.value = `${attribute.value}__${this.hash}`;
           }
         });
