@@ -24,6 +24,7 @@ const fixtures = {
   react: 'http://localhost:1337/react.svg',
   react_png: 'http://localhost:1337/react.png',
   tiger: 'http://localhost:1337/tiger.svg',
+  datahref: 'http://localhost:1337/datahref.svg',
   url:
     'https://raw.githubusercontent.com/google/material-design-icons/master/av/svg/production/ic_play_arrow_24px.svg',
   base64:
@@ -206,6 +207,27 @@ describe('react-inlinesvg', () => {
         expect.stringMatching(
           /https:\/\/github\.com\/gilbarbara\/react-inlinesvg\/#radialGradient-1__.*?/,
         ),
+      );
+    });
+
+    it('should not uniquify non-id hrefs', async () => {
+      const original = await setup({
+        src: fixtures.datahref,
+        uniquifyIDs: false,
+      });
+
+      const uniquified = await setup({
+        src: fixtures.datahref,
+        uniquifyIDs: true,
+      });
+
+      original.update();
+      uniquified.update();
+
+      expect(original.find('svg')).toExist();
+      expect(uniquified.find('svg')).toExist();
+      expect(uniquified.find('image').prop('xlinkHref')).toEqual(
+        original.find('image').prop('xlinkHref'),
       );
     });
 
