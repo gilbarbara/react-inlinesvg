@@ -354,6 +354,26 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
     }
   }
 
+  private cacheContent = (content: string) => {
+    const { cacheRequests, src } = this.props;
+    /* istanbul ignore else */
+    if (cacheRequests) {
+      const cache = cacheStore[src];
+
+      /* istanbul ignore else */
+      if (cache) {
+        cache.content = content;
+        cache.status = STATUS.LOADED;
+
+        cache.queue = cache.queue.filter((cb: (content: string) => void) => {
+          cb(content);
+
+          return false;
+        });
+      }
+    }
+  }
+
   private request = () => {
     const { cacheRequests, src } = this.props;
 
@@ -368,22 +388,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
             this.validateContentAndStatus(response.headers['content-type'], response.status);
             const content = response.data;
             this.handleLoad(content);
-            /* istanbul ignore else */
-            if (cacheRequests) {
-              const cache = cacheStore[src];
-
-              /* istanbul ignore else */
-              if (cache) {
-                cache.content = content;
-                cache.status = STATUS.LOADED;
-
-                cache.queue = cache.queue.filter((cb: (content: string) => void) => {
-                  cb(content);
-
-                  return false;
-                });
-              }
-            }
+            this.cacheContent(content);
           })
           .catch(error => {
             /* istanbul ignore else */
@@ -401,23 +406,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
         })
         .then(content => {
           this.handleLoad(content);
-
-          /* istanbul ignore else */
-          if (cacheRequests) {
-            const cache = cacheStore[src];
-
-            /* istanbul ignore else */
-            if (cache) {
-              cache.content = content;
-              cache.status = STATUS.LOADED;
-
-              cache.queue = cache.queue.filter((cb: (content: string) => void) => {
-                cb(content);
-
-                return false;
-              });
-            }
-          }
+          this.cacheContent(content);
         })
         .catch(error => {
           /* istanbul ignore else */
