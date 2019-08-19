@@ -2080,6 +2080,37 @@ exports[`react-inlinesvg basic functionality should handle src changes 2`] = `
 </InlineSVG>
 `;
 
+exports[`react-inlinesvg basic functionality should not uniquify non-id hrefs 1`] = `
+<InlineSVG
+  cacheRequests={true}
+  onError={[Function]}
+  onLoad={[Function]}
+  src="http://localhost:1337/datahref.svg"
+  uniquifyIDs={true}
+>
+  <svg
+    height="400px"
+    key="0-0"
+    preserveAspectRatio="xMidYMid"
+    version="1.1"
+    viewBox="0 0 600 400"
+    width="600px"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlnsXlink="http://www.w3.org/1999/xlink"
+  >
+    <g
+      key="1-1"
+    >
+      <image
+        key="2-1"
+        xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAQAAAD41aSMAAAABGdBTUEAALGPC/xhBQAABKhJREFUeNrtnQmL10UAhp9SyyOzLI+0stLUMu0ytUvL6MQSCQmRkBAREREJCYmQEBGJkJAQCZGQEBHxIsvovjTD1DI1zWozr2111fXaXXcn5kv0zszvfZ9v8DwgsjP/+YHneZ7neZ7neZ7neZ7neZ7nZbB19LYE5QJnmM7lFqELENnCYKtQBgg0MZ/21qELEDnAaAtRBogs5zpLUQYI1DLRWpQBIpu5zWqUAQLnmE1b69EFiOxgqAUpAwRaWMRVlqQLEKlhjDUpA0RW0dOqlAEC9UzhMuvSBYh8zUALUwYINDKXKyxNFyCyl0etTRkg0MpSrrE6XYDIUcZbnjJAZCM3W6AyQKCBmT7OVAaIbOMea1QGCDSzkA5WqQsQOchTlqkMEFlBNwtVBgjUMclKlQEin9HPWpUBAheYQzur1QWI/MwIy1UGiMeZi+lswboAkUOMtWJlgMgaelmzMkDgNNN8nKkMEPmOQZatDBAvwM/jSgvXBYj8xmNWrgwQWUZXa1cGCBxngsUrA0Q+4hbLVwaIF+BfpY0DBCnbud8BtFzibTo5gJa/eNYB1KykhwNoOcnkKv7FKCTFlwxwAC0XeaNaF+BDgvzKww6gpZUldHEALUd40QHUrOdGB9ByhhllX4APGbCVIQ6gpZkFpV6AD9nwO084gJr3y3vPK2TGv7zsAGo+Kek9r5Al53mtlPe8QrbsZJgDaGnhnfzf8wqZ8zfPO4Ca1dzgAFpOMTXX48xQDN9whwNoaeTN/C7Ah8LYx0gHUB9nvpfTe16hSI7xkgOo+TCP97xCwZxlVvoX4EPh/Mi9DqC+AP8WHR1Ayx887QBqPkjzPa9QIU7wigOo+ZzbHUDLBV5P6T2vUEl+4UEHUB9nvsvVDqDlH8Y5gDbAWAdQ/hPU2f8EqUjoUU3/N9QB/leSe1i5SvLr/KcI/zGuogES/rxE+fKbfSCjPZJM/BNDJctvYFb6vzEuV/9GX0vRcdQXs3w1saIBsvvYbmnX07N7basc/Zl+cL0M+fX+iZKS1fQk2+Uuv4YxZL28jxX9Q20hO3iAApanfD/WIWWzn6vRUesHm5T4yTIhBxhNgctDfhMLaA8OoGELgyl2qcv308VS1vnxbh2H/Xy98lhxSRq/X6lmgN08RGWWmvz4EZ924AAavqA/FVs68k8wmQouFf0r6Q4OoOFPnqGyU8uPn7PtCA6gYTv3UfHp5J/1J82VATbRx/JVAY4xweJVAVpZxrXWrgqwj1FWrgrQyLz83jYvJ8C33GnZqgCnmJbr5fESAqzJ+QsvuQc4xAtWrArQwuI03qSqZoBdDLdcVYDzzCnl8niOAT6lr7WqAtQxyUp1AVZwvYWqAhzkSctUBWhmIR2sUhXgB+62RlWABmaWfXk87QAbuMkCVQGOMN7yVAFaWUoXq1MF2MMj1qYKcJG5+b1JVU6ArxhgYaoA9UzxsaIuwCp6WJUqQA3PWZMqwCUW0cmSVAF+YqgFqQKcY7Yvj+sCfMytVqMKUMtEa9EFWE5XS1EF2M/jFqIK0MT8Ut+kyiHA99xlFaoAp5nuY0Xd1tLbEjzP8zzP8zzP8zzP8zzP8zwv6f0HWXdaCS3r6mYAAAAASUVORK5CYII=
+"
+      />
+    </g>
+  </svg>
+</InlineSVG>
+`;
+
 exports[`react-inlinesvg basic functionality should transform the SVG text with the preProcessor prop 1`] = `
 <InlineSVG
   cacheRequests={true}

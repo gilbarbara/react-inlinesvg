@@ -211,24 +211,13 @@ describe('react-inlinesvg', () => {
     });
 
     it('should not uniquify non-id hrefs', async () => {
-      const original = await setup({
-        src: fixtures.datahref,
-        uniquifyIDs: false,
-      });
-
-      const uniquified = await setup({
+      const wrapper = await setup({
         src: fixtures.datahref,
         uniquifyIDs: true,
       });
 
-      original.update();
-      uniquified.update();
-
-      expect(original.find('svg')).toExist();
-      expect(uniquified.find('svg')).toExist();
-      expect(uniquified.find('image').prop('xlinkHref')).toEqual(
-        original.find('image').prop('xlinkHref'),
-      );
+      wrapper.update();
+      expect(wrapper).toMatchSnapshot();
     });
 
     it('should transform the SVG text with the preProcessor prop', async () => {

@@ -5,8 +5,6 @@ import { configure } from 'enzyme';
 import { default as Adapter } from 'enzyme-adapter-react-16';
 import fetch from 'node-fetch';
 
-import { InlineSVGError } from '../../src/helpers';
-
 configure({ adapter: new Adapter() });
 
 window.fetch = fetch;
