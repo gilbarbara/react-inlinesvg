@@ -4,6 +4,7 @@
 
 Load inline, local or remote SVGs in your React components.  
 Async requests will be cached.
+Optional use of Axios for remote request customization.
 
 ## Usage
 
@@ -81,6 +82,9 @@ A string to use with `uniquifyIDs`.
 **uniquifyIDs** {boolean} ▶︎ `false`  
 Create unique IDs for each icon.
 
+**axiosRequest** {Promise<AxiosResponse<any>>} ▶︎ `{function}`
+An axios function returning a promise to retrieve the image from a remote location.
+
 > Additional props will be spread over the SVG element.
 
 ### Example
@@ -98,6 +102,7 @@ Create unique IDs for each icon.
   title="React"
   uniqueHash="a1f8d1"
   uniquifyIDs={true}
+  axiosRequest={api.images.brandIcon(id)}
 />
 ```
 

@@ -3,6 +3,7 @@ import * as React from 'react';
 import convert from 'react-from-dom';
 
 import { canUseDOM, InlineSVGError, isSupportedEnvironment, randomString } from './helpers';
+import { AxiosResponse } from 'axios';
 
 export interface IProps {
   baseURL?: string;
@@ -19,6 +20,7 @@ export interface IProps {
   uniqueHash?: string;
   uniquifyIDs?: boolean;
   [key: string]: any;
+  axiosRequest?: Promise<AxiosResponse<any>>;
 }
 
 export interface IState {
@@ -341,6 +343,17 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
     }
   };
 
+  private validateContentAndStatus = (contentType: string | null, status: number) => {
+    const [fileType] = (contentType || '').split(/ ?; ?/);
+    if (status > 299) {
+      throw new InlineSVGError('Not Found');
+    }
+
+    if (!['image/svg+xml', 'text/plain', 'application/xml'].some(d => fileType.indexOf(d) >= 0)) {
+      throw new InlineSVGError(`Content type isn't valid: ${fileType}`);
+    }
+  }
+
   private request = () => {
     const { cacheRequests, src } = this.props;
 
@@ -349,19 +362,41 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
         cacheStore[src] = { content: '', status: STATUS.LOADING, queue: [] };
       }
 
+      if (this.props.axiosRequest) {
+        return this.props.axiosRequest
+          .then(response => {
+            this.validateContentAndStatus(response.headers['content-type'], response.status);
+            const content = response.data;
+            this.handleLoad(content);
+            /* istanbul ignore else */
+            if (cacheRequests) {
+              const cache = cacheStore[src];
+
+              /* istanbul ignore else */
+              if (cache) {
+                cache.content = content;
+                cache.status = STATUS.LOADED;
+
+                cache.queue = cache.queue.filter((cb: (content: string) => void) => {
+                  cb(content);
+
+                  return false;
+                });
+              }
+            }
+          })
+          .catch(error => {
+            /* istanbul ignore else */
+            if (cacheRequests) {
+              delete cacheStore[src];
+            }
+            this.handleError(error);
+          });
+      }
+
       return fetch(src)
         .then(response => {
-          const contentType = response.headers.get('content-type');
-          const [fileType] = (contentType || '').split(/ ?; ?/);
-
-          if (response.status > 299) {
-            throw new InlineSVGError('Not Found');
-          }
-
-          if (!['image/svg+xml', 'text/plain'].some(d => fileType.indexOf(d) >= 0)) {
-            throw new InlineSVGError(`Content type isn't valid: ${fileType}`);
-          }
-
+          this.validateContentAndStatus(response.headers.get('content-type'), response.status);
           return response.text();
         })
         .then(content => {
