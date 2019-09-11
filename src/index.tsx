@@ -232,23 +232,6 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
   }
 
   private getElement() {
-    const {
-      baseURL,
-      cacheRequests,
-      children,
-      description,
-      innerRef,
-      onError,
-      onLoad,
-      loader,
-      preProcessor,
-      src,
-      title,
-      uniqueHash,
-      uniquifyIDs,
-      ...rest
-    } = this.props;
-
     try {
       const node = this.getNode() as Node;
       const element = convert(node);
@@ -258,7 +241,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
       }
 
       this.setState({
-        element: React.cloneElement(element, { ref: innerRef, ...rest }),
+        element,
         status: STATUS.READY,
       });
     } catch (error) {
@@ -405,10 +388,25 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
     }
 
     const { element, status } = this.state;
-    const { children = null, loader = null } = this.props;
+    const {
+      baseURL,
+      cacheRequests,
+      children = null,
+      description,
+      innerRef,
+      loader = null,
+      onError,
+      onLoad,
+      preProcessor,
+      src,
+      title,
+      uniqueHash,
+      uniquifyIDs,
+      ...rest
+    } = this.props;
 
     if (element) {
-      return element;
+      return React.cloneElement(element as React.ReactElement, { ref: innerRef, ...rest });
     }
 
     if ([STATUS.UNSUPPORTED, STATUS.FAILED].indexOf(status) > -1) {
