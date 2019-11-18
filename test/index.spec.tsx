@@ -26,6 +26,7 @@ const fixtures = {
   react_png: 'http://localhost:1337/react.png',
   tiger: 'http://localhost:1337/tiger.svg',
   datahref: 'http://localhost:1337/datahref.svg',
+  styles: 'http://localhost:1337/styles.svg',
   url:
     'https://raw.githubusercontent.com/google/material-design-icons/master/av/svg/production/ic_play_arrow_24px.svg',
   base64:
@@ -117,6 +118,17 @@ describe('react-inlinesvg', () => {
       const wrapper = await setup({
         src: fixtures.circles,
         title: 'Circles',
+      });
+
+      wrapper.update();
+      expect(wrapper).toMatchSnapshot();
+    });
+
+    it('should handle a svg url with inline styles', async () => {
+      const wrapper = await setup({
+        src: fixtures.styles,
+        uniquifyIDs: true,
+        uniqueHash: 'test',
       });
 
       wrapper.update();

@@ -244,6 +244,146 @@ exports[`react-inlinesvg basic functionality should handle a svg url with extern
 </InlineSVG>
 `;
 
+exports[`react-inlinesvg basic functionality should handle a svg url with inline styles 1`] = `
+<InlineSVG
+  cacheRequests={true}
+  onError={[Function]}
+  onLoad={[Function]}
+  src="http://localhost:1337/styles.svg"
+  uniqueHash="test"
+  uniquifyIDs={true}
+>
+  <svg
+    id="BACKGROUND-ELEMENTS"
+    key="0-0"
+    viewBox="0 0 324 504"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlnsXlink="http://www.w3.org/1999/xlink"
+  >
+    <defs
+      key="1-1"
+    >
+      <radialGradient
+        cx="162"
+        cy="252"
+        gradientUnits="userSpaceOnUse"
+        id="radial-gradient__test"
+        key="2-1"
+        r="211.83"
+      >
+        <stop
+          key="3-1"
+          offset="0"
+          stopColor="#223120"
+        />
+        <stop
+          key="3-3"
+          offset="1"
+        />
+      </radialGradient>
+      <radialGradient
+        cx="167.67"
+        cy="92"
+        gradientTransform="translate(-5.7 48) scale(1 0.48)"
+        gradientUnits="userSpaceOnUse"
+        id="radial-gradient-2__test"
+        key="2-3"
+        r="131.49"
+      >
+        <stop
+          key="3-1"
+          offset="0"
+          stopColor="#2f5e16"
+        />
+        <stop
+          key="3-3"
+          offset="1"
+        />
+      </radialGradient>
+      <pattern
+        data-name="New Pattern Swatch 3"
+        height="11.37"
+        id="New_Pattern_Swatch_3__test"
+        key="2-5"
+        patternTransform="translate(-37.1 0)"
+        patternUnits="userSpaceOnUse"
+        viewBox="0 0 10.9 11.4"
+        width="10.9"
+      >
+        <rect
+          height="11.37"
+          key="3-1"
+          style={
+            Object {
+              "fill": "none",
+            }
+          }
+          width="10.9"
+        />
+        <polygon
+          key="3-3"
+          points="9.6 0 9.6 0 8.6 0 5.6 2.9 2.7 0 1.7 0 1.7 0 5.6 3.9 9.6 0"
+        />
+        <polygon
+          key="3-5"
+          points="10.9 8.4 8 5.5 10.9 2.5 10.9 1.5 10.9 1.5 6.9 5.5 10.9 9.4 10.9 9.4 10.9 8.4"
+        />
+        <polygon
+          key="3-7"
+          points="2.7 11.4 5.6 8.5 8.6 11.4 9.6 11.4 5.6 7.4 1.7 11.4 2.7 11.4"
+        />
+        <polygon
+          key="3-9"
+          points="2.9 5.5 0 8.4 0 9.4 3.9 5.5 0 1.5 0 2.5 2.9 5.5"
+        />
+      </pattern>
+    </defs>
+    <title
+      key="1-3"
+    >
+      sample
+    </title>
+    <rect
+      height="504"
+      key="1-5"
+      rx="17"
+      ry="17"
+      style={
+        Object {
+          "fill": "url(#radial-gradient__test)",
+        }
+      }
+      width="324"
+    />
+    <rect
+      height="92.91"
+      key="1-7"
+      style={
+        Object {
+          "fill": "url(#radial-gradient-2__test)",
+        }
+      }
+      width="240.8"
+      x="41.6"
+      y="45.5"
+    />
+    <rect
+      height="92.91"
+      key="1-9"
+      style={
+        Object {
+          "fill": "url(#New_Pattern_Swatch_3__test)",
+          "opacity": 0.30000000000000004,
+        }
+      }
+      width="240.8"
+      x="41.6"
+      y="45.5"
+    />
+  </svg>
+</InlineSVG>
+`;
+
 exports[`react-inlinesvg basic functionality should handle a svg url with mask, gradient and classes 1`] = `
 <InlineSVG
   cacheRequests={true}
