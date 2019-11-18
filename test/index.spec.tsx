@@ -1,7 +1,8 @@
 /* tslint:disable:object-literal-sort-keys jsx-no-lambda */
-import React from 'react';
+
+import * as React from 'react';
 import { mount, ReactWrapper } from 'enzyme';
-import { default as fetchMock } from 'fetch-mock';
+import * as fetchMock from 'fetch-mock';
 
 import ReactInlineSVG from '../src/index';
 import { InlineSVGError } from '../src/helpers';

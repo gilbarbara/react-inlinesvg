@@ -1,7 +1,9 @@
 /* tslint:disable:jsx-no-lambda */
 declare var window: any;
+
 import * as React from 'react';
 import { mount, ReactWrapper } from 'enzyme';
+
 import ReactInlineSVG from '../src';
 import { InlineSVGError } from '../src/helpers';
 
@@ -10,7 +12,7 @@ let mockCanUseDOM = false;
 let mockIsSupportedEnvironment = true;
 
 jest.mock('../src/helpers', () => {
-  const utils = require.requireActual('../src/helpers');
+  const utils = jest.requireActual('../src/helpers');
 
   return {
     ...utils,

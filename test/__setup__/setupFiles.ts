@@ -2,7 +2,7 @@
 declare var window: any;
 
 import { configure } from 'enzyme';
-import { default as Adapter } from 'enzyme-adapter-react-16';
+import * as Adapter from 'enzyme-adapter-react-16';
 import fetch from 'node-fetch';
 
 configure({ adapter: new Adapter() });
