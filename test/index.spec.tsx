@@ -27,6 +27,7 @@ const fixtures = {
   tiger: 'http://localhost:1337/tiger.svg',
   datahref: 'http://localhost:1337/datahref.svg',
   styles: 'http://localhost:1337/styles.svg',
+  utf8: 'http://localhost:1337/utf8.svg',
   url:
     'https://raw.githubusercontent.com/google/material-design-icons/master/av/svg/production/ic_play_arrow_24px.svg',
   base64:
@@ -137,6 +138,13 @@ describe('react-inlinesvg', () => {
 
     it('should handle a svg url with symbols', async () => {
       const wrapper = await setup({ src: fixtures.icons });
+
+      wrapper.update();
+      expect(wrapper).toMatchSnapshot();
+    });
+
+    it('should handle a svg url with utf-8 characters', async () => {
+      const wrapper = await setup({ src: fixtures.utf8 });
 
       wrapper.update();
       expect(wrapper).toMatchSnapshot();
