@@ -21,6 +21,8 @@ jest.mock('../src/helpers', () => {
   };
 });
 
+const Loader = () => <div id="loader" />;
+
 function setup(): Promise<ReactWrapper> {
   return new Promise(resolve => {
     const wrapper = mount(
@@ -35,6 +37,7 @@ function setup(): Promise<ReactWrapper> {
           mockOnError(error);
           setTimeout(() => resolve(wrapper), 0);
         }}
+        loader={<Loader />}
       />,
     );
 
