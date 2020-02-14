@@ -79,7 +79,6 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
     this._isMounted = true;
 
     if (!canUseDOM()) {
-      this.handleError(new InlineSVGError('No DOM'));
       return;
     }
 
@@ -383,10 +382,6 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
   };
 
   public render() {
-    if (!canUseDOM()) {
-      return null;
-    }
-
     const { element, status } = this.state;
     const {
       baseURL,
@@ -404,6 +399,10 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
       uniquifyIDs,
       ...rest
     } = this.props;
+
+    if (!canUseDOM()) {
+      return loader;
+    }
 
     if (element) {
       return React.cloneElement(element as React.ReactElement, { ref: innerRef, ...rest });
