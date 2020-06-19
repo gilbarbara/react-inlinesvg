@@ -21,6 +21,8 @@ jest.mock('../src/helpers', () => {
   };
 });
 
+const Loader = () => <div id="loader" />;
+
 function setup(): Promise<ReactWrapper> {
   return new Promise(resolve => {
     const wrapper = mount(
@@ -35,6 +37,7 @@ function setup(): Promise<ReactWrapper> {
           mockOnError(error);
           setTimeout(() => resolve(wrapper), 0);
         }}
+        loader={<Loader />}
       />,
     );
 
@@ -43,9 +46,19 @@ function setup(): Promise<ReactWrapper> {
 }
 describe('unsupported environments', () => {
   it("shouldn't break without DOM ", async () => {
-    const wrapper = await setup();
+    const mockOnLoad = jest.fn();
 
-    expect(mockOnError).toHaveBeenCalledWith(new InlineSVGError('No DOM'));
+    const wrapper = mount(
+      <ReactInlineSVG
+        src="http://localhost:1337/play.svg"
+        onLoad={mockOnLoad}
+        onError={mockOnError}
+        loader={<Loader />}
+      />,
+    );
+
+    expect(mockOnLoad).not.toHaveBeenCalled();
+    expect(mockOnError).not.toHaveBeenCalled();
     expect(wrapper).toMatchSnapshot();
   });
 

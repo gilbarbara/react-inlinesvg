@@ -3,6 +3,7 @@
 exports[`unsupported environments should warn the user if fetch is missing 1`] = `
 <InlineSVG
   cacheRequests={true}
+  loader={<Loader />}
   onError={[Function]}
   onLoad={[Function]}
   src="http://localhost:1337/play.svg"
@@ -13,16 +14,24 @@ exports[`unsupported environments should warn the user if fetch is missing 1`] =
 exports[`unsupported environments shouldn't break without DOM  1`] = `
 <InlineSVG
   cacheRequests={true}
-  onError={[Function]}
-  onLoad={[Function]}
+  loader={<Loader />}
+  onError={[MockFunction]}
+  onLoad={[MockFunction]}
   src="http://localhost:1337/play.svg"
   uniquifyIDs={false}
-/>
+>
+  <Loader>
+    <div
+      id="loader"
+    />
+  </Loader>
+</InlineSVG>
 `;
 
 exports[`unsupported environments shouldn't not render anything if is an unsupported browser 1`] = `
 <InlineSVG
   cacheRequests={true}
+  loader={<Loader />}
   onError={[Function]}
   onLoad={[Function]}
   src="http://localhost:1337/play.svg"
