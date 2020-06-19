@@ -1,11 +1,10 @@
-/* tslint:disable:jsx-no-lambda */
-declare var window: any;
-
 import * as React from 'react';
 import { mount, ReactWrapper } from 'enzyme';
 
 import ReactInlineSVG from '../src';
 import { InlineSVGError } from '../src/helpers';
+
+declare let window: any;
 
 const mockOnError = jest.fn();
 let mockCanUseDOM = false;
@@ -24,7 +23,7 @@ jest.mock('../src/helpers', () => {
 const Loader = () => <div id="loader" />;
 
 function setup(): Promise<ReactWrapper> {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const wrapper = mount(
       <ReactInlineSVG
         src="http://localhost:1337/play.svg"
@@ -33,7 +32,7 @@ function setup(): Promise<ReactWrapper> {
             resolve(wrapper);
           }, 0);
         }}
-        onError={error => {
+        onError={(error) => {
           mockOnError(error);
           setTimeout(() => resolve(wrapper), 0);
         }}
@@ -60,6 +59,8 @@ describe('unsupported environments', () => {
     expect(mockOnLoad).not.toHaveBeenCalled();
     expect(mockOnError).not.toHaveBeenCalled();
     expect(wrapper).toMatchSnapshot();
+
+    wrapper.setProps({ src: 'http://localhost:1337/player.svg' });
   });
 
   it('should warn the user if fetch is missing', async () => {

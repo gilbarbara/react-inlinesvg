@@ -53,15 +53,6 @@ export const STATUS = {
 const cacheStore: { [key: string]: IStorageItem } = Object.create(null);
 
 export default class InlineSVG extends React.PureComponent<IProps, IState> {
-  public static defaultProps = {
-    cacheRequests: true,
-    uniquifyIDs: false,
-  };
-
-  // tslint:disable-next-line:variable-name
-  private _isMounted = false;
-  private readonly hash: string;
-
   constructor(props: IProps) {
     super(props);
 
@@ -75,8 +66,16 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
     this.hash = props.uniqueHash || randomString(8);
   }
 
-  public componentDidMount() {
-    this._isMounted = true;
+  private isActive = false;
+  private readonly hash: string;
+
+  public static defaultProps = {
+    cacheRequests: true,
+    uniquifyIDs: false,
+  };
+
+  public componentDidMount(): void {
+    this.isActive = true;
 
     if (!canUseDOM()) {
       return;
@@ -105,7 +104,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
     }
   }
 
-  public componentDidUpdate(prevProps: IProps, prevState: IState) {
+  public componentDidUpdate(prevProps: IProps, prevState: IState): void {
     if (!canUseDOM()) {
       return;
     }
@@ -130,8 +129,8 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
     }
   }
 
-  public componentWillUnmount() {
-    this._isMounted = false;
+  public componentWillUnmount(): void {
+    this.isActive = false;
   }
 
   private processSVG() {
@@ -156,20 +155,21 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
       return node;
     }
 
-    [...node.children].map(d => {
+    [...node.children].map((d) => {
       if (d.attributes && d.attributes.length) {
-        const attributes = Object.values(d.attributes);
-
-        attributes.forEach(a => {
+        const attributes = Object.values(d.attributes).map((a) => {
+          const attr = a;
           const match = a.value.match(/url\((.*?)\)/);
 
           if (match && match[1]) {
-            a.value = a.value.replace(match[0], `url(${baseURL}${match[1]}__${this.hash})`);
+            attr.value = a.value.replace(match[0], `url(${baseURL}${match[1]}__${this.hash})`);
           }
+
+          return attr;
         });
 
-        replaceableAttributes.forEach(r => {
-          const attribute = attributes.find(a => a.name === r);
+        replaceableAttributes.forEach((r) => {
+          const attribute = attributes.find((a) => a.name === r);
 
           if (attribute && !isDataValue(r, attribute.value)) {
             attribute.value = `${attribute.value}__${this.hash}`;
@@ -178,7 +178,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
       }
 
       if (d.children.length) {
-        d = this.updateSVGAttributes(d as SVGSVGElement);
+        return this.updateSVGAttributes(d as SVGSVGElement);
       }
 
       return d;
@@ -226,7 +226,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
 
       return svg;
     } catch (error) {
-      this.handleError(error);
+      return this.handleError(error);
     }
   }
 
@@ -250,7 +250,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
 
   private load() {
     /* istanbul ignore else */
-    if (this._isMounted) {
+    if (this.isActive) {
       this.setState(
         {
           content: '',
@@ -293,7 +293,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
 
   private handleLoad = (content: string) => {
     /* istanbul ignore else */
-    if (this._isMounted) {
+    if (this.isActive) {
       this.setState(
         {
           content,
@@ -311,12 +311,12 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
 
     /* istanbul ignore else */
     if (process.env.NODE_ENV !== 'production') {
-      // tslint:disable-next-line:no-console
+      // eslint-disable-next-line no-console
       console.error(error);
     }
 
     /* istanbul ignore else */
-    if (this._isMounted) {
+    if (this.isActive) {
       this.setState({ status }, () => {
         /* istanbul ignore else */
         if (typeof onError === 'function') {
@@ -335,7 +335,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
       }
 
       return fetch(src)
-        .then(response => {
+        .then((response) => {
           const contentType = response.headers.get('content-type');
           const [fileType] = (contentType || '').split(/ ?; ?/);
 
@@ -343,13 +343,13 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
             throw new InlineSVGError('Not Found');
           }
 
-          if (!['image/svg+xml', 'text/plain'].some(d => fileType.indexOf(d) >= 0)) {
+          if (!['image/svg+xml', 'text/plain'].some((d) => fileType.indexOf(d) >= 0)) {
             throw new InlineSVGError(`Content type isn't valid: ${fileType}`);
           }
 
           return response.text();
         })
-        .then(content => {
+        .then((content) => {
           this.handleLoad(content);
 
           /* istanbul ignore else */
@@ -369,7 +369,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
             }
           }
         })
-        .catch(error => {
+        .catch((error) => {
           /* istanbul ignore else */
           if (cacheRequests) {
             delete cacheStore[src];
@@ -377,11 +377,11 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
           this.handleError(error);
         });
     } catch (error) {
-      this.handleError(new InlineSVGError(error.message));
+      return this.handleError(new InlineSVGError(error.message));
     }
   };
 
-  public render() {
+  public render(): React.ReactNode {
     const { element, status } = this.state;
     const {
       baseURL,

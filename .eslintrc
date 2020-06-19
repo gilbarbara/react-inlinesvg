@@ -1,0 +1,78 @@
+{
+  "extends": [
+    "airbnb",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/typescript",
+    "plugin:prettier/recommended",
+    "prettier/react",
+    "prettier/standard"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "env": {
+    "browser": true,
+    "jest": true
+  },
+  "globals": {
+    "cy": false
+  },
+  "plugins": ["@typescript-eslint", "prettier"],
+  "rules": {
+    "lines-between-class-members": "off",
+    "no-plusplus": "off",
+    "no-restricted-syntax": ["error", "DebuggerStatement", "LabeledStatement", "WithStatement"],
+    "no-use-before-define": ["error", "nofunc"],
+    "spaced-comment": [
+      "warn",
+      "always",
+      {
+        "exceptions": ["-+"],
+        "markers": [
+          "eslint-disable",
+          "eslint-disable-line",
+          "eslint-disable-next-line",
+          "eslint-enable"
+        ]
+      }
+    ],
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": ["warn", { "ignoreRestSiblings": true }],
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "import/extensions": ["warn", "never"],
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
+    "import/prefer-default-export": "off",
+    "react/jsx-fragments": "off",
+    "react/jsx-filename-extension": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/no-unescaped-entities": "off",
+    "react/prop-types": "off",
+    "react/sort-comp": [
+      "warn",
+      {
+        "order": ["constructor", "lifecycle", "everything-else", "render"],
+        "groups": {
+          "lifecycle": [
+            "state",
+            "instance-variables",
+            "static-methods",
+            "propTypes",
+            "defaultProps",
+            "contextTypes",
+            "childContextTypes",
+            "getChildContext",
+            "getDerivedStateFromProps",
+            "componentWillMount",
+            "componentDidMount",
+            "componentWillReceiveProps",
+            "shouldComponentUpdate",
+            "getSnapshotBeforeUpdate",
+            "componentDidUpdate",
+            "componentDidCatch",
+            "componentWillUnmount"
+          ]
+        }
+      }
+    ],
+    "react/static-property-placement": "off"
+  }
+}

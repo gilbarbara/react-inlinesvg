@@ -1,9 +1,10 @@
-/* tslint:disable:no-console */
-declare var window: any;
-
 import { configure } from 'enzyme';
 import * as Adapter from 'enzyme-adapter-react-16';
 import fetch from 'node-fetch';
+
+declare let window: any;
+
+export {};
 
 configure({ adapter: new Adapter() });
 
@@ -14,7 +15,7 @@ react.id = 'react';
 react.style.height = '100vh';
 document.body.appendChild(react);
 
-window.skipEventLoop = () => new Promise(resolve => setImmediate(resolve));
+window.skipEventLoop = () => new Promise((resolve) => setImmediate(resolve));
 
 window.requestAnimationFrame = (callback: () => void) => {
   setTimeout(callback, 0);
@@ -27,13 +28,13 @@ window.matchMedia = () => ({
 });
 
 const consoleError = console.error;
-console.error = jest.fn(error => {
+console.error = jest.fn((error) => {
   const skipMessages = ['Expected `%s` listener', 'Error parsing input'];
 
   if (
-    (typeof error === 'string' && skipMessages.some(d => error.indexOf(d) >= 0)) ||
+    (typeof error === 'string' && skipMessages.some((d) => error.indexOf(d) >= 0)) ||
     (error instanceof Error &&
-      (error.name === 'InlineSVGError' || skipMessages.some(d => error.message.indexOf(d) >= 0)))
+      (error.name === 'InlineSVGError' || skipMessages.some((d) => error.message.indexOf(d) >= 0)))
   ) {
     return;
   }

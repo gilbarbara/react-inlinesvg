@@ -1,8 +1,10 @@
 import { canUseDOM as canUseDOMFlag } from 'exenv';
 
-export const canUseDOM = () => canUseDOMFlag;
+export function canUseDOM(): boolean {
+  return canUseDOMFlag;
+}
 
-export const supportsInlineSVG = () => {
+export function supportsInlineSVG(): boolean {
   /* istanbul ignore next */
   if (!document) {
     return false;
@@ -10,16 +12,15 @@ export const supportsInlineSVG = () => {
 
   const div = document.createElement('div');
   div.innerHTML = '<svg />';
-  return div.firstChild && div.firstChild.namespaceURI === 'http://www.w3.org/2000/svg';
-};
+  return !!div.firstChild && div.firstChild.namespaceURI === 'http://www.w3.org/2000/svg';
+}
 
-// tslint:disable-next-line:no-shadowed-variable
 export class InlineSVGError extends Error {
   public name: string;
   public message: string;
-  public data?: object;
+  public data?: Record<string, any>;
 
-  constructor(message: string, data?: object) {
+  constructor(message: string, data?: Record<string, any>) {
     super();
 
     this.name = 'InlineSVGError';
@@ -30,10 +31,11 @@ export class InlineSVGError extends Error {
   }
 }
 
-export const isSupportedEnvironment = () =>
-  supportsInlineSVG() && typeof window !== 'undefined' && window !== null;
+export function isSupportedEnvironment(): boolean {
+  return supportsInlineSVG() && typeof window !== 'undefined' && window !== null;
+}
 
-export const randomString = (length: number) => {
+export function randomString(length: number): string {
   const letters = 'abcdefghijklmnopqrstuvwxyz';
   const numbers = '1234567890';
   const charset = `${letters}${letters.toUpperCase()}${numbers}`;
@@ -45,5 +47,6 @@ export const randomString = (length: number) => {
   for (let i = 0; i < length; i++) {
     R += randomCharacter(charset);
   }
+
   return R;
-};
+}

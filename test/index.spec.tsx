@@ -1,8 +1,6 @@
-/* tslint:disable:object-literal-sort-keys jsx-no-lambda */
-
 import * as React from 'react';
 import { mount, ReactWrapper } from 'enzyme';
-import * as fetchMock from 'fetch-mock';
+import fetchMock from 'jest-fetch-mock';
 
 import ReactInlineSVG from '../src/index';
 import { InlineSVGError } from '../src/helpers';
@@ -34,6 +32,7 @@ const fixtures = {
     'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxwYXRoIGQ9Ik04IDV2MTRsMTEtN3oiLz4KICAgIDxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4KPC9zdmc+Cg==',
   urlEncoded:
     'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M8%205v14l11-7z%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22%2F%3E%0A%3C%2Fsvg%3E%0A',
+  html: 'data:image/svg+xml,%3Chtml%20lang%3D%22en%22%3E%3Cbody%3EText%3C%2Fbody%3E%3C%2Fhtml%3E',
   string:
     '<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid"><g> <polygon fill="#000000" points="7 5 7 19 18 12"></polygon></g></svg>',
 };
@@ -41,7 +40,7 @@ const fixtures = {
 const mockOnError = jest.fn();
 
 function setup({ onLoad, ...rest }: IProps): Promise<ReactWrapper> {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const wrapper = mount(
       <ReactInlineSVG
         onLoad={(src, isCached) => {
@@ -53,7 +52,7 @@ function setup({ onLoad, ...rest }: IProps): Promise<ReactWrapper> {
             resolve(wrapper);
           }, 0);
         }}
-        onError={error => {
+        onError={(error) => {
           mockOnError(error);
           setTimeout(() => resolve(wrapper), 0);
         }}
@@ -245,7 +244,7 @@ describe('react-inlinesvg', () => {
       const extraProp = 'data-isvg="test"';
       const wrapper = await setup({
         src: fixtures.play,
-        preProcessor: svgText => svgText.replace('<svg ', `<svg ${extraProp} `),
+        preProcessor: (svgText) => svgText.replace('<svg ', `<svg ${extraProp} `),
       });
 
       wrapper.update();
@@ -280,32 +279,34 @@ describe('react-inlinesvg', () => {
 
   describe('cached requests', () => {
     beforeAll(() => {
-      fetchMock.get(
-        '*',
-        new Promise(res =>
-          setTimeout(
-            () =>
-              res({
-                body: '<svg><circle /></svg>',
-                headers: { 'Content-Type': 'image/svg+xml' },
-              }),
-            500,
+      fetchMock.enableMocks();
+
+      fetchMock.mockResponseOnce(
+        () =>
+          new Promise((res) =>
+            setTimeout(
+              () =>
+                res({
+                  body: '<svg><circle /></svg>',
+                  headers: { 'Content-Type': 'image/svg+xml' },
+                }),
+              500,
+            ),
           ),
-        ),
       );
     });
 
     afterAll(() => {
-      fetchMock.restore();
+      fetchMock.disableMocks();
     });
 
-    it('should request an SVG only once with cacheRequests prop', done => {
+    it('should request an SVG only once with cacheRequests prop', (done) => {
       const second = () => {
         setup({
           src: fixtures.url,
-          onLoad: (src, isCached) => {
+          onLoad: (_src, isCached) => {
             expect(isCached).toBe(true);
-            expect(fetchMock.calls()).toHaveLength(1);
+            expect(fetchMock.mock.calls).toHaveLength(1);
 
             done();
           },
@@ -314,9 +315,9 @@ describe('react-inlinesvg', () => {
 
       setup({
         src: fixtures.url,
-        onLoad: (src, isCached) => {
+        onLoad: (_src, isCached) => {
           expect(isCached).toBe(false);
-          expect(fetchMock.calls()).toHaveLength(1);
+          expect(fetchMock.mock.calls).toHaveLength(1);
 
           second();
         },
@@ -324,9 +325,9 @@ describe('react-inlinesvg', () => {
 
       setup({
         src: fixtures.url,
-        onLoad: (src, isCached) => {
+        onLoad: (_src, isCached) => {
           expect(isCached).toBe(true);
-          expect(fetchMock.calls()).toHaveLength(1);
+          expect(fetchMock.mock.calls).toHaveLength(1);
         },
       });
     });
@@ -335,9 +336,9 @@ describe('react-inlinesvg', () => {
       const wrapper = await setup({
         cacheRequests: false,
         src: fixtures.url,
-        onLoad: (src, isCached) => {
+        onLoad: (_src, isCached) => {
           expect(isCached).toBe(false);
-          expect(fetchMock.calls()).toHaveLength(2);
+          expect(fetchMock.mock.calls).toHaveLength(2);
         },
       });
 
@@ -403,20 +404,13 @@ describe('react-inlinesvg', () => {
     });
 
     it('should trigger an error if the content is not valid', async () => {
-      fetchMock.get('*', {
-        body: '<html lang="en"><body>Text</body></html>',
-        headers: { 'Content-Type': 'image/svg+xml' },
-      });
-
       await setup({
-        src: fixtures.react_png,
+        src: fixtures.html,
       });
 
       expect(mockOnError).toHaveBeenCalledWith(
         new InlineSVGError('Could not convert the src to a React element'),
       );
-
-      fetchMock.restore();
     });
   });
 });
