@@ -18,11 +18,14 @@
   },
   "homepage": "https://github.com/gilbarbara/react-inlinesvg#readme",
   "main": "lib/index.js",
+  "module": "esm/index.js",
   "files": [
+    "esm",
     "lib",
     "src"
   ],
-  "types": "lib/index.d.ts",
+  "types": "lib",
+  "sideEffects": true,
   "license": "MIT",
   "keywords": [
     "react",
@@ -78,11 +81,12 @@
     "typescript": "^3.9.5"
   },
   "scripts": {
-    "build": "npm run clean && npm run build:ts",
-    "build:ts": "tsc",
-    "watch": "npm run build:ts -- -w",
-    "clean": "rimraf lib",
-    "start": "http-server -p 1337 --cors test/__fixtures__",
+    "build": "npm run clean && npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc",
+    "build:esm": "tsc -m es6 --outDir esm",
+    "clean": "del lib/* && del esm/*",
+    "watch": "npm run build:esm && npm run build:cjs -- -w",
+    "start": "http-server test/__fixtures__ -p 1337 --cors",
     "test": "start-server-and-test start http://localhost:1337 test:coverage",
     "test:coverage": "jest --coverage --bail",
     "test:watch": "jest --watch --verbose",
@@ -101,7 +105,11 @@
   "size-limit": [
     {
       "path": "./lib/index.js",
-      "limit": "8 KB"
+      "limit": "8 kB"
+    },
+    {
+      "path": "./esm/index.js",
+      "limit": "8 kB"
     }
   ],
   "husky": {
