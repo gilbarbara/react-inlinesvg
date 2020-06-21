@@ -2,7 +2,6 @@ import * as React from 'react';
 import { mount, ReactWrapper } from 'enzyme';
 
 import ReactInlineSVG from '../src';
-import { InlineSVGError } from '../src/helpers';
 
 declare let window: any;
 
@@ -72,7 +71,7 @@ describe('unsupported environments', () => {
 
     const wrapper = await setup();
 
-    expect(mockOnError).toHaveBeenCalledWith(new InlineSVGError('fetch is not a function'));
+    expect(mockOnError).toHaveBeenCalledWith(new Error('fetch is not a function'));
     expect(wrapper).toMatchSnapshot();
 
     window.fetch = globalFetch;
@@ -84,7 +83,7 @@ describe('unsupported environments', () => {
 
     const wrapper = await setup();
 
-    expect(mockOnError).toHaveBeenCalledWith(new InlineSVGError('Browser does not support SVG'));
+    expect(mockOnError).toHaveBeenCalledWith(new Error('Browser does not support SVG'));
     expect(wrapper).toMatchSnapshot();
   });
 });

@@ -1,5 +1,14 @@
 import { canUseDOM as canUseDOMFlag } from 'exenv';
 
+export const STATUS = {
+  FAILED: 'failed',
+  LOADED: 'loaded',
+  LOADING: 'loading',
+  PENDING: 'pending',
+  READY: 'ready',
+  UNSUPPORTED: 'unsupported',
+};
+
 export function canUseDOM(): boolean {
   return canUseDOMFlag;
 }
@@ -13,22 +22,6 @@ export function supportsInlineSVG(): boolean {
   const div = document.createElement('div');
   div.innerHTML = '<svg />';
   return !!div.firstChild && div.firstChild.namespaceURI === 'http://www.w3.org/2000/svg';
-}
-
-export class InlineSVGError extends Error {
-  public name: string;
-  public message: string;
-  public data?: Record<string, any>;
-
-  constructor(message: string, data?: Record<string, any>) {
-    super();
-
-    this.name = 'InlineSVGError';
-    this.message = message;
-    this.data = data;
-
-    return this;
-  }
 }
 
 export function isSupportedEnvironment(): boolean {

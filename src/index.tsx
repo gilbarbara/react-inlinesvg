@@ -2,58 +2,13 @@ import * as React from 'react';
 
 import convert from 'react-from-dom';
 
-import { canUseDOM, InlineSVGError, isSupportedEnvironment, randomString } from './helpers';
+import { STATUS, canUseDOM, isSupportedEnvironment, randomString } from './helpers';
+import { FetchError, Props, State, StorageItem } from './types';
 
-export interface IProps {
-  baseURL?: string;
-  cacheRequests?: boolean;
-  children?: React.ReactNode;
-  description?: string;
-  loader?: React.ReactNode;
-  innerRef?: React.Ref<HTMLElement>;
-  onError?: (error: InlineSVGError | IFetchError) => void;
-  onLoad?: (src: string, isCached: boolean) => void;
-  preProcessor?: (code: string) => string;
-  src: string;
-  title?: string;
-  uniqueHash?: string;
-  uniquifyIDs?: boolean;
-  [key: string]: any;
-}
+const cacheStore: { [key: string]: StorageItem } = Object.create(null);
 
-export interface IState {
-  content: string;
-  element: React.ReactNode;
-  hasCache: boolean;
-  status: string;
-}
-
-export interface IFetchError extends Error {
-  code: string;
-  errno: string;
-  message: string;
-  type: string;
-}
-
-export interface IStorageItem {
-  content: string;
-  queue: any[];
-  status: string;
-}
-
-export const STATUS = {
-  FAILED: 'failed',
-  LOADED: 'loaded',
-  LOADING: 'loading',
-  PENDING: 'pending',
-  READY: 'ready',
-  UNSUPPORTED: 'unsupported',
-};
-
-const cacheStore: { [key: string]: IStorageItem } = Object.create(null);
-
-export default class InlineSVG extends React.PureComponent<IProps, IState> {
-  constructor(props: IProps) {
+export default class InlineSVG extends React.PureComponent<Props, State> {
+  constructor(props: Props) {
     super(props);
 
     this.state = {
@@ -89,12 +44,12 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
       if (status === STATUS.PENDING) {
         /* istanbul ignore else */
         if (!isSupportedEnvironment()) {
-          throw new InlineSVGError('Browser does not support SVG');
+          throw new Error('Browser does not support SVG');
         }
 
         /* istanbul ignore else */
         if (!src) {
-          throw new InlineSVGError('Missing src');
+          throw new Error('Missing src');
         }
 
         this.load();
@@ -104,7 +59,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
     }
   }
 
-  public componentDidUpdate(prevProps: IProps, prevState: IState): void {
+  public componentDidUpdate(prevProps: Props, prevState: State): void {
     if (!canUseDOM()) {
       return;
     }
@@ -121,7 +76,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
 
     if (prevProps.src !== src) {
       if (!src) {
-        this.handleError(new InlineSVGError('Missing src'));
+        this.handleError(new Error('Missing src'));
         return;
       }
 
@@ -195,7 +150,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
       const node = convert(svgText, { nodeOnly: true });
 
       if (!node || !(node instanceof SVGSVGElement)) {
-        throw new InlineSVGError('Could not convert the src to a DOM Node');
+        throw new Error('Could not convert the src to a DOM Node');
       }
 
       const svg = this.updateSVGAttributes(node);
@@ -236,7 +191,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
       const element = convert(node);
 
       if (!element || !React.isValidElement(element)) {
-        throw new InlineSVGError('Could not convert the src to a React element');
+        throw new Error('Could not convert the src to a React element');
       }
 
       this.setState({
@@ -244,7 +199,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
         status: STATUS.READY,
       });
     } catch (error) {
-      this.handleError(new InlineSVGError(error.message));
+      this.handleError(new Error(error.message));
     }
   }
 
@@ -304,7 +259,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
     }
   };
 
-  private handleError = (error: InlineSVGError | IFetchError) => {
+  private handleError = (error: Error | FetchError) => {
     const { onError } = this.props;
     const status =
       error.message === 'Browser does not support SVG' ? STATUS.UNSUPPORTED : STATUS.FAILED;
@@ -340,11 +295,11 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
           const [fileType] = (contentType || '').split(/ ?; ?/);
 
           if (response.status > 299) {
-            throw new InlineSVGError('Not Found');
+            throw new Error('Not found');
           }
 
           if (!['image/svg+xml', 'text/plain'].some((d) => fileType.indexOf(d) >= 0)) {
-            throw new InlineSVGError(`Content type isn't valid: ${fileType}`);
+            throw new Error(`Content type isn't valid: ${fileType}`);
           }
 
           return response.text();
@@ -377,7 +332,7 @@ export default class InlineSVG extends React.PureComponent<IProps, IState> {
           this.handleError(error);
         });
     } catch (error) {
-      return this.handleError(new InlineSVGError(error.message));
+      return this.handleError(new Error(error.message));
     }
   };
 

@@ -3,7 +3,6 @@ import { mount, ReactWrapper } from 'enzyme';
 import fetchMock from 'jest-fetch-mock';
 
 import ReactInlineSVG from '../src/index';
-import { InlineSVGError } from '../src/helpers';
 
 interface IProps {
   src: string;
@@ -358,7 +357,7 @@ describe('react-inlinesvg', () => {
       wrapper.update();
       expect(wrapper).toMatchSnapshot();
 
-      expect(mockOnError).toHaveBeenCalledWith(new InlineSVGError('Missing src'));
+      expect(mockOnError).toHaveBeenCalledWith(new Error('Missing src'));
     });
 
     it('should trigger an error on empty `src` prop changes', async () => {
@@ -374,7 +373,7 @@ describe('react-inlinesvg', () => {
         src: '',
       });
 
-      expect(mockOnError).toHaveBeenCalledWith(new InlineSVGError('Missing src'));
+      expect(mockOnError).toHaveBeenCalledWith(new Error('Missing src'));
     });
 
     it('should trigger an error and show the fallback children if src is not found', async () => {
@@ -389,7 +388,7 @@ describe('react-inlinesvg', () => {
 
       wrapper.update();
 
-      expect(mockOnError).toHaveBeenCalledWith(new InlineSVGError('Not Found'));
+      expect(mockOnError).toHaveBeenCalledWith(new Error('Not found'));
       expect(wrapper.find('.missing')).toExist();
     });
 
@@ -398,9 +397,7 @@ describe('react-inlinesvg', () => {
         src: fixtures.react_png,
       });
 
-      expect(mockOnError).toHaveBeenCalledWith(
-        new InlineSVGError("Content type isn't valid: image/png"),
-      );
+      expect(mockOnError).toHaveBeenCalledWith(new Error("Content type isn't valid: image/png"));
     });
 
     it('should trigger an error if the content is not valid', async () => {
@@ -409,7 +406,7 @@ describe('react-inlinesvg', () => {
       });
 
       expect(mockOnError).toHaveBeenCalledWith(
-        new InlineSVGError('Could not convert the src to a React element'),
+        new Error('Could not convert the src to a React element'),
       );
     });
   });
