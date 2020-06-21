@@ -2,8 +2,15 @@
 
 [![NPM version](https://badge.fury.io/js/react-inlinesvg.svg)](https://www.npmjs.com/package/react-inlinesvg) [![build status](https://travis-ci.org/gilbarbara/react-inlinesvg.svg)](https://travis-ci.org/gilbarbara/react-inlinesvg) [![Maintainability](https://api.codeclimate.com/v1/badges/c7e42fe511b80cc25760/maintainability)](https://codeclimate.com/github/gilbarbara/react-inlinesvg/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/c7e42fe511b80cc25760/test_coverage)](https://codeclimate.com/github/gilbarbara/react-inlinesvg/test_coverage)
 
-Load inline, local or remote SVGs in your React components.  
-Async requests will be cached.
+Load inline, local or remote SVGs in your React components.
+
+## Highlights
+
+- 🏖 **Easy to use:** Just set the `src`
+- 🛠 **Flexible:** Personalize the options to fit your needs
+- ⚡️ **Smart:** Async requests will be cached. 
+- 🚀 **SSR:** Render a loader until the DOM is available
+- 🟦 **Typescript:** Nicely typed
 
 ## Usage
 
@@ -17,13 +24,14 @@ And import it into your code:
 import React from 'react';
 import SVG from 'react-inlinesvg';
 
-const Icon = () => <SVG src="/path/to/myfile.svg" />;
+const Icon = () => <SVG src={require('/path/to/myfile.svg')} />;
 ```
 
 ## Props
 
 **src** {string} - **required**.  
-The SVG file you want to load. It can be an `url` or a string (base64 or encoded).
+The SVG file you want to load. It can be a require,  URL or a string (base64 or url encoded).
+*If you are using create-react-app and your file resides in the `public` directory you can use the path directly without require.*
 
 **baseURL** {string}  
 An URL to prefix each ID in case you are using the `<base>` tag and `uniquifyIDs`.
@@ -38,7 +46,8 @@ A description for your SVG. It will override an existing `<desc>` tag.
 Get the SVG HTMLElement.
 
 **loader** {node}  
-A component to be shown while the SVG is loading.
+A component to be shown while the SVG is loading.  
+If you set 
 
 **onError** {function}  
 A callback to be invoked if loading the SVG fails.  
@@ -104,8 +113,8 @@ Create unique IDs for each icon.
 ## Browser Support
 
 Any browsers that support inlining [SVGs](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) will work.
-If you need to support legacy browsers you'll need to include a polyfiil in your app.  
-Take a look at [react-app-polyfill](https://www.npmjs.com/package/react-app-polyfill).
+
+If you need to support legacy browsers you'll need to include a polyfiil for `fetch` and `Number.isNaN` in your app. Take a look at [react-app-polyfill](https://www.npmjs.com/package/react-app-polyfill) or [polyfill.io](https://polyfill.io/v3/).
 
 ## CORS
 
