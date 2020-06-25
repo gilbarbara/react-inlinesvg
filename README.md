@@ -118,12 +118,7 @@ If you need to support legacy browsers you'll need to include a polyfiil for `fe
 
 ## CORS
 
-If loading SVGs from another domain, you'll need to make sure it allows [CORS].
-
-[cors]: https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS
-[svg-use-external-source]: http://css-tricks.com/svg-use-external-source
-[use-article]: http://taye.me/blog/svg/a-guide-to-svg-use-elements/
-[use-support]: https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use#Browser_compatibility
+If you are loading remote SVGs, you'll need to make sure it has [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) support.
 
 ## Why you need this package?
 
