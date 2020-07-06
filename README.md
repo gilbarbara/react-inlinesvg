@@ -36,6 +36,15 @@ The SVG file you want to load. It can be a require,  URL or a string (base64 or 
 **baseURL** {string}  
 An URL to prefix each ID in case you are using the `<base>` tag and `uniquifyIDs`.
 
+**children** {ReactNode}  
+The fallback content in case of a fetch error or unsupported browser.
+
+```
+<SVG src="...">
+	<img src="..." alt="fallback" />
+</SVG>
+```
+
 **cacheRequests** {boolean} ▶︎ `true`  
 Cache remote SVGs.
 
