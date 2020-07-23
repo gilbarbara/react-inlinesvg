@@ -114,9 +114,13 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
       if (d.attributes && d.attributes.length) {
         const attributes = Object.values(d.attributes).map((a) => {
           const attr = a;
-          const match = a.value.match(/url\((.*?)\)/);
+          let match = [];
 
-          if (match && match[1]) {
+          if (typeof a.value === 'string') {
+            match = a.value.match(/url\((.*?)\)/);
+          }
+
+          if (match[1]) {
             attr.value = a.value.replace(match[0], `url(${baseURL}${match[1]}__${this.hash})`);
           }
 
