@@ -370,3 +370,5 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
     return loader;
   }
 }
+
+export * from './types';

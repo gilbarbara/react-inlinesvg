@@ -24,7 +24,7 @@
     "lib",
     "src"
   ],
-  "types": "lib",
+  "types": "lib/index.d.ts",
   "sideEffects": true,
   "license": "MIT",
   "keywords": [

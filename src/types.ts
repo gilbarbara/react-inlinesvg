@@ -1,12 +1,12 @@
 import * as React from 'react';
 
-export interface Props {
+export interface Props extends Omit<React.HTMLProps<SVGElement>, 'onLoad' | 'onError'> {
   baseURL?: string;
   cacheRequests?: boolean;
   children?: React.ReactNode;
   description?: string;
-  loader?: React.ReactNode;
   innerRef?: React.Ref<HTMLElement>;
+  loader?: React.ReactNode;
   onError?: (error: Error | FetchError) => void;
   onLoad?: (src: string, isCached: boolean) => void;
   preProcessor?: (code: string) => string;
@@ -14,7 +14,6 @@ export interface Props {
   title?: string;
   uniqueHash?: string;
   uniquifyIDs?: boolean;
-  [key: string]: any;
 }
 
 export interface State {
