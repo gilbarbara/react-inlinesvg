@@ -25,8 +25,8 @@ const fixtures = {
   datahref: 'http://localhost:1337/datahref.svg',
   styles: 'http://localhost:1337/styles.svg',
   utf8: 'http://localhost:1337/utf8.svg',
-  url:
-    'https://raw.githubusercontent.com/google/material-design-icons/master/av/svg/production/ic_play_arrow_24px.svg',
+  url: 'https://cdn.svgporn.com/logos/react.svg',
+  url2: 'https://cdn.svgporn.com/logos/javascript.svg',
   base64:
     'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxwYXRoIGQ9Ik04IDV2MTRsMTEtN3oiLz4KICAgIDxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4KPC9zdmc+Cg==',
   urlEncoded:
@@ -279,7 +279,18 @@ describe('react-inlinesvg', () => {
   describe('cached requests', () => {
     beforeAll(() => {
       fetchMock.enableMocks();
+    });
 
+    beforeEach(() => {
+      mockOnError.mockClear();
+      fetchMock.mockClear();
+    });
+
+    afterAll(() => {
+      fetchMock.disableMocks();
+    });
+
+    it('should request an SVG only once with cacheRequests prop', (done) => {
       fetchMock.mockResponseOnce(
         () =>
           new Promise((res) =>
@@ -293,13 +304,7 @@ describe('react-inlinesvg', () => {
             ),
           ),
       );
-    });
 
-    afterAll(() => {
-      fetchMock.disableMocks();
-    });
-
-    it('should request an SVG only once with cacheRequests prop', (done) => {
       const second = () => {
         setup({
           src: fixtures.url,
@@ -321,23 +326,58 @@ describe('react-inlinesvg', () => {
           second();
         },
       });
+    });
 
-      setup({
-        src: fixtures.url,
-        onLoad: (_src, isCached) => {
-          expect(isCached).toBe(true);
-          expect(fetchMock.mock.calls).toHaveLength(1);
-        },
-      });
+    it('should handle request fail with multiple instances', (done) => {
+      fetchMock.mockReject(new Error('500'));
+
+      const second = () => {
+        mount(
+          <ReactInlineSVG
+            src={fixtures.url2}
+            onError={(error) => {
+              mockOnError(error);
+
+              expect(mockOnError).toHaveBeenCalledTimes(2);
+              done();
+            }}
+          />,
+        );
+      };
+
+      mount(
+        <ReactInlineSVG
+          src={fixtures.url2}
+          onError={(error) => {
+            mockOnError(error);
+
+            second();
+          }}
+        />,
+      );
     });
 
     it('should skip the cache if `cacheRequest` is false', async () => {
+      fetchMock.mockResponseOnce(
+        () =>
+          new Promise((res) =>
+            setTimeout(
+              () =>
+                res({
+                  body: '<svg><circle /></svg>',
+                  headers: { 'Content-Type': 'image/svg+xml' },
+                }),
+              500,
+            ),
+          ),
+      );
+
       const wrapper = await setup({
         cacheRequests: false,
         src: fixtures.url,
         onLoad: (_src, isCached) => {
           expect(isCached).toBe(false);
-          expect(fetchMock.mock.calls).toHaveLength(2);
+          expect(fetchMock.mock.calls).toHaveLength(1);
         },
       });
 

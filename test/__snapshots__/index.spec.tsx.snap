@@ -3001,7 +3001,7 @@ exports[`react-inlinesvg cached requests should skip the cache if \`cacheRequest
   cacheRequests={false}
   onError={[Function]}
   onLoad={[Function]}
-  src="https://raw.githubusercontent.com/google/material-design-icons/master/av/svg/production/ic_play_arrow_24px.svg"
+  src="https://cdn.svgporn.com/logos/react.svg"
   uniquifyIDs={false}
 />
 `;
