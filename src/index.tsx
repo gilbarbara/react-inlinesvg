@@ -320,7 +320,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
               cache.content = content;
               cache.status = STATUS.LOADED;
 
-              cache.queue = cache.queue.filter((cb: (content: string) => void) => {
+              cache.queue = cache.queue.filter((cb) => {
                 cb(content);
 
                 return false;

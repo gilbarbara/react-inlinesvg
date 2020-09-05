@@ -1,5 +1,11 @@
 import * as React from 'react';
 
+type Callback = (...args: any[]) => void;
+
+export type ErrorCallback = (error: Error | FetchError) => void;
+export type LoadCallback = (src: string, isCached: boolean) => void;
+export type PreProcessorCallback = (code: string) => string;
+
 export interface Props extends Omit<React.HTMLProps<SVGElement>, 'onLoad' | 'onError'> {
   baseURL?: string;
   cacheRequests?: boolean;
@@ -7,9 +13,9 @@ export interface Props extends Omit<React.HTMLProps<SVGElement>, 'onLoad' | 'onE
   description?: string;
   innerRef?: React.Ref<HTMLElement>;
   loader?: React.ReactNode;
-  onError?: (error: Error | FetchError) => void;
-  onLoad?: (src: string, isCached: boolean) => void;
-  preProcessor?: (code: string) => string;
+  onError?: ErrorCallback;
+  onLoad?: LoadCallback;
+  preProcessor?: PreProcessorCallback;
   src: string;
   title?: string;
   uniqueHash?: string;
@@ -32,6 +38,6 @@ export interface FetchError extends Error {
 
 export interface StorageItem {
   content: string;
-  queue: any[];
+  queue: Callback[];
   status: string;
 }
