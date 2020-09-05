@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "lib": [
+            "dom",
+            "esnext"
+        ],
+        "moduleResolution": "node",
+        "jsx": "react"
+    },
+    "include": [
+        "./src/*"
+    ]
+}
