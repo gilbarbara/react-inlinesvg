@@ -219,7 +219,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
           if (cache) {
             /* istanbul ignore else */
             if (cache.status === STATUS.LOADING) {
-              cache.queue.push(this.handleLoad);
+              cache.queue.push(this.handleCacheQueue);
             } else if (cache.status === STATUS.LOADED) {
               this.handleLoad(cache.content);
             }
@@ -246,6 +246,16 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
     }
   }
 
+  private handleCacheQueue = (content: string | Error) => {
+    /* istanbul ignore else */
+    if (typeof content === 'string') {
+      this.handleLoad(content);
+      return;
+    }
+
+    this.handleError(content);
+  };
+
   private handleLoad = (content: string) => {
     /* istanbul ignore else */
     if (this.isActive) {
@@ -263,12 +273,6 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
     const { onError } = this.props;
     const status =
       error.message === 'Browser does not support SVG' ? STATUS.UNSUPPORTED : STATUS.FAILED;
-
-    /* istanbul ignore else */
-    if (process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
-      console.error(error);
-    }
 
     /* istanbul ignore else */
     if (this.isActive) {
@@ -325,11 +329,21 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
           }
         })
         .catch((error) => {
+          this.handleError(error);
+
           /* istanbul ignore else */
           if (cacheRequests) {
-            delete cacheStore[src];
+            const cache = cacheStore[src];
+
+            /* istanbul ignore else */
+            if (cache) {
+              cache.queue.forEach((cb: (content: string) => void) => {
+                cb(error);
+              });
+
+              delete cacheStore[src];
+            }
           }
-          this.handleError(error);
         });
     } catch (error) {
       return this.handleError(new Error(error.message));
