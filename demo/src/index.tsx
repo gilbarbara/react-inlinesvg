@@ -6,13 +6,15 @@ import { base64, urlEncoded, markup } from './media/strings';
 import { Grid, GridItem, SubTitle, Title, Wrapper } from './components';
 import GitHubRepo from './GitHubRepo';
 
+// @ts-ignore
 import vue from './media/vue.svgz';
+// @ts-ignore
 import icons from './media/icons.svgz';
 
 // Using extension .svgz to avoid svgr loader in webpack
 
 function App() {
-  const ref = React.useRef();
+  const ref = React.useRef(null);
 
   return (
     <Wrapper>

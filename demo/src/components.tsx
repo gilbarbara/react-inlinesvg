@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 
-interface IGrid {
-  size: number;
+interface GridProps {
+  size?: number;
 }
 
 export const SubTitle = styled.h2`
@@ -14,9 +14,9 @@ export const Title = styled.h1`
   margin-top: 0;
 `;
 
-export const Grid = styled.div`
+export const Grid = styled.div<GridProps>`
   display: grid;
-  grid-template-columns: ${({ size = 3 }: IGrid) => css`repeat(${size}, 1fr)`};
+  grid-template-columns: ${({ size = 3 }) => css`repeat(${size}, 1fr)`};
   grid-column-gap: 15px;
   grid-row-gap: 15px;
   justify-content: center;
