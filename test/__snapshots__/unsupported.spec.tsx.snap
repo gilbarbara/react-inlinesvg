@@ -1,40 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`unsupported environments should warn the user if fetch is missing 1`] = `
-<InlineSVG
-  cacheRequests={true}
-  loader={<Loader />}
-  onError={[Function]}
-  onLoad={[Function]}
-  src="http://localhost:1337/play.svg"
-  uniquifyIDs={false}
-/>
-`;
+exports[`unsupported environments should warn the user if fetch is missing 1`] = `null`;
 
 exports[`unsupported environments shouldn't break without DOM  1`] = `
-<InlineSVG
-  cacheRequests={true}
-  loader={<Loader />}
-  onError={[MockFunction]}
-  onLoad={[MockFunction]}
-  src="http://localhost:1337/play.svg"
-  uniquifyIDs={false}
->
-  <Loader>
-    <div
-      id="loader"
-    />
-  </Loader>
-</InlineSVG>
+<div id="loader">
+</div>
 `;
 
-exports[`unsupported environments shouldn't not render anything if is an unsupported browser 1`] = `
-<InlineSVG
-  cacheRequests={true}
-  loader={<Loader />}
-  onError={[Function]}
-  onLoad={[Function]}
-  src="http://localhost:1337/play.svg"
-  uniquifyIDs={false}
-/>
-`;
+exports[`unsupported environments shouldn't not render anything if is an unsupported browser 1`] = `null`;
