@@ -1,20 +1,16 @@
 import * as React from 'react';
 import { render } from 'react-dom';
 import SVG from 'react-inlinesvg';
-import { base64, urlEncoded, markup } from './media/strings';
+import { base64, urlEncoded, markup } from './strings';
 
 import { Grid, GridItem, SubTitle, Title, Wrapper } from './components';
 import GitHubRepo from './GitHubRepo';
 
-// @ts-ignore
-import vue from './media/vue.svgz';
-// @ts-ignore
-import icons from './media/icons.svgz';
-
-// Using extension .svgz to avoid svgr loader in webpack
+const { env } = process;
+env.PUBLIC_URL = env.PUBLIC_URL || '';
 
 function App() {
-  const ref = React.useRef(null);
+  const ref = React.useRef<SVGElement>(null);
 
   return (
     <Wrapper>
@@ -31,7 +27,7 @@ function App() {
         <GridItem>
           <h4>Local File</h4>
           <div>
-            <SVG src={vue} />
+            <SVG src={`${process.env.PUBLIC_URL}/vue.svg`} />
           </div>
         </GridItem>
 
@@ -66,7 +62,7 @@ function App() {
           </div>
         </GridItem>
       </Grid>
-      <SVG ref={ref} src={icons} />
+      <SVG innerRef={ref} src={`${process.env.PUBLIC_URL}/icons.svg`} />
       <SubTitle>With symbols</SubTitle>
       <Grid>
         <GridItem>
