@@ -20,11 +20,24 @@ npm i react-inlinesvg
 
 And import it into your code:
 
-```jsx
-import React from 'react';
-import SVG from 'react-inlinesvg';
+```typescript
+import React, { useRef } from 'react';
+import SVG, { Props as SVGProps } from 'react-inlinesvg';
 
-const Icon = () => <SVG src={require('/path/to/myfile.svg')} />;
+const Logo = React.forwardRef<SVGElement, SVGProps>((props, ref) => (
+  <SVG innerRef={ref} title="MyLogo" {...props} />
+));
+
+export function App() {
+  const logo = useRef<SVGElement>(null);
+
+  return (
+    <main>
+      <Logo ref={logo} src={`${process.env.PUBLIC_URL}/logo.svg`} />
+      ...
+    </main>
+  );
+}
 ```
 
 ## Props
@@ -51,8 +64,8 @@ Cache remote SVGs.
 **description** {string}  
 A description for your SVG. It will override an existing `<desc>` tag.
 
-**innerRef** {React.Ref|function}  
-Get the SVG HTMLElement.
+**innerRef** {React.Ref}  
+Set a ref in SVGElement.
 
 **loader** {node}  
 A component to be shown while the SVG is loading.  
