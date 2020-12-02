@@ -2,15 +2,7 @@ import * as React from 'react';
 import { mount, ReactWrapper } from 'enzyme';
 import fetchMock from 'jest-fetch-mock';
 
-import ReactInlineSVG from '../src/index';
-
-interface IProps {
-  src: string;
-  onLoad?: (src: string, isCached: boolean) => void;
-  preProcessor?: (input: string) => string;
-
-  [key: string]: any;
-}
+import ReactInlineSVG, { Props } from '../src/index';
 
 const Loader = () => <div id="loader" />;
 
@@ -38,9 +30,9 @@ const fixtures = {
 
 const mockOnError = jest.fn();
 
-function setup({ onLoad, ...rest }: IProps): Promise<ReactWrapper> {
+function setup({ onLoad, ...rest }: Props): Promise<ReactWrapper<Props>> {
   return new Promise((resolve) => {
-    const wrapper = mount(
+    const wrapper = mount<Props>(
       <ReactInlineSVG
         onLoad={(src, isCached) => {
           setTimeout(() => {
@@ -65,134 +57,135 @@ function setup({ onLoad, ...rest }: IProps): Promise<ReactWrapper> {
 
 describe('react-inlinesvg', () => {
   describe('basic functionality', () => {
-    it('should handle a base64 src', async () => {
+    it('should render a base64 src', async () => {
       const wrapper = await setup({
         src: fixtures.base64,
         title: 'base64',
       });
+      wrapper.update();
 
-      expect(wrapper).toMatchSnapshot();
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
-    it('should handle an urlEncoded src', async () => {
+    it('should render an urlEncoded src', async () => {
       const wrapper = await setup({
         src: fixtures.urlEncoded,
         title: 'URL Encoded',
       });
+      wrapper.update();
 
-      expect(wrapper).toMatchSnapshot();
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
-    it('should handle a svg string src', async () => {
+    it('should render a svg string src', async () => {
       const wrapper = await setup({
         src: fixtures.string,
         title: 'String',
       });
+      wrapper.update();
 
-      expect(wrapper).toMatchSnapshot();
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
-    it('should handle an svg url and add title and description', async () => {
+    it('should render an svg url and add title and description', async () => {
       const wrapper = await setup({
         src: fixtures.react,
         title: 'React',
         description: 'React is a view library',
       });
-
       wrapper.update();
-      expect(wrapper).toMatchSnapshot();
+
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
-    it('should handle a svg url with mask, gradient and classes', async () => {
+    it('should render a svg url with mask, gradient and classes', async () => {
       const wrapper = await setup({
         src: fixtures.dots,
         title: 'Dots',
       });
-
       wrapper.update();
-      expect(wrapper).toMatchSnapshot();
+
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
-    it('should handle a svg url with external css, style and script', async () => {
+    it('should render a svg url with external css, style and script', async () => {
       const wrapper = await setup({
         src: fixtures.circles,
         title: 'Circles',
       });
-
       wrapper.update();
-      expect(wrapper).toMatchSnapshot();
+
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
-    it('should handle a svg url with inline styles', async () => {
+    it('should render a svg url with inline styles', async () => {
       const wrapper = await setup({
         src: fixtures.styles,
         uniquifyIDs: true,
         uniqueHash: 'test',
       });
-
       wrapper.update();
-      expect(wrapper).toMatchSnapshot();
+
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
-    it('should handle a svg url with symbols', async () => {
+    it('should render a svg url with symbols', async () => {
       const wrapper = await setup({ src: fixtures.icons });
-
       wrapper.update();
-      expect(wrapper).toMatchSnapshot();
+
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
-    it('should handle a svg url with utf-8 characters', async () => {
+    it('should render a svg url with utf-8 characters', async () => {
       const wrapper = await setup({ src: fixtures.utf8 });
-
       wrapper.update();
-      expect(wrapper).toMatchSnapshot();
+
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
-    it('should handle an svg url and replace existing title and description', async () => {
+    it('should render an svg url and replace existing title and description', async () => {
       const wrapper = await setup({
         src: fixtures.tiger,
         title: 'The Tiger',
         description: 'Is this a tiger?',
       });
-
       wrapper.update();
-      expect(wrapper).toMatchSnapshot();
+
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
-    it('should handle a loader', async () => {
+    it('should render a loader', async () => {
       const wrapper = await setup({
         src: fixtures.play,
         loader: <Loader />,
       });
 
-      expect(wrapper.find('Loader')).toExist();
-      expect(wrapper).toMatchSnapshot();
+      expect(wrapper.html()).toMatchSnapshot();
 
       wrapper.update();
-      expect(wrapper.find('Loader')).not.toExist();
-      expect(wrapper).toMatchSnapshot();
+
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
     it('should handle src changes', async () => {
       const wrapper = await setup({ src: '' });
 
-      expect(wrapper).toMatchSnapshot();
+      expect(wrapper.html()).toMatchSnapshot();
 
       wrapper.setProps({
         src: fixtures.react,
         title: 'Test',
       });
-
       wrapper.update();
-      expect(wrapper).toMatchSnapshot();
+
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
-    it('should uniquify ids with the default uniqueHash', async () => {
+    it('should uniquify ids with the random uniqueHash', async () => {
       const wrapper = await setup({
         src: fixtures.play,
         uniquifyIDs: true,
       });
-
       wrapper.update();
 
       expect(wrapper.find('svg')).toExist();
@@ -207,26 +200,21 @@ describe('react-inlinesvg', () => {
         uniqueHash: 'test',
         uniquifyIDs: true,
       });
-
       wrapper.update();
-      expect(wrapper).toMatchSnapshot();
+
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
     it('should prefix the ids with the baseURL', async () => {
       const wrapper = await setup({
         src: fixtures.play,
-        baseURL: 'https://github.com/gilbarbara/react-inlinesvg/',
+        baseURL: 'https://example.com/',
+        uniqueHash: 'test',
         uniquifyIDs: true,
       });
-
       wrapper.update();
 
-      expect(wrapper.find('svg')).toExist();
-      expect(wrapper.find('circle').prop('fill')).toEqual(
-        expect.stringMatching(
-          /https:\/\/github\.com\/gilbarbara\/react-inlinesvg\/#radialGradient-1__.*?/,
-        ),
-      );
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
     it('should not uniquify non-id hrefs', async () => {
@@ -234,9 +222,9 @@ describe('react-inlinesvg', () => {
         src: fixtures.datahref,
         uniquifyIDs: true,
       });
-
       wrapper.update();
-      expect(wrapper).toMatchSnapshot();
+
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
     it('should transform the SVG text with the preProcessor prop', async () => {
@@ -245,23 +233,22 @@ describe('react-inlinesvg', () => {
         src: fixtures.play,
         preProcessor: (svgText) => svgText.replace('<svg ', `<svg ${extraProp} `),
       });
-
       wrapper.update();
-      expect(wrapper).toMatchSnapshot();
+
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
     it('should handle innerRef', async () => {
-      const innerRef = React.createRef();
+      const innerRef = React.createRef<SVGElement>();
 
       const wrapper = await setup({
         src: fixtures.play,
         innerRef,
       });
-
       wrapper.update();
 
       expect(innerRef.current).toMatchSnapshot();
-      expect(wrapper).toMatchSnapshot();
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
     it('should handle unmount', async () => {
@@ -380,8 +367,9 @@ describe('react-inlinesvg', () => {
           expect(fetchMock.mock.calls).toHaveLength(1);
         },
       });
+      wrapper.update();
 
-      expect(wrapper).toMatchSnapshot();
+      expect(wrapper.html()).toMatchSnapshot();
     });
   });
 
@@ -393,20 +381,19 @@ describe('react-inlinesvg', () => {
     it('should trigger an error if empty', async () => {
       // @ts-ignore
       const wrapper = await setup({});
-
       wrapper.update();
-      expect(wrapper).toMatchSnapshot();
 
       expect(mockOnError).toHaveBeenCalledWith(new Error('Missing src'));
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
     it('should trigger an error on empty `src` prop changes', async () => {
       const wrapper = await setup({
         src: fixtures.urlEncoded,
       });
-
       wrapper.update();
-      expect(wrapper).toMatchSnapshot();
+
+      expect(wrapper.html()).toMatchSnapshot();
 
       wrapper.setProps({
         ...wrapper.props(),
@@ -416,7 +403,7 @@ describe('react-inlinesvg', () => {
       expect(mockOnError).toHaveBeenCalledWith(new Error('Missing src'));
     });
 
-    it('should trigger an error and show the fallback children if src is not found', async () => {
+    it('should trigger an error and render the fallback children if src is not found', async () => {
       const wrapper = await setup({
         src: 'http://localhost:1337/DOESNOTEXIST.svg',
         children: (
@@ -425,11 +412,10 @@ describe('react-inlinesvg', () => {
           </div>
         ),
       });
-
       wrapper.update();
 
       expect(mockOnError).toHaveBeenCalledWith(new Error('Not found'));
-      expect(wrapper.find('.missing')).toExist();
+      expect(wrapper.html()).toMatchSnapshot();
     });
 
     it('should trigger an error if the request content-type is not valid', async () => {

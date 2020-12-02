@@ -57,7 +57,7 @@ describe('unsupported environments', () => {
 
     expect(mockOnLoad).not.toHaveBeenCalled();
     expect(mockOnError).not.toHaveBeenCalled();
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper.html()).toMatchSnapshot();
 
     wrapper.setProps({ src: 'http://localhost:1337/player.svg' });
   });
@@ -72,7 +72,7 @@ describe('unsupported environments', () => {
     const wrapper = await setup();
 
     expect(mockOnError).toHaveBeenCalledWith(new Error('fetch is not a function'));
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper.html()).toMatchSnapshot();
 
     window.fetch = globalFetch;
   });
@@ -84,6 +84,6 @@ describe('unsupported environments', () => {
     const wrapper = await setup();
 
     expect(mockOnError).toHaveBeenCalledWith(new Error('Browser does not support SVG'));
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper.html()).toMatchSnapshot();
   });
 });
