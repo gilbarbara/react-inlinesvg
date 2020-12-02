@@ -6,12 +6,12 @@ export type ErrorCallback = (error: Error | FetchError) => void;
 export type LoadCallback = (src: string, isCached: boolean) => void;
 export type PreProcessorCallback = (code: string) => string;
 
-export interface Props extends Omit<React.HTMLProps<SVGElement>, 'onLoad' | 'onError'> {
+export interface Props extends Omit<React.HTMLProps<SVGElement>, 'onLoad' | 'onError' | 'ref'> {
   baseURL?: string;
   cacheRequests?: boolean;
   children?: React.ReactNode;
   description?: string;
-  innerRef?: React.Ref<HTMLElement>;
+  innerRef?: React.Ref<SVGElement>;
   loader?: React.ReactNode;
   onError?: ErrorCallback;
   onLoad?: LoadCallback;
