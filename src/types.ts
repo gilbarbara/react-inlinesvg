@@ -6,7 +6,7 @@ export type ErrorCallback = (error: Error | FetchError) => void;
 export type LoadCallback = (src: string, isCached: boolean) => void;
 export type PreProcessorCallback = (code: string) => string;
 
-export interface Props extends Omit<React.HTMLProps<SVGElement>, 'onLoad' | 'onError' | 'ref'> {
+export interface Props extends Omit<React.SVGProps<SVGElement>, 'onLoad' | 'onError' | 'ref'> {
   baseURL?: string;
   cacheRequests?: boolean;
   children?: React.ReactNode;
