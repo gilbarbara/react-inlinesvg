@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - '10'
+  - '14'
 cache:
   directories:
     - node_modules
@@ -12,5 +12,3 @@ script:
   - npm run validate
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
-addons:
-  code_climate: true

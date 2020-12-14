@@ -1,6 +1,6 @@
 # react-inlinesvg
 
-[![NPM version](https://badge.fury.io/js/react-inlinesvg.svg)](https://www.npmjs.com/package/react-inlinesvg) [![build status](https://travis-ci.org/gilbarbara/react-inlinesvg.svg)](https://travis-ci.org/gilbarbara/react-inlinesvg) [![Maintainability](https://api.codeclimate.com/v1/badges/c7e42fe511b80cc25760/maintainability)](https://codeclimate.com/github/gilbarbara/react-inlinesvg/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/c7e42fe511b80cc25760/test_coverage)](https://codeclimate.com/github/gilbarbara/react-inlinesvg/test_coverage)
+[![NPM version](https://badge.fury.io/js/react-inlinesvg.svg)](https://www.npmjs.com/package/react-inlinesvg) [![Build Status](https://travis-ci.com/gilbarbara/react-inlinesvg.svg?branch=master)](https://travis-ci.com/gilbarbara/react-inlinesvg) [![Maintainability](https://api.codeclimate.com/v1/badges/c7e42fe511b80cc25760/maintainability)](https://codeclimate.com/github/gilbarbara/react-inlinesvg/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/c7e42fe511b80cc25760/test_coverage)](https://codeclimate.com/github/gilbarbara/react-inlinesvg/test_coverage)
 
 Load inline, local or remote SVGs in your React components.
 
@@ -8,13 +8,13 @@ Load inline, local or remote SVGs in your React components.
 
 - 🏖 **Easy to use:** Just set the `src`
 - 🛠 **Flexible:** Personalize the options to fit your needs
-- ⚡️ **Smart:** Async requests will be cached. 
+- ⚡️ **Smart:** Async requests will be cached.
 - 🚀 **SSR:** Render a loader until the DOM is available
 - 🟦 **Typescript:** Nicely typed
 
 ## Usage
 
-```bash
+```sh
 npm i react-inlinesvg
 ```
 
@@ -33,9 +33,9 @@ export function App() {
 
   return (
     <main>
-      <Logo ref={logo} src={`${process.env.PUBLIC_URL}/logo.svg`} />
-      ...
-    </main>
+      <SVG src={`${process.env.PUBLIC_URL}/menu.svg`} width={24} height="auto" title="Menu" />
+    	<Logo ref={logo} src={`${process.env.PUBLIC_URL}/logo.svg`} />
+		</main>
   );
 }
 ```
@@ -43,8 +43,8 @@ export function App() {
 ## Props
 
 **src** {string} - **required**.  
-The SVG file you want to load. It can be a require,  URL or a string (base64 or url encoded).
-*If you are using create-react-app and your file resides in the `public` directory you can use the path directly without require.*
+The SVG file you want to load. It can be a require, URL or a string (base64 or url encoded).
+_If you are using create-react-app and your file resides in the `public` directory you can use the path directly without require._
 
 **baseURL** {string}  
 An URL to prefix each ID in case you are using the `<base>` tag and `uniquifyIDs`.
@@ -68,8 +68,7 @@ A description for your SVG. It will override an existing `<desc>` tag.
 Set a ref in SVGElement.
 
 **loader** {node}  
-A component to be shown while the SVG is loading.  
-If you set 
+A component to be shown while the SVG is loading.
 
 **onError** {function}  
 A callback to be invoked if loading the SVG fails.  
@@ -112,7 +111,7 @@ A string to use with `uniquifyIDs`.
 **uniquifyIDs** {boolean} ▶︎ `false`  
 Create unique IDs for each icon.
 
-> Additional props will be spread over the SVG element.
+> Any additional props will be passed down to the SVG element. 
 
 ### Example
 
