@@ -12,40 +12,27 @@
     "browser": true,
     "jest": true
   },
-  "globals": {
-    "cy": false
-  },
-  "plugins": ["@typescript-eslint", "prettier"],
+  "overrides": [
+    {
+      "files": ["test/**/*.ts?(x)"],
+      "rules": {
+        "no-console": "off",
+        "@typescript-eslint/ban-ts-comment": "off"
+      }
+    }
+  ],
+  "plugins": ["react-hooks"],
   "rules": {
     "lines-between-class-members": "off",
     "no-plusplus": "off",
     "no-restricted-syntax": ["error", "DebuggerStatement", "LabeledStatement", "WithStatement"],
     "no-use-before-define": "off",
-    "spaced-comment": [
-      "warn",
-      "always",
-      {
-        "exceptions": ["-+"],
-        "markers": [
-          "eslint-disable",
-          "eslint-disable-line",
-          "eslint-disable-next-line",
-          "eslint-enable"
-        ]
-      }
-    ],
-    "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-non-null-assertion": "off",
-    "@typescript-eslint/no-unused-vars": ["warn", { "ignoreRestSiblings": true }],
-    "@typescript-eslint/no-use-before-define": ["error"],
+    "@typescript-eslint/no-use-before-define": ["error", { "functions": false }],
     "import/extensions": ["warn", "never"],
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
-    "import/prefer-default-export": "off",
     "react/jsx-filename-extension": "off",
-    "react/jsx-fragments": "off",
     "react/jsx-props-no-spreading": "off",
-    "react/no-unescaped-entities": "off",
     "react/prop-types": "off",
     "react/sort-comp": [
       "warn",
@@ -74,6 +61,8 @@
         }
       }
     ],
-    "react/static-property-placement": "off"
+    "react/static-property-placement": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
   }
 }
