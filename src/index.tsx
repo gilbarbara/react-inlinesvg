@@ -2,7 +2,13 @@ import * as React from 'react';
 
 import convert from 'react-from-dom';
 
-import { STATUS, canUseDOM, isSupportedEnvironment, randomString } from './helpers';
+import {
+  STATUS,
+  canUseDOM,
+  isSupportedEnvironment,
+  randomString,
+  removeProperties,
+} from './helpers';
 import { FetchError, Props, State, StorageItem } from './types';
 
 const cacheStore: { [key: string]: StorageItem } = Object.create(null);
@@ -352,29 +358,30 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
 
   public render(): React.ReactNode {
     const { element, status } = this.state;
-    const {
-      baseURL,
-      cacheRequests,
-      children = null,
-      description,
-      innerRef,
-      loader = null,
-      onError,
-      onLoad,
-      preProcessor,
-      src,
-      title,
-      uniqueHash,
-      uniquifyIDs,
-      ...rest
-    } = this.props;
+    const { children = null, innerRef, loader = null } = this.props;
+    const elementProps = removeProperties(
+      this.props,
+      'baseURL',
+      'cacheRequests',
+      'children',
+      'description',
+      'innerRef',
+      'loader',
+      'onError',
+      'onLoad',
+      'preProcessor',
+      'src',
+      'title',
+      'uniqueHash',
+      'uniquifyIDs',
+    );
 
     if (!canUseDOM()) {
       return loader;
     }
 
     if (element) {
-      return React.cloneElement(element as React.ReactElement, { ref: innerRef, ...rest });
+      return React.cloneElement(element as React.ReactElement, { ref: innerRef, ...elementProps });
     }
 
     if ([STATUS.UNSUPPORTED, STATUS.FAILED].indexOf(status) > -1) {

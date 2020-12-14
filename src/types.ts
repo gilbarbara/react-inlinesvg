@@ -4,6 +4,7 @@ type Callback = (...args: any[]) => void;
 
 export type ErrorCallback = (error: Error | FetchError) => void;
 export type LoadCallback = (src: string, isCached: boolean) => void;
+export type PlainObject<T = unknown> = Record<string | number | symbol, T>;
 export type PreProcessorCallback = (code: string) => string;
 
 export interface Props extends Omit<React.SVGProps<SVGElement>, 'onLoad' | 'onError' | 'ref'> {
