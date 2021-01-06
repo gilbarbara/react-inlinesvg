@@ -374,7 +374,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
       'title',
       'uniqueHash',
       'uniquifyIDs',
-      'fetchOptions'
+      'fetchOptions',
     );
 
     if (!canUseDOM()) {
