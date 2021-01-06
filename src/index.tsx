@@ -292,14 +292,14 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
   };
 
   private request = () => {
-    const { cacheRequests, src } = this.props;
+    const { cacheRequests, fetchOptions, src } = this.props;
 
     try {
       if (cacheRequests) {
         cacheStore[src] = { content: '', status: STATUS.LOADING, queue: [] };
       }
 
-      return fetch(src)
+      return fetch(src, fetchOptions)
         .then((response) => {
           const contentType = response.headers.get('content-type');
           const [fileType] = (contentType || '').split(/ ?; ?/);
@@ -374,6 +374,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
       'title',
       'uniqueHash',
       'uniquifyIDs',
+      'fetchOptions'
     );
 
     if (!canUseDOM()) {

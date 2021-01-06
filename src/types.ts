@@ -21,6 +21,7 @@ export interface Props extends Omit<React.SVGProps<SVGElement>, 'onLoad' | 'onEr
   title?: string;
   uniqueHash?: string;
   uniquifyIDs?: boolean;
+  fetchOptions?: RequestInit;
 }
 
 export interface State {

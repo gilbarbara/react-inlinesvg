@@ -61,6 +61,9 @@ The fallback content in case of a fetch error or unsupported browser.
 **cacheRequests** {boolean} ▶︎ `true`  
 Cache remote SVGs.
 
+**fetchOptions** {string}  
+Custom [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request) options.
+
 **description** {string}  
 A description for your SVG. It will override an existing `<desc>` tag.
 
