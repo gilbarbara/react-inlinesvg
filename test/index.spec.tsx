@@ -3,7 +3,7 @@ import { poll } from '@gilbarbara/helpers';
 import { mount, ReactWrapper } from 'enzyme';
 import fetchMock from 'jest-fetch-mock';
 
-import ReactInlineSVG, { Props } from '../src/index';
+import ReactInlineSVG, { cacheStore, Props } from '../src/index';
 
 const Loader = () => <div id="loader" />;
 
@@ -387,6 +387,10 @@ describe('react-inlinesvg', () => {
   });
 
   describe('integration', () => {
+    beforeAll(() => {
+      fetchMock.resetMocks();
+    });
+
     it('should handle race condition with fast src changes', async () => {
       const mockOnLoad = jest.fn();
 
@@ -445,6 +449,28 @@ describe('react-inlinesvg', () => {
 
       await multiSetup();
       expect(mockOnLoad).toHaveBeenCalledTimes(4);
+    });
+
+    it('should handle pre-cached entries in the cacheStore', async () => {
+      fetchMock.enableMocks();
+      const mockOnLoad = jest.fn();
+
+      cacheStore['http://localhost:1337/react.svg'] = {
+        content: '<svg><circle /></svg>',
+        status: 'loaded',
+        queue: [],
+      };
+
+      const wrapper = mount(<ReactInlineSVG src={fixtures.react} onLoad={mockOnLoad} />);
+
+      await poll(() => !!mockOnLoad.mock.calls.length);
+      wrapper.update();
+
+      expect(fetchMock).toHaveBeenCalledTimes(0);
+      expect(wrapper.html()).toMatchSnapshot();
+
+      // clean up
+      fetchMock.disableMocks();
     });
   });
 

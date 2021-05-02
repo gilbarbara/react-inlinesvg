@@ -134,6 +134,11 @@ Create unique IDs for each icon.
 />
 ```
 
+## Caching
+
+The internal cache is exported as `cacheStore` if you need to debug or pre-cache some files.  
+⚠️ Use it at your own risk.
+
 ## Browser Support
 
 Any browsers that support inlining [SVGs](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) will work.

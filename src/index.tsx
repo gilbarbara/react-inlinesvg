@@ -11,7 +11,7 @@ import {
 } from './helpers';
 import { FetchError, Props, State, StorageItem } from './types';
 
-const cacheStore: { [key: string]: StorageItem } = Object.create(null);
+export const cacheStore: { [key: string]: StorageItem } = Object.create(null);
 
 export default class InlineSVG extends React.PureComponent<Props, State> {
   constructor(props: Props) {
@@ -221,7 +221,6 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
         () => {
           const { cacheRequests, src } = this.props;
           const cache = cacheRequests && cacheStore[src];
-
           if (cache) {
             /* istanbul ignore else */
             if (cache.status === STATUS.LOADING) {
