@@ -251,6 +251,20 @@ describe('react-inlinesvg', () => {
       expect(wrapper.html()).toMatchSnapshot();
     });
 
+    it('should handle fetchOptions', async () => {
+      const wrapper = await setup({
+        src: fixtures.react,
+        fetchOptions: {
+          headers: {
+            Authorization: 'Bearer ad99d8d5-419d-434e-97c2-3ce52e116d52',
+          },
+        },
+      });
+      wrapper.update();
+
+      expect(wrapper.html()).toMatchSnapshot();
+    });
+
     it('should handle unmount', async () => {
       const wrapper = await setup({
         src: fixtures.play,

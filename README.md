@@ -20,7 +20,7 @@ npm i react-inlinesvg
 
 And import it into your code:
 
-```typescript
+```tsx
 import React, { useRef } from 'react';
 import SVG, { Props as SVGProps } from 'react-inlinesvg';
 
@@ -34,8 +34,8 @@ export function App() {
   return (
     <main>
       <SVG src={`${process.env.PUBLIC_URL}/menu.svg`} width={24} height="auto" title="Menu" />
-    	<Logo ref={logo} src={`${process.env.PUBLIC_URL}/logo.svg`} />
-		</main>
+      <Logo ref={logo} src={`${process.env.PUBLIC_URL}/logo.svg`} />
+    </main>
   );
 }
 ```
@@ -64,6 +64,9 @@ Cache remote SVGs.
 **description** {string}  
 A description for your SVG. It will override an existing `<desc>` tag.
 
+**fetchOptions** {RequestInit}  
+Custom options for the [request](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request).
+
 **innerRef** {React.Ref}  
 Set a ref in SVGElement.
 
@@ -76,7 +79,7 @@ This will receive a single argument with:
 
 - a `FetchError` with:
 
-```js
+```typescript
 {
   message: string;
   type: string;
@@ -87,11 +90,11 @@ This will receive a single argument with:
 
 - or an `InlineSVGError`, which has the following properties:
 
-```js
+```typescript
 {
-    name: 'InlineSVGError',
-    data?: object,
-    message: string
+  name: 'InlineSVGError';
+  data: object; // optional
+  message: string;
 }
 ```
 
@@ -111,7 +114,7 @@ A string to use with `uniquifyIDs`.
 **uniquifyIDs** {boolean} ▶︎ `false`  
 Create unique IDs for each icon.
 
-> Any additional props will be passed down to the SVG element. 
+> Any additional props will be passed down to the SVG element.
 
 ### Example
 
@@ -121,9 +124,9 @@ Create unique IDs for each icon.
   cacheRequests={true}
   description="The React logo"
   loader={<span>Loading...</span>}
-  onError={error => console.log(error.message)}
+  onError={(error) => console.log(error.message)}
   onLoad={(src, hasCache) => console.log(src, hasCache)}
-  preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
+  preProcessor={(code) => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
   src="https://cdn.svgporn.com/logos/react.svg"
   title="React"
   uniqueHash="a1f8d1"
