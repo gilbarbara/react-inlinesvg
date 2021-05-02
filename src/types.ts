@@ -12,6 +12,7 @@ export interface Props extends Omit<React.SVGProps<SVGElement>, 'onLoad' | 'onEr
   cacheRequests?: boolean;
   children?: React.ReactNode;
   description?: string;
+  fetchOptions?: RequestInit;
   innerRef?: React.Ref<SVGElement>;
   loader?: React.ReactNode;
   onError?: ErrorCallback;
