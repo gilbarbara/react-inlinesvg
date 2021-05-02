@@ -39,6 +39,7 @@
     "react-from-dom": "^0.6.0"
   },
   "devDependencies": {
+    "@gilbarbara/helpers": "^0.2.0",
     "@gilbarbara/tsconfig": "^0.1.0",
     "@size-limit/preset-small-lib": "^4.10.2",
     "@types/enzyme": "^3.10.8",

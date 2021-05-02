@@ -315,6 +315,13 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
           return response.text();
         })
         .then((content) => {
+          const { src: currentSrc } = this.props;
+
+          // the current src don't match the previous one, skipping...
+          if (src !== currentSrc) {
+            return;
+          }
+
           this.handleLoad(content);
 
           /* istanbul ignore else */
