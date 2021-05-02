@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { poll } from '@gilbarbara/helpers';
 import { mount, ReactWrapper } from 'enzyme';
 import fetchMock from 'jest-fetch-mock';
 
@@ -50,8 +51,6 @@ function setup({ onLoad, ...rest }: Props): Promise<ReactWrapper<Props>> {
         {...rest}
       />,
     );
-
-    return wrapper;
   });
 }
 
@@ -384,6 +383,68 @@ describe('react-inlinesvg', () => {
       wrapper.update();
 
       expect(wrapper.html()).toMatchSnapshot();
+    });
+  });
+
+  describe('integration', () => {
+    it('should handle race condition with fast src changes', async () => {
+      const mockOnLoad = jest.fn();
+
+      const wrapper = mount(
+        <ReactInlineSVG cacheRequests={false} src={fixtures.react} onLoad={mockOnLoad} />,
+      );
+
+      wrapper.setProps({ src: fixtures.url2 });
+
+      await poll(() => !!mockOnLoad.mock.calls.length);
+      wrapper.update();
+
+      expect(mockOnLoad).toHaveBeenCalledWith(fixtures.url2, false);
+      expect(wrapper.html()).toMatchSnapshot();
+    });
+
+    it('should render multiple SVGs', async () => {
+      const mockOnLoad = jest.fn();
+
+      const multiSetup: () => Promise<ReactWrapper<any>> = () => {
+        return new Promise((resolve) => {
+          const onLoad = (wrapper: any, ...rest: any[]) => {
+            mockOnLoad(...rest);
+
+            if (mockOnLoad.mock.calls.length === 4) {
+              resolve(wrapper);
+            }
+          };
+
+          const wrapper = mount(
+            <div>
+              <ReactInlineSVG
+                cacheRequests={false}
+                src={fixtures.react}
+                onLoad={(...args) => onLoad(wrapper, ...args)}
+              />
+              <ReactInlineSVG
+                cacheRequests={false}
+                src={fixtures.circles}
+                onLoad={(...args) => onLoad(wrapper, ...args)}
+              />
+              <ReactInlineSVG
+                cacheRequests={false}
+                src={fixtures.dots}
+                onLoad={(...args) => onLoad(wrapper, ...args)}
+              />
+              <ReactInlineSVG
+                cacheRequests={false}
+                src={fixtures.datahref}
+                onLoad={(...args) => onLoad(wrapper, ...args)}
+              />
+            </div>,
+          );
+        });
+      };
+
+      await multiSetup();
+      expect(mockOnLoad).toHaveBeenCalledTimes(4);
     });
   });
 
