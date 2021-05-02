@@ -4,8 +4,7 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:import/typescript",
     "plugin:prettier/recommended",
-    "prettier/react",
-    "prettier/standard"
+    "prettier"
   ],
   "parser": "@typescript-eslint/parser",
   "env": {
