@@ -32,57 +32,45 @@
   "types": "esm",
   "sideEffects": false,
   "peerDependencies": {
-    "react": "^16.8.0 || ^17.0.0"
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0"
   },
   "dependencies": {
     "exenv": "^1.2.2",
-    "react-from-dom": "^0.6.0"
+    "react-from-dom": "^0.6.2"
   },
   "devDependencies": {
-    "@gilbarbara/helpers": "^0.2.0",
+    "@gilbarbara/eslint-config": "^0.2.1",
+    "@gilbarbara/helpers": "^0.5.1",
+    "@gilbarbara/prettier-config": "^0.1.0",
     "@gilbarbara/tsconfig": "^0.1.0",
-    "@size-limit/preset-small-lib": "^4.10.2",
-    "@types/enzyme": "^3.10.8",
-    "@types/enzyme-adapter-react-16": "^1.0.6",
+    "@size-limit/preset-small-lib": "^7.0.8",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.0.1",
     "@types/exenv": "^1.2.0",
-    "@types/fetch-mock": "^7.3.3",
-    "@types/jest": "^26.0.23",
-    "@types/node": "^15.0.1",
-    "@types/node-fetch": "^2.5.10",
-    "@types/react": "^17.0.4",
-    "@types/react-dom": "^17.0.3",
-    "@typescript-eslint/eslint-plugin": "^4.22.0",
-    "@typescript-eslint/parser": "^4.22.0",
+    "@types/fetch-mock": "^7.3.5",
+    "@types/jest": "^27.4.1",
+    "@types/node": "^17.0.24",
+    "@types/node-fetch": "^2.6.1",
+    "@types/react": "^18.0.5",
+    "@types/react-dom": "^18.0.1",
+    "cross-fetch": "^3.1.5",
     "del-cli": "^3.0.1",
-    "enzyme": "^3.11.0",
-    "enzyme-adapter-react-16": "^1.15.6",
-    "eslint": "^7.25.0",
-    "eslint-config-airbnb": "^18.2.1",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jsx-a11y": "^6.4.1",
-    "eslint-plugin-prettier": "^3.4.0",
-    "eslint-plugin-react": "^7.23.2",
-    "eslint-plugin-react-hooks": "^4.2.0",
-    "http-server": "^0.12.3",
-    "husky": "^4.3.8",
-    "jest": "^26.6.3",
+    "http-server": "^14.1.0",
+    "husky": "^7.0.4",
+    "jest": "^27.5.1",
     "jest-chain": "^1.1.5",
-    "jest-enzyme": "^7.1.2",
-    "jest-extended": "^0.11.5",
+    "jest-extended": "^2.0.0",
     "jest-fetch-mock": "^3.0.3",
-    "jest-serializer-html": "^7.0.0",
-    "jest-watch-typeahead": "^0.6.3",
-    "node-fetch": "^2.6.1",
-    "prettier": "^2.2.1",
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0",
+    "jest-serializer-html": "^7.1.0",
+    "jest-watch-typeahead": "^1.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
     "repo-tools": "^0.2.2",
-    "size-limit": "^4.10.2",
-    "start-server-and-test": "^1.12.1",
-    "ts-jest": "^26.5.5",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.2.4"
+    "size-limit": "^7.0.8",
+    "start-server-and-test": "^1.14.0",
+    "ts-jest": "^27.1.4",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.3"
   },
   "scripts": {
     "build": "npm run clean && npm run build:cjs && npm run build:esm",
@@ -99,28 +87,38 @@
     "format": "prettier \"**/*.{js,jsx,json,yml,yaml,css,less,scss,ts,tsx,md,graphql,mdx}\" --write",
     "validate": "npm run lint && npm run test && npm run build && npm run size",
     "size": "size-limit",
-    "prepublishOnly": "npm run validate"
+    "prepublishOnly": "npm run validate",
+    "prepare": "husky install"
   },
-  "prettier": {
-    "jsxBracketSameLine": false,
-    "printWidth": 100,
-    "singleQuote": true,
-    "trailingComma": "all"
+  "eslintConfig": {
+    "extends": [
+      "@gilbarbara/eslint-config"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "test/**/*.ts?(x)"
+        ],
+        "rules": {
+          "@typescript-eslint/ban-ts-comment": "off",
+          "no-console": "off",
+          "testing-library/no-container": "off",
+          "testing-library/no-node-access": "off"
+        }
+      }
+    ]
   },
+  "prettier": "@gilbarbara/prettier-config",
   "size-limit": [
     {
+      "name": "lib",
       "path": "./lib/index.js",
-      "limit": "8 kB"
+      "limit": "9 kB"
     },
     {
+      "name": "esm",
       "path": "./esm/index.js",
-      "limit": "8 kB"
+      "limit": "9 kB"
     }
-  ],
-  "husky": {
-    "hooks": {
-      "post-merge": "repo-tools install-packages",
-      "pre-commit": "repo-tools check-remote && npm run validate"
-    }
-  }
+  ]
 }

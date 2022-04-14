@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-type Callback = (...args: any[]) => void;
+type Callback = (...arguments_: any[]) => void;
 
 export type ErrorCallback = (error: Error | FetchError) => void;
 export type LoadCallback = (src: string, isCached: boolean) => void;
