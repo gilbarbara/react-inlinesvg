@@ -1,12 +1,13 @@
 import * as React from 'react';
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import SVG from 'react-inlinesvg';
-import { base64, urlEncoded, markup } from './strings';
 
 import { Grid, GridItem, SubTitle, Title, Wrapper } from './components';
 import GitHubRepo from './GitHubRepo';
+import { base64, markup, urlEncoded } from './strings';
 
 const { env } = process;
+
 env.PUBLIC_URL = env.PUBLIC_URL || '';
 
 function App() {
@@ -35,7 +36,7 @@ function App() {
           <h4>Fallback</h4>
           <div>
             {/* This file doesn't exist */}
-            <SVG src="https://cdn.svgporn.com/logos/react-rules.svg" loader="Loading...">
+            <SVG loader="Loading..." src="https://cdn.svgporn.com/logos/react-rules.svg">
               <SVG src="https://cdn.svgporn.com/logos/angular-icon.svg" />
             </SVG>
           </div>
@@ -94,5 +95,10 @@ function App() {
   );
 }
 
-const rootElement = document.getElementById('root');
-render(<App />, rootElement);
+const container = document.getElementById('root');
+
+if (container) {
+  const root = createRoot(container);
+
+  root.render(<App />);
+}
