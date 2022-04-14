@@ -1,19 +1,20 @@
 import * as React from 'react';
-
 import convert from 'react-from-dom';
 
-import {
-  STATUS,
-  canUseDOM,
-  isSupportedEnvironment,
-  randomString,
-  removeProperties,
-} from './helpers';
+import { canUseDOM, isSupportedEnvironment, omit, randomString, STATUS } from './helpers';
 import { FetchError, Props, State, StorageItem } from './types';
 
 export const cacheStore: { [key: string]: StorageItem } = Object.create(null);
 
 export default class InlineSVG extends React.PureComponent<Props, State> {
+  private isActive = false;
+  private readonly hash: string;
+
+  public static defaultProps = {
+    cacheRequests: true,
+    uniquifyIDs: false,
+  };
+
   constructor(props: Props) {
     super(props);
 
@@ -26,14 +27,6 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
 
     this.hash = props.uniqueHash || randomString(8);
   }
-
-  private isActive = false;
-  private readonly hash: string;
-
-  public static defaultProps = {
-    cacheRequests: true,
-    uniquifyIDs: false,
-  };
 
   public componentDidMount(): void {
     this.isActive = true;
@@ -60,12 +53,12 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
 
         this.load();
       }
-    } catch (error) {
+    } catch (error: any) {
       this.handleError(error);
     }
   }
 
-  public componentDidUpdate(prevProps: Props, prevState: State): void {
+  public componentDidUpdate(previousProps: Props, previousState: State): void {
     if (!canUseDOM()) {
       return;
     }
@@ -73,16 +66,17 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
     const { hasCache, status } = this.state;
     const { onLoad, src } = this.props;
 
-    if (prevState.status !== STATUS.READY && status === STATUS.READY) {
+    if (previousState.status !== STATUS.READY && status === STATUS.READY) {
       /* istanbul ignore else */
       if (onLoad) {
         onLoad(src, hasCache);
       }
     }
 
-    if (prevProps.src !== src) {
+    if (previousProps.src !== src) {
       if (!src) {
         this.handleError(new Error('Missing src'));
+
         return;
       }
 
@@ -92,60 +86,6 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
 
   public componentWillUnmount(): void {
     this.isActive = false;
-  }
-
-  private processSVG() {
-    const { content } = this.state;
-    const { preProcessor } = this.props;
-
-    if (preProcessor) {
-      return preProcessor(content);
-    }
-
-    return content;
-  }
-
-  private updateSVGAttributes(node: SVGSVGElement): SVGSVGElement {
-    const { baseURL = '', uniquifyIDs } = this.props;
-    const replaceableAttributes = ['id', 'href', 'xlink:href', 'xlink:role', 'xlink:arcrole'];
-    const linkAttributes = ['href', 'xlink:href'];
-    const isDataValue = (name: string, value: string) =>
-      linkAttributes.indexOf(name) >= 0 && (value ? value.indexOf('#') < 0 : false);
-
-    if (!uniquifyIDs) {
-      return node;
-    }
-
-    [...node.children].map((d) => {
-      if (d.attributes && d.attributes.length) {
-        const attributes = Object.values(d.attributes).map((a) => {
-          const attr = a;
-          const match = a.value.match(/url\((.*?)\)/);
-
-          if (match && match[1]) {
-            attr.value = a.value.replace(match[0], `url(${baseURL}${match[1]}__${this.hash})`);
-          }
-
-          return attr;
-        });
-
-        replaceableAttributes.forEach((r) => {
-          const attribute = attributes.find((a) => a.name === r);
-
-          if (attribute && !isDataValue(r, attribute.value)) {
-            attribute.value = `${attribute.value}__${this.hash}`;
-          }
-        });
-      }
-
-      if (d.children.length) {
-        return this.updateSVGAttributes(d as SVGSVGElement);
-      }
-
-      return d;
-    });
-
-    return node;
   }
 
   private getNode() {
@@ -169,6 +109,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
         }
 
         const descElement = document.createElement('desc');
+
         descElement.innerHTML = description;
         svg.prepend(descElement);
       }
@@ -181,12 +122,13 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
         }
 
         const titleElement = document.createElement('title');
+
         titleElement.innerHTML = title;
         svg.prepend(titleElement);
       }
 
       return svg;
-    } catch (error) {
+    } catch (error: any) {
       return this.handleError(error);
     }
   }
@@ -204,50 +146,8 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
         element,
         status: STATUS.READY,
       });
-    } catch (error) {
+    } catch (error: any) {
       this.handleError(new Error(error.message));
-    }
-  }
-
-  private load() {
-    /* istanbul ignore else */
-    if (this.isActive) {
-      this.setState(
-        {
-          content: '',
-          element: null,
-          status: STATUS.LOADING,
-        },
-        () => {
-          const { cacheRequests, src } = this.props;
-          const cache = cacheRequests && cacheStore[src];
-          if (cache) {
-            /* istanbul ignore else */
-            if (cache.status === STATUS.LOADING) {
-              cache.queue.push(this.handleCacheQueue);
-            } else if (cache.status === STATUS.LOADED) {
-              this.handleLoad(cache.content);
-            }
-            return;
-          }
-
-          const dataURI = src.match(/data:image\/svg[^,]*?(;base64)?,(.*)/);
-          let inlineSrc;
-
-          if (dataURI) {
-            inlineSrc = dataURI[1] ? atob(dataURI[2]) : decodeURIComponent(dataURI[2]);
-          } else if (src.indexOf('<svg') >= 0) {
-            inlineSrc = src;
-          }
-
-          if (inlineSrc) {
-            this.handleLoad(inlineSrc);
-            return;
-          }
-
-          this.request();
-        },
-      );
     }
   }
 
@@ -255,6 +155,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
     /* istanbul ignore else */
     if (typeof content === 'string') {
       this.handleLoad(content);
+
       return;
     }
 
@@ -299,7 +200,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
       }
 
       return fetch(src, fetchOptions)
-        .then((response) => {
+        .then(response => {
           const contentType = response.headers.get('content-type');
           const [fileType] = (contentType || '').split(/ ?; ?/);
 
@@ -307,13 +208,13 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
             throw new Error('Not found');
           }
 
-          if (!['image/svg+xml', 'text/plain'].some((d) => fileType.indexOf(d) >= 0)) {
+          if (!['image/svg+xml', 'text/plain'].some(d => fileType.includes(d))) {
             throw new Error(`Content type isn't valid: ${fileType}`);
           }
 
           return response.text();
         })
-        .then((content) => {
+        .then(content => {
           const { src: currentSrc } = this.props;
 
           // the current src don't match the previous one, skipping...
@@ -332,15 +233,15 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
               cache.content = content;
               cache.status = STATUS.LOADED;
 
-              cache.queue = cache.queue.filter((cb) => {
-                cb(content);
+              cache.queue = cache.queue.filter(callback => {
+                callback(content);
 
                 return false;
               });
             }
           }
         })
-        .catch((error) => {
+        .catch(error => {
           this.handleError(error);
 
           /* istanbul ignore else */
@@ -349,23 +250,124 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
 
             /* istanbul ignore else */
             if (cache) {
-              cache.queue.forEach((cb: (content: string) => void) => {
-                cb(error);
+              cache.queue.forEach((callback: (content: string) => void) => {
+                callback(error);
               });
 
               delete cacheStore[src];
             }
           }
         });
-    } catch (error) {
+    } catch (error: any) {
       return this.handleError(new Error(error.message));
     }
   };
 
+  private load() {
+    /* istanbul ignore else */
+    if (this.isActive) {
+      this.setState(
+        {
+          content: '',
+          element: null,
+          status: STATUS.LOADING,
+        },
+        () => {
+          const { cacheRequests, src } = this.props;
+          const cache = cacheRequests && cacheStore[src];
+
+          if (cache) {
+            if (cache.status === STATUS.LOADED) {
+              this.handleLoad(cache.content);
+
+              return;
+            }
+
+            /* istanbul ignore else */
+            if (cache.status === STATUS.LOADING) {
+              cache.queue.push(this.handleCacheQueue);
+            }
+          }
+
+          const dataURI = src.match(/data:image\/svg[^,]*?(;base64)?,(.*)/);
+          let inlineSrc;
+
+          if (dataURI) {
+            inlineSrc = dataURI[1] ? atob(dataURI[2]) : decodeURIComponent(dataURI[2]);
+          } else if (src.includes('<svg')) {
+            inlineSrc = src;
+          }
+
+          if (inlineSrc) {
+            this.handleLoad(inlineSrc);
+
+            return;
+          }
+
+          this.request();
+        },
+      );
+    }
+  }
+
+  private updateSVGAttributes(node: SVGSVGElement): SVGSVGElement {
+    const { baseURL = '', uniquifyIDs } = this.props;
+    const replaceableAttributes = ['id', 'href', 'xlink:href', 'xlink:role', 'xlink:arcrole'];
+    const linkAttributes = ['href', 'xlink:href'];
+    const isDataValue = (name: string, value: string) =>
+      linkAttributes.includes(name) && (value ? !value.includes('#') : false);
+
+    if (!uniquifyIDs) {
+      return node;
+    }
+
+    [...node.children].map(d => {
+      if (d.attributes && d.attributes.length) {
+        const attributes = Object.values(d.attributes).map(a => {
+          const attribute = a;
+          const match = a.value.match(/url\((.*?)\)/);
+
+          if (match && match[1]) {
+            attribute.value = a.value.replace(match[0], `url(${baseURL}${match[1]}__${this.hash})`);
+          }
+
+          return attribute;
+        });
+
+        replaceableAttributes.forEach(r => {
+          const attribute = attributes.find(a => a.name === r);
+
+          if (attribute && !isDataValue(r, attribute.value)) {
+            attribute.value = `${attribute.value}__${this.hash}`;
+          }
+        });
+      }
+
+      if (d.children.length) {
+        return this.updateSVGAttributes(d as SVGSVGElement);
+      }
+
+      return d;
+    });
+
+    return node;
+  }
+
+  private processSVG() {
+    const { content } = this.state;
+    const { preProcessor } = this.props;
+
+    if (preProcessor) {
+      return preProcessor(content);
+    }
+
+    return content;
+  }
+
   public render(): React.ReactNode {
     const { element, status } = this.state;
     const { children = null, innerRef, loader = null } = this.props;
-    const elementProps = removeProperties(
+    const elementProps = omit(
       this.props,
       'baseURL',
       'cacheRequests',
@@ -391,7 +393,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
       return React.cloneElement(element as React.ReactElement, { ref: innerRef, ...elementProps });
     }
 
-    if ([STATUS.UNSUPPORTED, STATUS.FAILED].indexOf(status) > -1) {
+    if ([STATUS.UNSUPPORTED, STATUS.FAILED].includes(status)) {
       return children;
     }
 

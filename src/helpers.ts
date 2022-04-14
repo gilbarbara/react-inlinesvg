@@ -26,8 +26,15 @@ export function supportsInlineSVG(): boolean {
   }
 
   const div = document.createElement('div');
+
   div.innerHTML = '<svg />';
-  return !!div.firstChild && div.firstChild.namespaceURI === 'http://www.w3.org/2000/svg';
+  const svg = div.firstChild as SVGSVGElement;
+
+  return !!svg && svg.namespaceURI === 'http://www.w3.org/2000/svg';
+}
+
+function randomCharacter(character: string) {
+  return character[Math.floor(Math.random() * character.length)];
 }
 
 export function randomString(length: number): string {
@@ -35,11 +42,9 @@ export function randomString(length: number): string {
   const numbers = '1234567890';
   const charset = `${letters}${letters.toUpperCase()}${numbers}`;
 
-  const randomCharacter = (character: string) =>
-    character[Math.floor(Math.random() * character.length)];
-
   let R = '';
-  for (let i = 0; i < length; i++) {
+
+  for (let index = 0; index < length; index++) {
     R += randomCharacter(charset);
   }
 
@@ -49,7 +54,7 @@ export function randomString(length: number): string {
 /**
  *  Remove properties from an object
  */
-export function removeProperties<T extends PlainObject, K extends keyof T>(
+export function omit<T extends PlainObject, K extends keyof T>(
   input: T,
   ...filter: K[]
 ): Omit<T, K> {
@@ -58,11 +63,11 @@ export function removeProperties<T extends PlainObject, K extends keyof T>(
   for (const key in input) {
     /* istanbul ignore else */
     if ({}.hasOwnProperty.call(input, key)) {
-      if (!filter.includes((key as unknown) as K)) {
+      if (!filter.includes(key as unknown as K)) {
         output[key] = input[key];
       }
     }
   }
 
-  return output;
+  return output as Omit<T, K>;
 }
