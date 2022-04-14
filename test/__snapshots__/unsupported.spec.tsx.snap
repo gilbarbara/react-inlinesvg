@@ -2,9 +2,10 @@
 
 exports[`unsupported environments should warn the user if fetch is missing 1`] = `null`;
 
-exports[`unsupported environments shouldn't break without DOM  1`] = `
-<div id="loader">
-</div>
+exports[`unsupported environments shouldn't break without DOM 1`] = `
+<div
+  id="loader"
+/>
 `;
 
 exports[`unsupported environments shouldn't not render anything if is an unsupported browser 1`] = `null`;

@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { poll } from '@gilbarbara/helpers';
-import { mount, ReactWrapper } from 'enzyme';
+import { render, waitFor } from '@testing-library/react';
 import fetchMock from 'jest-fetch-mock';
 
 import ReactInlineSVG, { cacheStore, Props } from '../src/index';
 
-const Loader = () => <div id="loader" />;
+function Loader() {
+  return <div id="Loader" />;
+}
 
 const fixtures = {
   circles: 'http://localhost:1337/circles.svg',
@@ -30,228 +31,301 @@ const fixtures = {
 };
 
 const mockOnError = jest.fn();
+const mockOnLoad = jest.fn();
 
-function setup({ onLoad, ...rest }: Props): Promise<ReactWrapper<Props>> {
-  return new Promise((resolve) => {
-    const wrapper = mount<Props>(
-      <ReactInlineSVG
-        onLoad={(src, isCached) => {
-          setTimeout(() => {
-            if (onLoad) {
-              onLoad(src, isCached);
-            }
-
-            resolve(wrapper);
-          }, 0);
-        }}
-        onError={(error) => {
-          mockOnError(error);
-          setTimeout(() => resolve(wrapper), 0);
-        }}
-        {...rest}
-      />,
-    );
-  });
+function setup({ onLoad, ...rest }: Props) {
+  return render(
+    <ReactInlineSVG loader={<Loader />} onError={mockOnError} onLoad={mockOnLoad} {...rest} />,
+  );
 }
 
 describe('react-inlinesvg', () => {
+  beforeAll(() => {
+    jest.spyOn(console, 'error').mockImplementation();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+
+    Object.keys(cacheStore).forEach(d => {
+      delete cacheStore[d];
+    });
+  });
+
   describe('basic functionality', () => {
     it('should render a base64 src', async () => {
-      const wrapper = await setup({
+      const { container } = setup({
         src: fixtures.base64,
         title: 'base64',
       });
-      wrapper.update();
 
-      expect(wrapper.html()).toMatchSnapshot();
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
     });
 
     it('should render an urlEncoded src', async () => {
-      const wrapper = await setup({
+      const { container } = setup({
         src: fixtures.urlEncoded,
         title: 'URL Encoded',
       });
-      wrapper.update();
 
-      expect(wrapper.html()).toMatchSnapshot();
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
     });
 
     it('should render a svg string src', async () => {
-      const wrapper = await setup({
+      const { container } = setup({
         src: fixtures.string,
         title: 'String',
       });
-      wrapper.update();
 
-      expect(wrapper.html()).toMatchSnapshot();
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
     });
 
     it('should render an svg url and add title and description', async () => {
-      const wrapper = await setup({
+      const { container } = setup({
         src: fixtures.react,
         title: 'React',
         description: 'React is a view library',
       });
-      wrapper.update();
 
-      expect(wrapper.html()).toMatchSnapshot();
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
     });
 
     it('should render a svg url with mask, gradient and classes', async () => {
-      const wrapper = await setup({
+      const { container } = setup({
         src: fixtures.dots,
         title: 'Dots',
       });
-      wrapper.update();
 
-      expect(wrapper.html()).toMatchSnapshot();
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
     });
 
     it('should render a svg url with external css, style and script', async () => {
-      const wrapper = await setup({
+      const { container } = setup({
         src: fixtures.circles,
         title: 'Circles',
       });
-      wrapper.update();
 
-      expect(wrapper.html()).toMatchSnapshot();
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
     });
 
     it('should render a svg url with inline styles', async () => {
-      const wrapper = await setup({
+      const { container } = setup({
         src: fixtures.styles,
         uniquifyIDs: true,
         uniqueHash: 'test',
       });
-      wrapper.update();
 
-      expect(wrapper.html()).toMatchSnapshot();
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
     });
 
     it('should render a svg url with symbols', async () => {
-      const wrapper = await setup({ src: fixtures.icons });
-      wrapper.update();
+      const { container } = setup({ src: fixtures.icons });
 
-      expect(wrapper.html()).toMatchSnapshot();
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
     });
 
     it('should render a svg url with utf-8 characters', async () => {
-      const wrapper = await setup({ src: fixtures.utf8 });
-      wrapper.update();
+      const { container } = setup({ src: fixtures.utf8 });
 
-      expect(wrapper.html()).toMatchSnapshot();
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
     });
 
     it('should render an svg url and replace existing title and description', async () => {
-      const wrapper = await setup({
+      const { container } = setup({
         src: fixtures.tiger,
         title: 'The Tiger',
         description: 'Is this a tiger?',
       });
-      wrapper.update();
 
-      expect(wrapper.html()).toMatchSnapshot();
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
     });
 
     it('should render a loader', async () => {
-      const wrapper = await setup({
+      const { container } = setup({
         src: fixtures.play,
         loader: <Loader />,
       });
 
-      expect(wrapper.html()).toMatchSnapshot();
+      expect(container).toMatchSnapshot();
 
-      wrapper.update();
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
 
-      expect(wrapper.html()).toMatchSnapshot();
+      expect(container.querySelector('svg')).toMatchSnapshot();
     });
 
-    it('should handle src changes', async () => {
-      const wrapper = await setup({ src: '' });
+    it('should handle empty src changes', async () => {
+      const { container, rerender } = setup({ src: '' });
 
-      expect(wrapper.html()).toMatchSnapshot();
+      expect(container.firstChild).toMatchSnapshot();
 
-      wrapper.setProps({
-        src: fixtures.react,
-        title: 'Test',
+      rerender(
+        <ReactInlineSVG
+          loader={<Loader />}
+          onError={mockOnError}
+          onLoad={mockOnLoad}
+          src={fixtures.react}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
       });
-      wrapper.update();
 
-      expect(wrapper.html()).toMatchSnapshot();
+      expect(container.querySelector('svg')).toMatchSnapshot();
+    });
+
+    it('should handle src changes to empty', async () => {
+      const { container, rerender } = setup({ src: fixtures.react });
+
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
+
+      rerender(
+        <ReactInlineSVG loader={<Loader />} onError={mockOnError} onLoad={mockOnLoad} src="" />,
+      );
+
+      await waitFor(() => {
+        expect(mockOnError).toHaveBeenCalledWith(new Error('Missing src'));
+      });
     });
 
     it('should uniquify ids with the random uniqueHash', async () => {
-      const wrapper = await setup({
+      const { container } = setup({
         src: fixtures.play,
         uniquifyIDs: true,
       });
-      wrapper.update();
 
-      expect(wrapper.find('svg')).toExist();
-      expect(wrapper.find('radialGradient').prop('id')).toEqual(
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('radialGradient')?.outerHTML).toEqual(
         expect.stringMatching(/radialGradient-1__.*?/),
       );
     });
 
     it('should uniquify ids with a custom uniqueHash', async () => {
-      const wrapper = await setup({
+      const { container } = setup({
         src: fixtures.play,
         uniqueHash: 'test',
         uniquifyIDs: true,
       });
-      wrapper.update();
 
-      expect(wrapper.html()).toMatchSnapshot();
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
     });
 
     it('should prefix the ids with the baseURL', async () => {
-      const wrapper = await setup({
+      const { container } = setup({
         src: fixtures.play,
         baseURL: 'https://example.com/',
         uniqueHash: 'test',
         uniquifyIDs: true,
       });
-      wrapper.update();
 
-      expect(wrapper.html()).toMatchSnapshot();
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
     });
 
     it('should not uniquify non-id hrefs', async () => {
-      const wrapper = await setup({
+      const { container } = setup({
         src: fixtures.datahref,
         uniquifyIDs: true,
       });
-      wrapper.update();
 
-      expect(wrapper.html()).toMatchSnapshot();
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
     });
 
     it('should transform the SVG text with the preProcessor prop', async () => {
       const extraProp = 'data-isvg="test"';
-      const wrapper = await setup({
+      const { container } = setup({
         src: fixtures.play,
-        preProcessor: (svgText) => svgText.replace('<svg ', `<svg ${extraProp} `),
+        preProcessor: svgText => svgText.replace('<svg ', `<svg ${extraProp} `),
       });
-      wrapper.update();
 
-      expect(wrapper.html()).toMatchSnapshot();
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
     });
 
     it('should handle innerRef', async () => {
       const innerRef = React.createRef<SVGElement>();
 
-      const wrapper = await setup({
+      const { container } = setup({
         src: fixtures.play,
         innerRef,
       });
-      wrapper.update();
 
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
       expect(innerRef.current).toMatchSnapshot();
-      expect(wrapper.html()).toMatchSnapshot();
     });
 
     it('should handle fetchOptions', async () => {
-      const wrapper = await setup({
+      fetchMock.enableMocks();
+
+      setup({
+        cacheRequests: false,
         src: fixtures.react,
         fetchOptions: {
           headers: {
@@ -259,20 +333,29 @@ describe('react-inlinesvg', () => {
           },
         },
       });
-      wrapper.update();
 
-      expect(wrapper.html()).toMatchSnapshot();
-    });
-
-    it('should handle unmount', async () => {
-      const wrapper = await setup({
-        src: fixtures.play,
+      await waitFor(() => {
+        expect(fetchMock).toHaveBeenCalledWith('http://localhost:1337/react.svg', {
+          headers: {
+            Authorization: 'Bearer ad99d8d5-419d-434e-97c2-3ce52e116d52',
+          },
+        });
       });
 
-      expect(wrapper.find('InlineSVG')).toExist();
+      fetchMock.disableMocks();
+    });
 
-      wrapper.unmount();
-      expect(wrapper.find('InlineSVG')).not.toExist();
+    it('should handle custom props', async () => {
+      const { container } = setup({
+        src: fixtures.react,
+        style: { width: 100 },
+      });
+
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
     });
   });
 
@@ -281,108 +364,127 @@ describe('react-inlinesvg', () => {
       fetchMock.enableMocks();
     });
 
-    beforeEach(() => {
-      mockOnError.mockClear();
-      fetchMock.mockClear();
-    });
-
     afterAll(() => {
       fetchMock.disableMocks();
     });
 
-    it('should request an SVG only once with cacheRequests prop', (done) => {
+    it('should request an SVG only once with cacheRequests prop', async () => {
       fetchMock.mockResponseOnce(
         () =>
-          new Promise((res) =>
+          new Promise(resolve => {
             setTimeout(
               () =>
-                res({
-                  body: '<svg><circle /></svg>',
+                resolve({
+                  body: '<svg><title>React</title><circle /></svg>',
                   headers: { 'Content-Type': 'image/svg+xml' },
                 }),
               500,
-            ),
-          ),
+            );
+          }),
       );
 
-      const second = () => {
-        setup({
-          src: fixtures.url,
-          onLoad: (_src, isCached) => {
-            expect(isCached).toBe(true);
-            expect(fetchMock.mock.calls).toHaveLength(1);
+      setup({ src: fixtures.url });
 
-            done();
-          },
-        });
-      };
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenNthCalledWith(1, fixtures.url, false);
+      });
+
+      setup({ src: fixtures.url });
+
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenNthCalledWith(2, fixtures.url, true);
+      });
+
+      expect(fetchMock).toHaveBeenNthCalledWith(1, fixtures.url, undefined);
+
+      expect(cacheStore).toMatchSnapshot();
+    });
+
+    it('should handle request fail with multiple instances', async () => {
+      fetchMock.mockRejectOnce(new Error('500')).mockRejectOnce(new Error('500'));
 
       setup({
-        src: fixtures.url,
-        onLoad: (_src, isCached) => {
-          expect(isCached).toBe(false);
-          expect(fetchMock.mock.calls).toHaveLength(1);
+        src: fixtures.url2,
+      });
 
-          second();
-        },
+      await waitFor(() => {
+        expect(mockOnError).toHaveBeenCalledTimes(1);
+      });
+
+      setup({
+        src: fixtures.url2,
+      });
+
+      await waitFor(() => {
+        expect(mockOnError).toHaveBeenCalledTimes(2);
       });
     });
 
-    it('should handle request fail with multiple instances', (done) => {
-      fetchMock.mockReject(new Error('500'));
+    it('should handle cached entries with loading status', async () => {
+      fetchMock.mockResponseOnce(() =>
+        Promise.resolve({
+          body: '<svg><title>React</title><circle /></svg>',
+          headers: { 'Content-Type': 'image/svg+xml' },
+        }),
+      );
 
-      const second = () => {
-        mount(
-          <ReactInlineSVG
-            src={fixtures.url2}
-            onError={(error) => {
-              mockOnError(error);
-
-              expect(mockOnError).toHaveBeenCalledTimes(2);
-              done();
-            }}
-          />,
-        );
+      cacheStore[fixtures.react] = {
+        content: '',
+        status: 'loading',
+        queue: [],
       };
 
-      mount(
-        <ReactInlineSVG
-          src={fixtures.url2}
-          onError={(error) => {
-            mockOnError(error);
+      setup({ src: fixtures.react });
 
-            second();
-          }}
-        />,
-      );
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenNthCalledWith(1, fixtures.react, true);
+      });
+
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      expect(cacheStore).toMatchSnapshot();
+    });
+
+    it('should handle cached entries with loading status on error', async () => {
+      const error = new Error('Failed to fetch');
+
+      fetchMock.mockResponseOnce(() => Promise.reject(error));
+
+      cacheStore[fixtures.react] = {
+        content: '',
+        status: 'loading',
+        queue: [],
+      };
+
+      setup({ src: fixtures.react });
+
+      await waitFor(() => {
+        expect(mockOnError).toHaveBeenNthCalledWith(1, error);
+      });
+
+      expect(fetchMock).toHaveBeenCalledTimes(1);
     });
 
     it('should skip the cache if `cacheRequest` is false', async () => {
-      fetchMock.mockResponseOnce(
-        () =>
-          new Promise((res) =>
-            setTimeout(
-              () =>
-                res({
-                  body: '<svg><circle /></svg>',
-                  headers: { 'Content-Type': 'image/svg+xml' },
-                }),
-              500,
-            ),
-          ),
+      fetchMock.mockResponseOnce(() =>
+        Promise.resolve({
+          body: '<svg><circle /></svg>',
+          headers: { 'Content-Type': 'image/svg+xml' },
+        }),
       );
 
-      const wrapper = await setup({
+      setup({
         cacheRequests: false,
         src: fixtures.url,
-        onLoad: (_src, isCached) => {
-          expect(isCached).toBe(false);
-          expect(fetchMock.mock.calls).toHaveLength(1);
-        },
       });
-      wrapper.update();
 
-      expect(wrapper.html()).toMatchSnapshot();
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenNthCalledWith(1, fixtures.url, false);
+      });
+
+      expect(fetchMock.mock.calls).toHaveLength(1);
+
+      expect(cacheStore).toMatchSnapshot();
     });
   });
 
@@ -392,82 +494,117 @@ describe('react-inlinesvg', () => {
     });
 
     it('should handle race condition with fast src changes', async () => {
-      const mockOnLoad = jest.fn();
+      fetchMock.enableMocks();
+      fetchMock
+        .mockResponseOnce(
+          () =>
+            new Promise(resolve => {
+              setTimeout(
+                () =>
+                  resolve({
+                    body: '<svg><title>React</title><circle /></svg>',
+                    headers: { 'Content-Type': 'image/svg+xml' },
+                  }),
+                0,
+              );
+            }),
+        )
+        .mockResponseOnce(
+          () =>
+            new Promise(resolve => {
+              setTimeout(
+                () =>
+                  resolve({
+                    body: '<svg><title>React</title><circle /></svg>',
+                    headers: { 'Content-Type': 'image/svg+xml' },
+                  }),
+                0,
+              );
+            }),
+        );
 
-      const wrapper = mount(
-        <ReactInlineSVG cacheRequests={false} src={fixtures.react} onLoad={mockOnLoad} />,
+      console.log(cacheStore);
+
+      const { container, rerender } = setup({ src: fixtures.react, title: 'React' });
+
+      await waitFor(() => {
+        expect(fetchMock).toHaveBeenNthCalledWith(1, fixtures.react, undefined);
+      });
+
+      rerender(
+        <ReactInlineSVG
+          loader={<Loader />}
+          onError={mockOnError}
+          onLoad={mockOnLoad}
+          src={fixtures.url2}
+          title="Javascript"
+        />,
       );
 
-      wrapper.setProps({ src: fixtures.url2 });
+      await waitFor(() => {
+        expect(fetchMock).toHaveBeenNthCalledWith(2, fixtures.url2, undefined);
+      });
 
-      await poll(() => !!mockOnLoad.mock.calls.length);
-      wrapper.update();
+      rerender(
+        <ReactInlineSVG
+          loader={<Loader />}
+          onError={mockOnError}
+          onLoad={mockOnLoad}
+          src={fixtures.react}
+        />,
+      );
 
-      expect(mockOnLoad).toHaveBeenCalledWith(fixtures.url2, false);
-      expect(wrapper.html()).toMatchSnapshot();
+      await waitFor(() => {
+        expect(fetchMock).toHaveBeenNthCalledWith(3, fixtures.react, undefined);
+      });
+
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot('svg');
+
+      expect(cacheStore).toMatchSnapshot('cacheStore');
+
+      fetchMock.disableMocks();
     });
 
     it('should render multiple SVGs', async () => {
-      const mockOnLoad = jest.fn();
+      const { container } = render(
+        <div>
+          <ReactInlineSVG onLoad={mockOnLoad} src={fixtures.react} />
+          <ReactInlineSVG onLoad={mockOnLoad} src={fixtures.circles} />
+          <ReactInlineSVG onLoad={mockOnLoad} src={fixtures.dots} />
+          <ReactInlineSVG onLoad={mockOnLoad} src={fixtures.datahref} />
+        </div>,
+      );
 
-      const multiSetup: () => Promise<ReactWrapper<any>> = () => {
-        return new Promise((resolve) => {
-          const onLoad = (wrapper: any, ...rest: any[]) => {
-            mockOnLoad(...rest);
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(4);
+      });
 
-            if (mockOnLoad.mock.calls.length === 4) {
-              resolve(wrapper);
-            }
-          };
-
-          const wrapper = mount(
-            <div>
-              <ReactInlineSVG
-                cacheRequests={false}
-                src={fixtures.react}
-                onLoad={(...args) => onLoad(wrapper, ...args)}
-              />
-              <ReactInlineSVG
-                cacheRequests={false}
-                src={fixtures.circles}
-                onLoad={(...args) => onLoad(wrapper, ...args)}
-              />
-              <ReactInlineSVG
-                cacheRequests={false}
-                src={fixtures.dots}
-                onLoad={(...args) => onLoad(wrapper, ...args)}
-              />
-              <ReactInlineSVG
-                cacheRequests={false}
-                src={fixtures.datahref}
-                onLoad={(...args) => onLoad(wrapper, ...args)}
-              />
-            </div>,
-          );
-        });
-      };
-
-      await multiSetup();
-      expect(mockOnLoad).toHaveBeenCalledTimes(4);
+      expect(container.querySelectorAll('svg')).toHaveLength(4);
+      expect(container.firstChild).toMatchSnapshot();
     });
 
     it('should handle pre-cached entries in the cacheStore', async () => {
       fetchMock.enableMocks();
-      const mockOnLoad = jest.fn();
 
-      cacheStore['http://localhost:1337/react.svg'] = {
+      cacheStore[fixtures.react] = {
         content: '<svg><circle /></svg>',
         status: 'loaded',
         queue: [],
       };
 
-      const wrapper = mount(<ReactInlineSVG src={fixtures.react} onLoad={mockOnLoad} />);
+      const { container } = render(<ReactInlineSVG onLoad={mockOnLoad} src={fixtures.react} />);
 
-      await poll(() => !!mockOnLoad.mock.calls.length);
-      wrapper.update();
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
 
       expect(fetchMock).toHaveBeenCalledTimes(0);
-      expect(wrapper.html()).toMatchSnapshot();
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
 
       // clean up
       fetchMock.disableMocks();
@@ -481,31 +618,35 @@ describe('react-inlinesvg', () => {
 
     it('should trigger an error if empty', async () => {
       // @ts-ignore
-      const wrapper = await setup({});
-      wrapper.update();
+      const { container } = setup({});
 
-      expect(mockOnError).toHaveBeenCalledWith(new Error('Missing src'));
-      expect(wrapper.html()).toMatchSnapshot();
+      await waitFor(() => {
+        expect(mockOnError).toHaveBeenCalledWith(new Error('Missing src'));
+      });
+
+      expect(container.querySelector('svg')).toBeNull();
     });
 
     it('should trigger an error on empty `src` prop changes', async () => {
-      const wrapper = await setup({
+      const { container, rerender } = setup({
         src: fixtures.urlEncoded,
       });
-      wrapper.update();
 
-      expect(wrapper.html()).toMatchSnapshot();
-
-      wrapper.setProps({
-        ...wrapper.props(),
-        src: '',
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
       });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
+
+      rerender(
+        <ReactInlineSVG loader={<Loader />} onError={mockOnError} onLoad={mockOnLoad} src="" />,
+      );
 
       expect(mockOnError).toHaveBeenCalledWith(new Error('Missing src'));
     });
 
     it('should trigger an error and render the fallback children if src is not found', async () => {
-      const wrapper = await setup({
+      const { container } = setup({
         src: 'http://localhost:1337/DOESNOTEXIST.svg',
         children: (
           <div className="missing">
@@ -513,28 +654,30 @@ describe('react-inlinesvg', () => {
           </div>
         ),
       });
-      wrapper.update();
 
-      expect(mockOnError).toHaveBeenCalledWith(new Error('Not found'));
-      expect(wrapper.html()).toMatchSnapshot();
+      await waitFor(() => {
+        expect(mockOnError).toHaveBeenCalledWith(new Error('Not found'));
+      });
+
+      expect(container.firstChild).toMatchSnapshot();
     });
 
     it('should trigger an error if the request content-type is not valid', async () => {
-      await setup({
-        src: fixtures.react_png,
-      });
+      await setup({ src: fixtures.react_png });
 
-      expect(mockOnError).toHaveBeenCalledWith(new Error("Content type isn't valid: image/png"));
+      await waitFor(() => {
+        expect(mockOnError).toHaveBeenCalledWith(new Error("Content type isn't valid: image/png"));
+      });
     });
 
     it('should trigger an error if the content is not valid', async () => {
-      await setup({
-        src: fixtures.html,
-      });
+      await setup({ src: fixtures.html });
 
-      expect(mockOnError).toHaveBeenCalledWith(
-        new Error('Could not convert the src to a React element'),
-      );
+      await waitFor(() => {
+        expect(mockOnError).toHaveBeenCalledWith(
+          new Error('Could not convert the src to a React element'),
+        );
+      });
     });
   });
 });
