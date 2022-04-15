@@ -151,17 +151,6 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
     }
   }
 
-  private handleCacheQueue = (content: string | Error) => {
-    /* istanbul ignore else */
-    if (typeof content === 'string') {
-      this.handleLoad(content);
-
-      return;
-    }
-
-    this.handleError(content);
-  };
-
   private handleLoad = (content: string) => {
     /* istanbul ignore else */
     if (this.isActive) {
@@ -196,7 +185,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
 
     try {
       if (cacheRequests) {
-        cacheStore[src] = { content: '', status: STATUS.LOADING, queue: [] };
+        cacheStore[src] = { content: '', status: STATUS.LOADING };
       }
 
       return fetch(src, fetchOptions)
@@ -219,6 +208,10 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
 
           // the current src don't match the previous one, skipping...
           if (src !== currentSrc) {
+            if (cacheStore[src].status === STATUS.LOADING) {
+              delete cacheStore[src];
+            }
+
             return;
           }
 
@@ -232,12 +225,6 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
             if (cache) {
               cache.content = content;
               cache.status = STATUS.LOADED;
-
-              cache.queue = cache.queue.filter(callback => {
-                callback(content);
-
-                return false;
-              });
             }
           }
         })
@@ -250,10 +237,6 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
 
             /* istanbul ignore else */
             if (cache) {
-              cache.queue.forEach((callback: (content: string) => void) => {
-                callback(error);
-              });
-
               delete cacheStore[src];
             }
           }
@@ -276,24 +259,17 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
           const { cacheRequests, src } = this.props;
           const cache = cacheRequests && cacheStore[src];
 
-          if (cache) {
-            if (cache.status === STATUS.LOADED) {
-              this.handleLoad(cache.content);
+          if (cache && cache.status === STATUS.LOADED) {
+            this.handleLoad(cache.content);
 
-              return;
-            }
-
-            /* istanbul ignore else */
-            if (cache.status === STATUS.LOADING) {
-              cache.queue.push(this.handleCacheQueue);
-            }
+            return;
           }
 
           const dataURI = src.match(/data:image\/svg[^,]*?(;base64)?,(.*)/);
           let inlineSrc;
 
           if (dataURI) {
-            inlineSrc = dataURI[1] ? atob(dataURI[2]) : decodeURIComponent(dataURI[2]);
+            inlineSrc = dataURI[1] ? window.atob(dataURI[2]) : decodeURIComponent(dataURI[2]);
           } else if (src.includes('<svg')) {
             inlineSrc = src;
           }

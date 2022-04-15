@@ -431,7 +431,6 @@ describe('react-inlinesvg', () => {
       cacheStore[fixtures.react] = {
         content: '',
         status: 'loading',
-        queue: [],
       };
 
       setup({ src: fixtures.react });
@@ -453,7 +452,6 @@ describe('react-inlinesvg', () => {
       cacheStore[fixtures.react] = {
         content: '',
         status: 'loading',
-        queue: [],
       };
 
       setup({ src: fixtures.react });
@@ -593,7 +591,6 @@ describe('react-inlinesvg', () => {
       cacheStore[fixtures.react] = {
         content: '<svg><circle /></svg>',
         status: 'loaded',
-        queue: [],
       };
 
       const { container } = render(<ReactInlineSVG onLoad={mockOnLoad} src={fixtures.react} />);
