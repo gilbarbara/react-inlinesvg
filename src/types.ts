@@ -1,7 +1,5 @@
 import * as React from 'react';
 
-type Callback = (...arguments_: any[]) => void;
-
 export type ErrorCallback = (error: Error | FetchError) => void;
 export type LoadCallback = (src: string, isCached: boolean) => void;
 export type PlainObject<T = unknown> = Record<string | number | symbol, T>;
@@ -40,6 +38,5 @@ export interface FetchError extends Error {
 
 export interface StorageItem {
   content: string;
-  queue: Callback[];
   status: string;
 }

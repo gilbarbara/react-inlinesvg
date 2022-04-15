@@ -2384,7 +2384,6 @@ Object {
   <circle>
   </circle>
 </svg>,
-    "queue": Array [],
     "status": "loaded",
   },
 }
@@ -2400,7 +2399,6 @@ Object {
   <circle>
   </circle>
 </svg>,
-    "queue": Array [],
     "status": "loaded",
   },
 }
@@ -2424,13 +2422,7 @@ Object {
   <circle>
   </circle>
 </svg>,
-    "queue": Array [],
     "status": "loaded",
-  },
-  "https://cdn.svgporn.com/logos/javascript.svg": Object {
-    "content": "",
-    "queue": Array [],
-    "status": "loading",
   },
 }
 `;
