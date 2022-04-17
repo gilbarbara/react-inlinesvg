@@ -1,8 +1,10 @@
 # react-inlinesvg
 
-[![NPM version](https://badge.fury.io/js/react-inlinesvg.svg)](https://www.npmjs.com/package/react-inlinesvg) [![Build Status](https://travis-ci.com/gilbarbara/react-inlinesvg.svg?branch=master)](https://travis-ci.com/gilbarbara/react-inlinesvg) [![Maintainability](https://api.codeclimate.com/v1/badges/c7e42fe511b80cc25760/maintainability)](https://codeclimate.com/github/gilbarbara/react-inlinesvg/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/c7e42fe511b80cc25760/test_coverage)](https://codeclimate.com/github/gilbarbara/react-inlinesvg/test_coverage)
+[![NPM version](https://badge.fury.io/js/react-inlinesvg.svg)](https://www.npmjs.com/package/react-inlinesvg) [![CI](https://github.com/gilbarbara/react-inlinesvg/actions/workflows/main.yml/badge.svg)](https://github.com/gilbarbara/react-inlinesvg/actions/workflows/main.yml) [![Maintainability](https://api.codeclimate.com/v1/badges/c7e42fe511b80cc25760/maintainability)](https://codeclimate.com/github/gilbarbara/react-inlinesvg/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/c7e42fe511b80cc25760/test_coverage)](https://codeclimate.com/github/gilbarbara/react-inlinesvg/test_coverage)
 
 Load inline, local or remote SVGs in your React components.
+
+View the [demo](https://codesandbox.io/s/github/gilbarbara/react-inlinesvg/tree/main/demo)
 
 ## Highlights
 
