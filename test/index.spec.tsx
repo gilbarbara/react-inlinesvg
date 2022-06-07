@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { renderToString } from 'react-dom/server';
 import { render, waitFor } from '@testing-library/react';
 import fetchMock from 'jest-fetch-mock';
 
@@ -675,6 +676,12 @@ describe('react-inlinesvg', () => {
           new Error('Could not convert the src to a React element'),
         );
       });
+    });
+
+    it('SSR scenario, should render a svg string src', async () => {
+      expect(
+        renderToString(<ReactInlineSVG onLoad={mockOnLoad} src={fixtures.string} />),
+      ).not.toBeNull();
     });
   });
 });
