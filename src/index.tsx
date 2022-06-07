@@ -342,7 +342,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
 
   public render(): React.ReactNode {
     const { element, status } = this.state;
-    const { children = null, innerRef, loader = null } = this.props;
+    const { children = null, innerRef, loader = null, src } = this.props;
     const elementProps = omit(
       this.props,
       'baseURL',
@@ -371,6 +371,17 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
 
     if ([STATUS.UNSUPPORTED, STATUS.FAILED].includes(status)) {
       return children;
+    }
+
+    // SSR scenarios,  converting SVG to a string ,In this context, the associated lifecycle hooks are not executed,
+    if (!loader && !this.isActive) {
+      const dataURI = src.match(/data:image\/svg[^,]*?(;base64)?,(.*)/);
+
+      if (dataURI) {
+        const inlineSrc = dataURI[1] ? window.atob(dataURI[2]) : decodeURIComponent(dataURI[2]);
+
+        return convert(inlineSrc) as React.ReactNode;
+      }
     }
 
     return loader;
