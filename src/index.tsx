@@ -7,6 +7,7 @@ import { FetchError, Props, State, StorageItem } from './types';
 export const cacheStore: { [key: string]: StorageItem } = Object.create(null);
 
 export default class InlineSVG extends React.PureComponent<Props, State> {
+  private isInitialized = false;
   private isActive = false;
   private readonly hash: string;
 
@@ -31,7 +32,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
   public componentDidMount(): void {
     this.isActive = true;
 
-    if (!canUseDOM()) {
+    if (!canUseDOM() || this.isInitialized) {
       return;
     }
 
@@ -56,6 +57,8 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
     } catch (error: any) {
       this.handleError(error);
     }
+
+    this.isInitialized = true;
   }
 
   public componentDidUpdate(previousProps: Props, previousState: State): void {
