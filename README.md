@@ -23,20 +23,18 @@ npm i react-inlinesvg
 And import it into your code:
 
 ```tsx
-import React, { useRef } from 'react';
-import SVG, { Props as SVGProps } from 'react-inlinesvg';
+import React from 'react';
+import SVG from 'react-inlinesvg';
 
-const Logo = React.forwardRef<SVGElement, SVGProps>((props, ref) => (
-  <SVG innerRef={ref} title="MyLogo" {...props} />
-));
-
-export function App() {
-  const logo = useRef<SVGElement>(null);
-
+export default function App() {
   return (
     <main>
-      <SVG src={`${process.env.PUBLIC_URL}/menu.svg`} width={24} height="auto" title="Menu" />
-      <Logo ref={logo} src={`${process.env.PUBLIC_URL}/logo.svg`} />
+      <SVG
+        src="https://cdn.svgporn.com/logos/react.svg"
+        width={128}
+        height="auto"
+        title="React"
+      />
     </main>
   );
 }
