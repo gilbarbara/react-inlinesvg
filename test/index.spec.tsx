@@ -357,6 +357,19 @@ describe('react-inlinesvg', () => {
 
       expect(container.querySelector('svg')).toMatchSnapshot();
     });
+
+    it('should remove the title', async () => {
+      const { container } = setup({
+        src: fixtures.react,
+        title: null,
+      });
+
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
+    });
   });
 
   describe('cached requests', () => {

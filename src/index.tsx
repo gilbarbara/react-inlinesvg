@@ -117,17 +117,19 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
         svg.prepend(descElement);
       }
 
-      if (title) {
+      if (typeof title !== 'undefined') {
         const originalTitle = svg.querySelector('title');
 
         if (originalTitle && originalTitle.parentNode) {
           originalTitle.parentNode.removeChild(originalTitle);
         }
 
-        const titleElement = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+        if (title) {
+          const titleElement = document.createElementNS('http://www.w3.org/2000/svg', 'title');
 
-        titleElement.innerHTML = title;
-        svg.prepend(titleElement);
+          titleElement.innerHTML = title;
+          svg.prepend(titleElement);
+        }
       }
 
       return svg;
