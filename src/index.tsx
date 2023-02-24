@@ -154,12 +154,13 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
     }
   }
 
-  private handleLoad = (content: string) => {
+  private handleLoad = (content: string, hasCache = false) => {
     /* istanbul ignore else */
     if (this.isActive) {
       this.setState(
         {
           content,
+          hasCache,
           status: STATUS.LOADED,
         },
         this.getElement,
@@ -256,6 +257,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
         {
           content: '',
           element: null,
+          hasCache: false,
           status: STATUS.LOADING,
         },
         () => {
@@ -263,7 +265,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
           const cache = cacheRequests && cacheStore[src];
 
           if (cache && cache.status === STATUS.LOADED) {
-            this.handleLoad(cache.content);
+            this.handleLoad(cache.content, true);
 
             return;
           }

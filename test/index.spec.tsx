@@ -9,16 +9,16 @@ function Loader() {
 }
 
 const fixtures = {
-  circles: 'http://localhost:1337/circles.svg',
-  dots: 'http://localhost:1337/dots.svg',
-  icons: 'http://localhost:1337/icons.svg',
-  play: 'http://localhost:1337/play.svg',
-  react: 'http://localhost:1337/react.svg',
-  react_png: 'http://localhost:1337/react.png',
-  tiger: 'http://localhost:1337/tiger.svg',
-  datahref: 'http://localhost:1337/datahref.svg',
-  styles: 'http://localhost:1337/styles.svg',
-  utf8: 'http://localhost:1337/utf8.svg',
+  circles: 'http://127.0.0.1:1337/circles.svg',
+  dots: 'http://127.0.0.1:1337/dots.svg',
+  icons: 'http://127.0.0.1:1337/icons.svg',
+  play: 'http://127.0.0.1:1337/play.svg',
+  react: 'http://127.0.0.1:1337/react.svg',
+  react_png: 'http://127.0.0.1:1337/react.png',
+  tiger: 'http://127.0.0.1:1337/tiger.svg',
+  datahref: 'http://127.0.0.1:1337/datahref.svg',
+  styles: 'http://127.0.0.1:1337/styles.svg',
+  utf8: 'http://127.0.0.1:1337/utf8.svg',
   url: 'https://cdn.svgporn.com/logos/react.svg',
   url2: 'https://cdn.svgporn.com/logos/javascript.svg',
   base64:
@@ -28,7 +28,7 @@ const fixtures = {
   html: 'data:image/svg+xml,%3Chtml%20lang%3D%22en%22%3E%3Cbody%3EText%3C%2Fbody%3E%3C%2Fhtml%3E',
   string:
     '<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid"><g> <polygon fill="#000000" points="7 5 7 19 18 12"></polygon></g></svg>',
-};
+} as const;
 
 const mockOnError = jest.fn();
 const mockOnLoad = jest.fn();
@@ -95,7 +95,7 @@ describe('react-inlinesvg', () => {
     it('should render an svg url and add title and description', async () => {
       const { container } = setup({
         src: fixtures.react,
-        title: 'React',
+        title: 'React FTW',
         description: 'React is a view library',
       });
 
@@ -335,7 +335,7 @@ describe('react-inlinesvg', () => {
       });
 
       await waitFor(() => {
-        expect(fetchMock).toHaveBeenCalledWith('http://localhost:1337/react.svg', {
+        expect(fetchMock).toHaveBeenCalledWith('http://127.0.0.1:1337/react.svg', {
           headers: {
             Authorization: 'Bearer ad99d8d5-419d-434e-97c2-3ce52e116d52',
           },
@@ -436,7 +436,7 @@ describe('react-inlinesvg', () => {
       setup({ src: fixtures.react });
 
       await waitFor(() => {
-        expect(mockOnLoad).toHaveBeenNthCalledWith(1, fixtures.react, true);
+        expect(mockOnLoad).toHaveBeenNthCalledWith(1, fixtures.react, false);
       });
 
       expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -521,12 +521,14 @@ describe('react-inlinesvg', () => {
             }),
         );
 
-      console.log(cacheStore);
-
       const { container, rerender } = setup({ src: fixtures.react, title: 'React' });
 
       await waitFor(() => {
         expect(fetchMock).toHaveBeenNthCalledWith(1, fixtures.react, undefined);
+      });
+
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenNthCalledWith(1, fixtures.react, false);
       });
 
       rerender(
@@ -543,6 +545,10 @@ describe('react-inlinesvg', () => {
         expect(fetchMock).toHaveBeenNthCalledWith(2, fixtures.url2, undefined);
       });
 
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenNthCalledWith(2, fixtures.url2, false);
+      });
+
       rerender(
         <ReactInlineSVG
           loader={<Loader />}
@@ -552,12 +558,10 @@ describe('react-inlinesvg', () => {
         />,
       );
 
-      await waitFor(() => {
-        expect(fetchMock).toHaveBeenNthCalledWith(3, fixtures.react, undefined);
-      });
+      expect(fetchMock).toHaveBeenCalledTimes(2);
 
       await waitFor(() => {
-        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+        expect(mockOnLoad).toHaveBeenNthCalledWith(3, fixtures.react, true);
       });
 
       expect(container.querySelector('svg')).toMatchSnapshot('svg');
@@ -644,7 +648,7 @@ describe('react-inlinesvg', () => {
 
     it('should trigger an error and render the fallback children if src is not found', async () => {
       const { container } = setup({
-        src: 'http://localhost:1337/DOESNOTEXIST.svg',
+        src: 'http://127.0.0.1:1337/DOESNOTEXIST.svg',
         children: (
           <div className="missing">
             <span>MISSING</span>

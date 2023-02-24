@@ -80,7 +80,7 @@
     "watch:cjs": "npm run build:cjs -- -w",
     "watch:esm": "npm run build:esm -- -w",
     "start": "http-server test/__fixtures__ -p 1337 --cors",
-    "test": "start-server-and-test start http://localhost:1337 test:coverage",
+    "test": "start-server-and-test start http://127.0.0.1:1337 test:coverage",
     "test:coverage": "jest --coverage --bail",
     "test:watch": "jest --watchAll --verbose",
     "lint": "eslint --ext .ts,.tsx src test",
