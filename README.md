@@ -105,8 +105,9 @@ This will receive 2 arguments: the `src` prop and a `hasCache` boolean
 **preProcessor** {function} ▶︎ `string`  
 A function to process the contents of the SVG text before parsing.
 
-**title** {string}  
-A title for your SVG. It will override an existing `<title>` tag.
+**title** {string | null}  
+A title for your SVG. It will override an existing `<title>` tag.  
+If `null` is passed, the `<title>` tag will be removed.
 
 **uniqueHash** {string} ▶︎ a random 8 characters string `[A-Za-z0-9]`  
 A string to use with `uniquifyIDs`.
