@@ -17,7 +17,7 @@ export interface Props extends Omit<React.SVGProps<SVGElement>, 'onLoad' | 'onEr
   onLoad?: LoadCallback;
   preProcessor?: PreProcessorCallback;
   src: string;
-  title?: string;
+  title?: string | null;
   uniqueHash?: string;
   uniquifyIDs?: boolean;
 }
