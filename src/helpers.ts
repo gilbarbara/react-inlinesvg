@@ -1,15 +1,15 @@
 import { canUseDOM as canUseDOMFlag } from 'exenv';
 
-import { PlainObject } from './types';
+import type { PlainObject } from './types';
 
 export const STATUS = {
-  FAILED: 'failed',
-  LOADED: 'loaded',
+  IDLE: 'idle',
   LOADING: 'loading',
-  PENDING: 'pending',
+  LOADED: 'loaded',
+  FAILED: 'failed',
   READY: 'ready',
   UNSUPPORTED: 'unsupported',
-};
+} as const;
 
 export function canUseDOM(): boolean {
   return canUseDOMFlag;

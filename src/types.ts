@@ -1,8 +1,10 @@
 import * as React from 'react';
 
+import { STATUS } from './helpers';
+
 export type ErrorCallback = (error: Error | FetchError) => void;
 export type LoadCallback = (src: string, isCached: boolean) => void;
-export type PlainObject<T = unknown> = Record<string | number | symbol, T>;
+export type PlainObject<T = unknown> = Record<string, T>;
 export type PreProcessorCallback = (code: string) => string;
 
 export interface Props extends Omit<React.SVGProps<SVGElement>, 'onLoad' | 'onError' | 'ref'> {
@@ -26,7 +28,7 @@ export interface State {
   content: string;
   element: React.ReactNode;
   hasCache: boolean;
-  status: string;
+  status: Status;
 }
 
 export interface FetchError extends Error {
@@ -36,7 +38,9 @@ export interface FetchError extends Error {
   type: string;
 }
 
+export type Status = (typeof STATUS)[keyof typeof STATUS];
+
 export interface StorageItem {
   content: string;
-  status: string;
+  status: Status;
 }
