@@ -2,7 +2,7 @@ import * as React from 'react';
 import convert from 'react-from-dom';
 
 import { canUseDOM, isSupportedEnvironment, omit, randomString, STATUS } from './helpers';
-import { FetchError, Props, State, StorageItem } from './types';
+import { FetchError, Props, State, Status, StorageItem } from './types';
 
 export const cacheStore: { [key: string]: StorageItem } = Object.create(null);
 
@@ -23,7 +23,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
       content: '',
       element: null,
       hasCache: !!props.cacheRequests && !!cacheStore[props.src],
-      status: STATUS.PENDING,
+      status: STATUS.IDLE,
     };
 
     this.hash = props.uniqueHash || randomString(8);
@@ -41,7 +41,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
 
     try {
       /* istanbul ignore else */
-      if (status === STATUS.PENDING) {
+      if (status === STATUS.IDLE) {
         /* istanbul ignore else */
         if (!isSupportedEnvironment()) {
           throw new Error('Browser does not support SVG');
@@ -369,7 +369,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
       return React.cloneElement(element as React.ReactElement, { ref: innerRef, ...elementProps });
     }
 
-    if ([STATUS.UNSUPPORTED, STATUS.FAILED].includes(status)) {
+    if (([STATUS.UNSUPPORTED, STATUS.FAILED] as Status[]).includes(status)) {
       return children;
     }
 
