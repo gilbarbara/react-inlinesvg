@@ -57,6 +57,13 @@ jobs:
         run: npm run validate
         timeout-minutes: 3
 
+      - name: SonarCloud Scan
+        if: "!startsWith(github.ref, 'refs/tags/')"
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
       - name: Publish code coverage
         if: "!startsWith(github.ref, 'refs/tags/')"
         uses: paambaati/codeclimate-action@v3.2.0
