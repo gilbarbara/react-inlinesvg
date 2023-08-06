@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { STATUS } from './helpers';
+import { STATUS } from './config';
 
 export type ErrorCallback = (error: Error | FetchError) => void;
 export type LoadCallback = (src: string, isCached: boolean) => void;
@@ -27,7 +27,7 @@ export interface Props extends Omit<React.SVGProps<SVGElement>, 'onLoad' | 'onEr
 export interface State {
   content: string;
   element: React.ReactNode;
-  hasCache: boolean;
+  isCached: boolean;
   status: Status;
 }
 

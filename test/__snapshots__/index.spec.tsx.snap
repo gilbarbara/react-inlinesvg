@@ -283,7 +283,7 @@ exports[`react-inlinesvg basic functionality should render a base64 src 1`] = `
 exports[`react-inlinesvg basic functionality should render a loader 1`] = `
 <div>
   <div
-    id="Loader"
+    data-testid="Loader"
   />
 </div>
 `;
@@ -2422,38 +2422,6 @@ exports[`react-inlinesvg basic functionality should uniquify ids with a custom u
 </svg>
 `;
 
-exports[`react-inlinesvg cached requests should handle cached entries with loading status 1`] = `
-{
-  "http://127.0.0.1:1337/react.svg": {
-    "content": <svg>
-  <title>
-    React
-  </title>
-  <circle>
-  </circle>
-</svg>,
-    "status": "loaded",
-  },
-}
-`;
-
-exports[`react-inlinesvg cached requests should request an SVG only once with cacheRequests prop 1`] = `
-{
-  "https://cdn.svgporn.com/logos/react.svg": {
-    "content": <svg>
-  <title>
-    React
-  </title>
-  <circle>
-  </circle>
-</svg>,
-    "status": "loaded",
-  },
-}
-`;
-
-exports[`react-inlinesvg cached requests should skip the cache if \`cacheRequest\` is false 1`] = `{}`;
-
 exports[`react-inlinesvg integration should handle pre-cached entries in the cacheStore 1`] = `
 <svg>
   <circle />
@@ -2461,28 +2429,10 @@ exports[`react-inlinesvg integration should handle pre-cached entries in the cac
 `;
 
 exports[`react-inlinesvg integration should handle race condition with fast src changes: cacheStore 1`] = `
-{
-  "http://127.0.0.1:1337/react.svg": {
-    "content": <svg>
-  <title>
-    React
-  </title>
-  <circle>
-  </circle>
-</svg>,
-    "status": "loaded",
-  },
-  "https://cdn.svgporn.com/logos/javascript.svg": {
-    "content": <svg>
-  <title>
-    React
-  </title>
-  <circle>
-  </circle>
-</svg>,
-    "status": "loaded",
-  },
-}
+[
+  "http://127.0.0.1:1337/react.svg",
+  "https://cdn.svgporn.com/logos/javascript.svg",
+]
 `;
 
 exports[`react-inlinesvg integration should handle race condition with fast src changes: svg 1`] = `

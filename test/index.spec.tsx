@@ -1,12 +1,10 @@
 import * as React from 'react';
-import { render, waitFor } from '@testing-library/react';
+import { act, render, waitFor as waitForBase } from '@testing-library/react';
 import fetchMock from 'jest-fetch-mock';
 
 import ReactInlineSVG, { cacheStore, Props } from '../src/index';
 
-function Loader() {
-  return <div id="Loader" />;
-}
+jest.useFakeTimers();
 
 const fixtures = {
   circles: 'http://127.0.0.1:1337/circles.svg',
@@ -35,6 +33,21 @@ const fixtures = {
 const mockOnError = jest.fn();
 const mockOnLoad = jest.fn();
 
+async function waitFor(callback: () => void) {
+  await waitForBase(callback, {
+    onTimeout: error => {
+      console.log('waitFor timeout', error);
+
+      return error;
+    },
+    timeout: 2000,
+  });
+}
+
+function Loader() {
+  return <div data-testid="Loader" />;
+}
+
 function setup({ onLoad, ...rest }: Props) {
   return render(
     <ReactInlineSVG loader={<Loader />} onError={mockOnError} onLoad={mockOnLoad} {...rest} />,
@@ -49,9 +62,7 @@ describe('react-inlinesvg', () => {
   afterEach(() => {
     jest.clearAllMocks();
 
-    Object.keys(cacheStore).forEach(d => {
-      delete cacheStore[d];
-    });
+    cacheStore.clear();
   });
 
   describe('basic functionality', () => {
@@ -396,7 +407,7 @@ describe('react-inlinesvg', () => {
       fetchMock.disableMocks();
     });
 
-    it('should request an SVG only once with cacheRequests prop', async () => {
+    it('should request an SVG only once', async () => {
       fetchMock.mockResponseOnce(
         () =>
           new Promise(resolve => {
@@ -414,7 +425,7 @@ describe('react-inlinesvg', () => {
       setup({ src: fixtures.url });
 
       await waitFor(() => {
-        expect(mockOnLoad).toHaveBeenNthCalledWith(1, fixtures.url, false);
+        expect(mockOnLoad).toHaveBeenNthCalledWith(1, fixtures.url, true);
       });
 
       setup({ src: fixtures.url });
@@ -425,7 +436,30 @@ describe('react-inlinesvg', () => {
 
       expect(fetchMock).toHaveBeenNthCalledWith(1, fixtures.url, undefined);
 
-      expect(cacheStore).toMatchSnapshot();
+      expect(cacheStore.isCached(fixtures.url)).toBeTrue();
+    });
+
+    it('should handle multiple simultaneous instances with the same url', async () => {
+      fetchMock.mockResponseOnce(() =>
+        Promise.resolve({
+          body: '<svg><title>React</title><circle /></svg>',
+          headers: { 'Content-Type': 'image/svg+xml' },
+        }),
+      );
+
+      render(
+        <>
+          <ReactInlineSVG onLoad={mockOnLoad} src={fixtures.url} />
+          <ReactInlineSVG onLoad={mockOnLoad} src={fixtures.url} />
+          <ReactInlineSVG onLoad={mockOnLoad} src={fixtures.url} />
+        </>,
+      );
+
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenNthCalledWith(3, fixtures.url, true);
+      });
     });
 
     it('should handle request fail with multiple instances', async () => {
@@ -456,20 +490,24 @@ describe('react-inlinesvg', () => {
         }),
       );
 
-      cacheStore[fixtures.react] = {
+      cacheStore.set(fixtures.react, {
         content: '',
         status: 'loading',
-      };
+      });
 
       setup({ src: fixtures.react });
 
+      await act(async () => {
+        jest.runAllTimers();
+      });
+
       await waitFor(() => {
-        expect(mockOnLoad).toHaveBeenNthCalledWith(1, fixtures.react, false);
+        expect(mockOnLoad).toHaveBeenNthCalledWith(1, fixtures.react, true);
       });
 
       expect(fetchMock).toHaveBeenCalledTimes(1);
 
-      expect(cacheStore).toMatchSnapshot();
+      expect(cacheStore.keys()).toEqual([fixtures.react]);
     });
 
     it('should handle cached entries with loading status on error', async () => {
@@ -477,12 +515,16 @@ describe('react-inlinesvg', () => {
 
       fetchMock.mockResponseOnce(() => Promise.reject(error));
 
-      cacheStore[fixtures.react] = {
+      cacheStore.set(fixtures.react, {
         content: '',
         status: 'loading',
-      };
+      });
 
       setup({ src: fixtures.react });
+
+      await act(async () => {
+        jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(mockOnError).toHaveBeenNthCalledWith(1, error);
@@ -510,7 +552,7 @@ describe('react-inlinesvg', () => {
 
       expect(fetchMock.mock.calls).toHaveLength(1);
 
-      expect(cacheStore).toMatchSnapshot();
+      expect(cacheStore.keys()).toHaveLength(0);
     });
   });
 
@@ -556,7 +598,7 @@ describe('react-inlinesvg', () => {
       });
 
       await waitFor(() => {
-        expect(mockOnLoad).toHaveBeenNthCalledWith(1, fixtures.react, false);
+        expect(mockOnLoad).toHaveBeenNthCalledWith(1, fixtures.react, true);
       });
 
       rerender(
@@ -574,7 +616,7 @@ describe('react-inlinesvg', () => {
       });
 
       await waitFor(() => {
-        expect(mockOnLoad).toHaveBeenNthCalledWith(2, fixtures.url2, false);
+        expect(mockOnLoad).toHaveBeenNthCalledWith(2, fixtures.url2, true);
       });
 
       rerender(
@@ -594,7 +636,7 @@ describe('react-inlinesvg', () => {
 
       expect(container.querySelector('svg')).toMatchSnapshot('svg');
 
-      expect(cacheStore).toMatchSnapshot('cacheStore');
+      expect(cacheStore.keys()).toMatchSnapshot('cacheStore');
 
       fetchMock.disableMocks();
     });
@@ -620,10 +662,10 @@ describe('react-inlinesvg', () => {
     it('should handle pre-cached entries in the cacheStore', async () => {
       fetchMock.enableMocks();
 
-      cacheStore[fixtures.react] = {
+      cacheStore.set(fixtures.react, {
         content: '<svg><circle /></svg>',
         status: 'loaded',
-      };
+      });
 
       const { container } = render(<ReactInlineSVG onLoad={mockOnLoad} src={fixtures.react} />);
 
@@ -692,7 +734,7 @@ describe('react-inlinesvg', () => {
     });
 
     it('should trigger an error if the request content-type is not valid', async () => {
-      await setup({ src: fixtures.react_png });
+      setup({ src: fixtures.react_png });
 
       await waitFor(() => {
         expect(mockOnError).toHaveBeenCalledWith(new Error("Content type isn't valid: image/png"));
@@ -700,7 +742,7 @@ describe('react-inlinesvg', () => {
     });
 
     it('should trigger an error if the content is not valid', async () => {
-      await setup({ src: fixtures.html });
+      setup({ src: fixtures.html });
 
       await waitFor(() => {
         expect(mockOnError).toHaveBeenCalledWith(

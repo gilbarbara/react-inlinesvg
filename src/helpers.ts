@@ -2,21 +2,34 @@ import { canUseDOM as canUseDOMFlag } from 'exenv';
 
 import type { PlainObject } from './types';
 
-export const STATUS = {
-  IDLE: 'idle',
-  LOADING: 'loading',
-  LOADED: 'loaded',
-  FAILED: 'failed',
-  READY: 'ready',
-  UNSUPPORTED: 'unsupported',
-} as const;
-
 export function canUseDOM(): boolean {
   return canUseDOMFlag;
 }
 
 export function isSupportedEnvironment(): boolean {
   return supportsInlineSVG() && typeof window !== 'undefined' && window !== null;
+}
+
+export async function request(url: string, options?: RequestInit) {
+  const response = await fetch(url, options);
+  const contentType = response.headers.get('content-type');
+  const [fileType] = (contentType || '').split(/ ?; ?/);
+
+  if (response.status > 299) {
+    throw new Error('Not found');
+  }
+
+  if (!['image/svg+xml', 'text/plain'].some(d => fileType.includes(d))) {
+    throw new Error(`Content type isn't valid: ${fileType}`);
+  }
+
+  return response.text();
+}
+
+export function sleep(seconds = 1) {
+  return new Promise(resolve => {
+    setTimeout(resolve, seconds * 1000);
+  });
 }
 
 export function supportsInlineSVG(): boolean {
