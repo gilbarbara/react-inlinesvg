@@ -206,7 +206,7 @@ export default class InlineSVG extends React.PureComponent<Props, State> {
             return;
           }
 
-          const dataURI = src.match(/data:image\/svg[^,]*?(;base64)?,(.*)/);
+          const dataURI = src.match(/^data:image\/svg[^,]*?(;base64)?,(.*)/u);
           let inlineSrc;
 
           if (dataURI) {
