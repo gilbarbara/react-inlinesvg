@@ -43,11 +43,11 @@ export default function App() {
 ## Props
 
 **src** {string} - **required**.  
-The SVG file you want to load. It can be a require, URL or a string (base64 or url encoded).
-_If you are using create-react-app and your file resides in the `public` directory you can use the path directly without require._
+The SVG file you want to load. It can be a require, URL, or a string (base64 or URL encoded).
+_If you are using create-react-app and your file resides in the `public` directory, you can use the path directly without require._
 
 **baseURL** {string}  
-An URL to prefix each ID in case you are using the `<base>` tag and `uniquifyIDs`.
+An URL to prefix each ID in case you use the `<base>` tag and `uniquifyIDs`.
 
 **children** {ReactNode}  
 The fallback content in case of a fetch error or unsupported browser.
@@ -59,7 +59,8 @@ The fallback content in case of a fetch error or unsupported browser.
 ```
 
 **cacheRequests** {boolean} ▶︎ `true`  
-Cache remote SVGs.
+Cache remote SVGs.  
+Starting in version 4.x, you can also cache the files permanently, read more [below](#caching).
 
 **description** {string}  
 A description for your SVG. It will override an existing `<desc>` tag.
@@ -100,7 +101,7 @@ This will receive a single argument with:
 
 **onLoad** {function}.  
 A callback to be invoked upon successful load.  
-This will receive 2 arguments: the `src` prop and a `hasCache` boolean
+This will receive 2 arguments: the `src` prop and an `isCached` boolean
 
 **preProcessor** {function} ▶︎ `string`  
 A function to process the contents of the SVG text before parsing.
@@ -126,7 +127,7 @@ Create unique IDs for each icon.
   description="The React logo"
   loader={<span>Loading...</span>}
   onError={(error) => console.log(error.message)}
-  onLoad={(src, hasCache) => console.log(src, hasCache)}
+  onLoad={(src, isCached) => console.log(src, isCached)}
   preProcessor={(code) => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
   src="https://cdn.svgporn.com/logos/react.svg"
   title="React"
@@ -137,23 +138,37 @@ Create unique IDs for each icon.
 
 ## Caching
 
-The internal cache is exported as `cacheStore` if you need to debug or pre-cache some files.  
-⚠️ Use it at your own risk.
+You can use the browser's cache to store the SVGs permanently.  
+To set it up, wrap your app with the cache provider:
+
+```typescript
+import { createRoot } from 'react-dom/client';
+import CacheProvider from 'react-inlinesvg/provider';
+import App from './App';
+
+createRoot(document.getElementById('root')!).render(
+  <CacheProvider>
+    <App />
+  </CacheProvider>
+);
+```
+
+> Be aware of the limitations of the [Cache API](https://developer.mozilla.org/en-US/docs/Web/API/Cache).
 
 ## Browser Support
 
 Any browsers that support inlining [SVGs](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) will work.
 
-If you need to support legacy browsers you'll need to include a polyfiil for `fetch` and `Number.isNaN` in your app. Take a look at [react-app-polyfill](https://www.npmjs.com/package/react-app-polyfill) or [polyfill.io](https://polyfill.io/v3/).
+If you need to support legacy browsers, include a polyfill for `fetch` and `Number.isNaN` in your app. Take a look at [react-app-polyfill](https://www.npmjs.com/package/react-app-polyfill) or [polyfill.io](https://polyfill.io/v3/).
 
 ## CORS
 
-If you are loading remote SVGs, you'll need to make sure it has [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) support.
+If you are loading remote SVGs, you must ensure it has [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) support.
 
-## Why you need this package?
+## Why do you need this package?
 
-One of the reasons SVGs are awesome is because you can style them with CSS.
-Unfortunately, this winds up not being too useful in practice because the style element has to be in the same document. This leaves you with three bad options:
+One of the reasons SVGs are awesome is that you can style them with CSS.
+Unfortunately, this is not useful in practice because the style element has to be in the same document. This leaves you with three bad options:
 
 1. Embed the CSS in the SVG document
    - Can't use your CSS preprocessors (LESS, SASS)
@@ -178,5 +193,5 @@ The SVG [`<use>`](http://css-tricks.com/svg-use-external-source) element can be 
 
 ## Credits
 
-Thanks to [@matthewwithanm](https://github.com/matthewwithanm) for creating this component and so kindly transfer it to me.
-I'll definitely keep the good work! ❤️
+Thanks to [@matthewwithanm](https://github.com/matthewwithanm) for creating this component and so kindly transferring it to me.
+I'll definitely keep up the good work! ❤️

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 
 import InlineSVG, { Props } from '../src';
 
@@ -50,19 +50,22 @@ describe('unsupported environments', () => {
     mockCanUseDOM = true;
     mockIsSupportedEnvironment = true;
 
-    const { container } = await setup();
+    const { container } = setup();
 
-    expect(mockOnError).toHaveBeenCalledWith(new Error('fetch is not a function'));
+    await waitFor(() => {
+      expect(mockOnError).toHaveBeenCalledWith(new Error('fetch is not a function'));
+    });
+
     expect(container.firstChild).toMatchSnapshot();
 
     window.fetch = globalFetch;
   });
 
-  it("shouldn't not render anything if is an unsupported browser", async () => {
+  it("shouldn't not render anything if is an unsupported browser", () => {
     mockCanUseDOM = true;
     mockIsSupportedEnvironment = false;
 
-    const { container } = await setup();
+    const { container } = setup();
 
     expect(mockOnError).toHaveBeenCalledWith(new Error('Browser does not support SVG'));
     expect(container.firstChild).toMatchSnapshot();
