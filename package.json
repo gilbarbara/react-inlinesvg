@@ -22,14 +22,19 @@
     "url": "https://github.com/gilbarbara/react-inlinesvg/issues"
   },
   "homepage": "https://github.com/gilbarbara/react-inlinesvg#readme",
-  "main": "lib/index.js",
-  "module": "esm/index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
   "files": [
-    "esm",
-    "lib",
+    "dist",
     "src"
   ],
-  "types": "esm",
+  "types": "dist/index.d.ts",
   "sideEffects": false,
   "peerDependencies": {
     "react": "^16.8.0 || ^17.0.0 || ^18.0.0"
@@ -44,6 +49,7 @@
     "@gilbarbara/prettier-config": "^1.0.0",
     "@gilbarbara/tsconfig": "^0.1.1",
     "@size-limit/preset-small-lib": "^8.2.6",
+    "@swc/core": "^1.3.75",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^14.0.0",
     "@types/exenv": "^1.2.0",
@@ -51,7 +57,7 @@
     "@types/jest": "^29.5.3",
     "@types/node": "^20.4.8",
     "@types/node-fetch": "^2.6.4",
-    "@types/react": "^18.2.18",
+    "@types/react": "^18.2.19",
     "@types/react-dom": "^18.2.7",
     "cross-fetch": "^4.0.0",
     "del-cli": "^5.0.0",
@@ -70,15 +76,13 @@
     "start-server-and-test": "^2.0.0",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.1",
+    "tsup": "^7.2.0",
     "typescript": "^5.1.6"
   },
   "scripts": {
-    "build": "npm run clean && npm run build:cjs && npm run build:esm",
-    "build:cjs": "tsc",
-    "build:esm": "tsc -m es6 --outDir esm",
-    "clean": "del lib/* && del esm/*",
-    "watch:cjs": "npm run build:cjs -- -w",
-    "watch:esm": "npm run build:esm -- -w",
+    "build": "npm run clean && tsup",
+    "watch": "tsup --watch",
+    "clean": "del dist/*",
     "start": "http-server test/__fixtures__ -p 1337 --cors",
     "test": "start-server-and-test start http://127.0.0.1:1337 test:coverage",
     "test:coverage": "jest --coverage --bail",
@@ -89,6 +93,18 @@
     "size": "size-limit",
     "prepublishOnly": "npm run validate",
     "prepare": "husky install"
+  },
+  "tsup": {
+    "dts": true,
+    "entry": [
+      "src/index.tsx"
+    ],
+    "format": [
+      "cjs",
+      "esm"
+    ],
+    "sourcemap": true,
+    "splitting": false
   },
   "eslintConfig": {
     "extends": [
@@ -111,14 +127,14 @@
   "prettier": "@gilbarbara/prettier-config",
   "size-limit": [
     {
-      "name": "lib",
-      "path": "./lib/index.js",
-      "limit": "9 kB"
+      "name": "commonjs",
+      "path": "./dist/index.js",
+      "limit": "11 KB"
     },
     {
       "name": "esm",
-      "path": "./esm/index.js",
-      "limit": "9 kB"
+      "path": "./dist/index.mjs",
+      "limit": "9 KB"
     }
   ]
 }

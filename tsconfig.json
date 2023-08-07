@@ -2,8 +2,7 @@
   "extends": "@gilbarbara/tsconfig",
   "compilerOptions": {
     "downlevelIteration": true,
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "outDir": "./lib",
+    "noEmit": true,
     "target": "es5"
   },
   "include": ["src/**/*"]
