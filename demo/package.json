@@ -1,19 +1,18 @@
 {
   "name": "react-inlinesvg-demo",
-  "version": "3.0.2",
+  "version": "4.0.0",
   "description": "An SVG loader component for ReactJS",
   "keywords": [],
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-inlinesvg": "^3.0.2",
+    "react-inlinesvg": "latest",
     "react-scripts": "^5.0.1",
-    "styled-components": "^5.3.6",
+    "styled-components": "^6.0.7",
     "@types/node": "^18.14.1",
-    "@types/react": "^18.0.28",
-    "@types/react-dom": "^18.0.11",
-    "@types/styled-components": "^5.1.26",
-    "typescript": "^4.9.5"
+    "@types/react": "^18.2.19",
+    "@types/react-dom": "^18.2.7",
+    "typescript": "^5.1.6"
   },
   "scripts": {
     "start": "react-scripts start",
