@@ -1,9 +1,7 @@
-import { canUseDOM as canUseDOMFlag } from 'exenv';
-
 import type { PlainObject } from './types';
 
 export function canUseDOM(): boolean {
-  return canUseDOMFlag;
+  return !!(typeof window !== 'undefined' && window.document && window.document.createElement);
 }
 
 export function isSupportedEnvironment(): boolean {

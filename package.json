@@ -51,7 +51,6 @@
     "react": "^16.8.0 || ^17.0.0 || ^18.0.0"
   },
   "dependencies": {
-    "exenv": "^1.2.2",
     "react-from-dom": "^0.6.2"
   },
   "devDependencies": {
