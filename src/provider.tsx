@@ -1,25 +1,17 @@
-import { ReactNode, useEffect } from 'react';
+import { ReactNode } from 'react';
+
+import { canUseDOM } from './helpers';
 
 interface Props {
   children: ReactNode;
+  name?: string;
 }
 
-declare global {
-  interface Window {
-    REACT_INLINESVG_PERSISTENT_CACHE?: boolean;
-  }
-}
-
-export default function CacheProvider({ children }: Props) {
-  window.REACT_INLINESVG_PERSISTENT_CACHE = true;
-
-  useEffect(() => {
+export default function CacheProvider({ children, name }: Props) {
+  if (canUseDOM()) {
+    window.REACT_INLINESVG_CACHE_NAME = name;
     window.REACT_INLINESVG_PERSISTENT_CACHE = true;
-
-    return () => {
-      delete window.REACT_INLINESVG_PERSISTENT_CACHE;
-    };
-  }, []);
+  }
 
   return children;
 }
