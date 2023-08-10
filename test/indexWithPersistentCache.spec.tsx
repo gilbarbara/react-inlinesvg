@@ -40,10 +40,10 @@ fetchMock.mockResponse(() =>
   }),
 );
 
-function setup({ onLoad, ...rest }: Props) {
+function setup({ cacheName, onLoad, ...rest }: Props & { cacheName?: string }) {
   return render(
     <ReactInlineSVG loader={<Loader />} onError={mockOnError} onLoad={mockOnLoad} {...rest} />,
-    { wrapper: ({ children }) => <CacheProvider>{children}</CacheProvider> },
+    { wrapper: ({ children }) => <CacheProvider name={cacheName}>{children}</CacheProvider> },
   );
 }
 
@@ -51,6 +51,19 @@ describe('react-inlinesvg (with persistent cache)', () => {
   afterEach(async () => {
     fetchMock.mockClear();
     await cacheStore.clear();
+  });
+
+  it('should set the default global variables', () => {
+    setup({ src: url });
+
+    expect(window.REACT_INLINESVG_PERSISTENT_CACHE).toBeTrue();
+    expect(window.REACT_INLINESVG_CACHE_NAME).toBeUndefined();
+  });
+
+  it('should set the cache name global variable', () => {
+    setup({ cacheName: 'test-cache', src: url });
+
+    expect(window.REACT_INLINESVG_CACHE_NAME).toBe('test-cache');
   });
 
   it('should request an SVG only once', async () => {

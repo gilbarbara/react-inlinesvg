@@ -1,22 +1,26 @@
 import { CACHE_MAX_RETRIES, CACHE_NAME, STATUS } from './config';
-import { request, sleep } from './helpers';
+import { canUseDOM, request, sleep } from './helpers';
 import { StorageItem } from './types';
 
 export default class CacheStore {
   private cacheApi: Cache | undefined;
   private readonly cacheStore: Map<string, StorageItem>;
   private readonly subscribers: Array<() => void> = [];
-  private readonly usePersistentCache: boolean;
   public isReady = false;
 
   constructor() {
     this.cacheStore = new Map<string, StorageItem>();
 
-    this.usePersistentCache =
-      'REACT_INLINESVG_PERSISTENT_CACHE' in window && !!window.REACT_INLINESVG_PERSISTENT_CACHE;
+    let cacheName = CACHE_NAME;
+    let usePersistentCache = false;
 
-    if (this.usePersistentCache) {
-      caches.open(CACHE_NAME).then(cache => {
+    if (canUseDOM()) {
+      cacheName = window.REACT_INLINESVG_CACHE_NAME ?? CACHE_NAME;
+      usePersistentCache = !!window.REACT_INLINESVG_PERSISTENT_CACHE;
+    }
+
+    if (usePersistentCache) {
+      caches.open(cacheName).then(cache => {
         this.cacheApi = cache;
         this.isReady = true;
 
@@ -36,7 +40,7 @@ export default class CacheStore {
   }
 
   public async get(url: string, fetchOptions?: RequestInit) {
-    await (this.usePersistentCache
+    await (this.cacheApi
       ? this.fetchAndAddToPersistentCache(url, fetchOptions)
       : this.fetchAndAddToInternalCache(url, fetchOptions));
 
