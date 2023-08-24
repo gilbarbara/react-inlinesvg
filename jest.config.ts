@@ -1,4 +1,6 @@
-module.exports = {
+import { Config } from 'jest';
+
+const config: Config = {
   collectCoverage: false,
   collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}'],
   coverageThreshold: {
@@ -10,7 +12,6 @@ module.exports = {
     },
   },
   moduleDirectories: ['node_modules', 'src'],
-  preset: 'ts-jest',
   setupFiles: ['<rootDir>/test/__setup__/setupFiles.ts'],
   setupFilesAfterEnv: ['<rootDir>/test/__setup__/setupFilesAfterEnv.ts'],
   snapshotSerializers: ['jest-serializer-html'],
@@ -18,7 +19,6 @@ module.exports = {
   testEnvironmentOptions: {
     url: 'http://localhost:1337/',
   },
-  testMatch: null,
   testRegex: '/test/.*?\\.(test|spec)\\.tsx?$',
   transform: {
     '^.+\\.m?[tj]sx?$': [
@@ -34,3 +34,5 @@ module.exports = {
   verbose: false,
   watchPlugins: ['jest-watch-typeahead/filename', 'jest-watch-typeahead/testname'],
 };
+
+export default config;
