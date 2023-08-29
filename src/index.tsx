@@ -79,7 +79,7 @@ class ReactInlineSVG extends React.PureComponent<Props, State> {
       }
     }
 
-    if (previousProps.src !== src) {
+    if (previousProps !== this.props) {
       if (!src) {
         this.handleError(new Error('Missing src'));
 
