@@ -69,7 +69,10 @@ A description for your SVG. It will override an existing `<desc>` tag.
 Custom options for the [request](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request).
 
 **innerRef** {React.Ref}  
-Set a ref in SVGElement.
+Set a ref in SVGElement.  
+
+>The SVG is processed and parsed so the ref won't be set on the initial render.
+You can use the `onLoad` callback to get and use the ref instead.
 
 **loader** {node}  
 A component to be shown while the SVG is loading.
