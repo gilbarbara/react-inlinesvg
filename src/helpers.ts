@@ -11,7 +11,7 @@ export function isSupportedEnvironment(): boolean {
 export async function request(url: string, options?: RequestInit) {
   const response = await fetch(url, options);
   const contentType = response.headers.get('content-type');
-  const [fileType] = (contentType || '').split(/ ?; ?/);
+  const [fileType] = (contentType ?? '').split(/ ?; ?/);
 
   if (response.status > 299) {
     throw new Error('Not found');
