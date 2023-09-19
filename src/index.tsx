@@ -29,7 +29,7 @@ class ReactInlineSVG extends React.PureComponent<Props, State> {
       status: STATUS.IDLE,
     };
 
-    this.hash = props.uniqueHash || randomString(8);
+    this.hash = props.uniqueHash ?? randomString(8);
   }
 
   public componentDidMount(): void {
@@ -136,7 +136,7 @@ class ReactInlineSVG extends React.PureComponent<Props, State> {
       if (description) {
         const originalDesc = svg.querySelector('desc');
 
-        if (originalDesc && originalDesc.parentNode) {
+        if (originalDesc?.parentNode) {
           originalDesc.parentNode.removeChild(originalDesc);
         }
 
@@ -149,7 +149,7 @@ class ReactInlineSVG extends React.PureComponent<Props, State> {
       if (typeof title !== 'undefined') {
         const originalTitle = svg.querySelector('title');
 
-        if (originalTitle && originalTitle.parentNode) {
+        if (originalTitle?.parentNode) {
           originalTitle.parentNode.removeChild(originalTitle);
         }
 
@@ -210,7 +210,7 @@ class ReactInlineSVG extends React.PureComponent<Props, State> {
         async () => {
           const { cacheRequests, fetchOptions, src } = this.props;
 
-          const dataURI = src.match(/^data:image\/svg[^,]*?(;base64)?,(.*)/u);
+          const dataURI = /^data:image\/svg[^,]*?(;base64)?,(.*)/u.exec(src);
           let inlineSrc;
 
           if (dataURI) {
@@ -264,12 +264,12 @@ class ReactInlineSVG extends React.PureComponent<Props, State> {
     }
 
     [...node.children].forEach(d => {
-      if (d.attributes && d.attributes.length) {
+      if (d.attributes?.length) {
         const attributes = Object.values(d.attributes).map(a => {
           const attribute = a;
-          const match = a.value.match(/url\((.*?)\)/);
+          const match = /url\((.*?)\)/.exec(a.value);
 
-          if (match && match[1]) {
+          if (match?.[1]) {
             attribute.value = a.value.replace(match[0], `url(${baseURL}${match[1]}__${this.hash})`);
           }
 
