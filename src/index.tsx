@@ -70,7 +70,7 @@ class ReactInlineSVG extends React.PureComponent<Props, State> {
     }
 
     const { isCached, status } = this.state;
-    const { onLoad, src } = this.props;
+    const { description, onLoad, src, title } = this.props;
 
     if (previousState.status !== STATUS.READY && status === STATUS.READY) {
       /* istanbul ignore else */
@@ -87,6 +87,10 @@ class ReactInlineSVG extends React.PureComponent<Props, State> {
       }
 
       this.load();
+    }
+
+    if (previousProps.title !== title || previousProps.description !== description) {
+      this.getElement();
     }
   }
 

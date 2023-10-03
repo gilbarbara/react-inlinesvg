@@ -343,7 +343,6 @@ exports[`react-inlinesvg basic functionality should render a svg string src 1`] 
 <svg
   height="24px"
   preserveAspectRatio="xMidYMid"
-  version="1.1"
   viewBox="0 0 24 24"
   width="24px"
   xmlns="http://www.w3.org/2000/svg"
