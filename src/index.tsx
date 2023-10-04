@@ -43,14 +43,11 @@ class ReactInlineSVG extends React.PureComponent<Props, State> {
     const { src } = this.props;
 
     try {
-      /* istanbul ignore else */
       if (status === STATUS.IDLE) {
-        /* istanbul ignore else */
         if (!isSupportedEnvironment()) {
           throw new Error('Browser does not support SVG');
         }
 
-        /* istanbul ignore else */
         if (!src) {
           throw new Error('Missing src');
         }
@@ -73,7 +70,6 @@ class ReactInlineSVG extends React.PureComponent<Props, State> {
     const { description, onLoad, src, title } = this.props;
 
     if (previousState.status !== STATUS.READY && status === STATUS.READY) {
-      /* istanbul ignore else */
       if (onLoad) {
         onLoad(src, isCached);
       }
@@ -176,10 +172,8 @@ class ReactInlineSVG extends React.PureComponent<Props, State> {
     const status =
       error.message === 'Browser does not support SVG' ? STATUS.UNSUPPORTED : STATUS.FAILED;
 
-    /* istanbul ignore else */
     if (this.isActive) {
       this.setState({ status }, () => {
-        /* istanbul ignore else */
         if (typeof onError === 'function') {
           onError(error);
         }
@@ -188,7 +182,6 @@ class ReactInlineSVG extends React.PureComponent<Props, State> {
   };
 
   private handleLoad = (content: string, hasCache = false) => {
-    /* istanbul ignore else */
     if (this.isActive) {
       this.setState(
         {
@@ -202,7 +195,6 @@ class ReactInlineSVG extends React.PureComponent<Props, State> {
   };
 
   private load() {
-    /* istanbul ignore else */
     if (this.isActive) {
       this.setState(
         {

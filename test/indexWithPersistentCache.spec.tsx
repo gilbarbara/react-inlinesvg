@@ -2,7 +2,9 @@
 import * as React from 'react';
 import { render, waitFor } from '@testing-library/react';
 import CacheMock from 'browser-cache-mock';
-import fetchMock from 'jest-fetch-mock';
+import createFetchMock from 'vitest-fetch-mock';
+
+const fetchMock = createFetchMock(vi);
 
 const cacheMock = new CacheMock();
 
@@ -26,8 +28,8 @@ function Loader() {
   return <div data-testid="Loader" />;
 }
 
-const mockOnError = jest.fn();
-const mockOnLoad = jest.fn();
+const mockOnError = vi.fn();
+const mockOnLoad = vi.fn();
 
 const url = 'https://cdn.svgporn.com/logos/react.svg';
 

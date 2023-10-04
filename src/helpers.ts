@@ -31,7 +31,7 @@ export function sleep(seconds = 1) {
 }
 
 export function supportsInlineSVG(): boolean {
-  /* istanbul ignore next */
+  /* c8 ignore next 3 */
   if (!document) {
     return false;
   }
@@ -72,7 +72,6 @@ export function omit<T extends PlainObject, K extends keyof T>(
   const output: any = {};
 
   for (const key in input) {
-    /* istanbul ignore else */
     if ({}.hasOwnProperty.call(input, key)) {
       if (!filter.includes(key as unknown as K)) {
         output[key] = input[key];
