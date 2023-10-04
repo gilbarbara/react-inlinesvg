@@ -5,14 +5,14 @@ import InlineSVG, { Props } from '../src';
 
 declare let window: any;
 
-const mockOnError = jest.fn();
-const mockOnLoad = jest.fn();
+const mockOnError = vi.fn();
+const mockOnLoad = vi.fn();
 
 let mockCanUseDOM = false;
 let mockIsSupportedEnvironment = true;
 
-jest.mock('../src/helpers', () => {
-  const utils = jest.requireActual('../src/helpers');
+vi.mock('../src/helpers', async () => {
+  const utils = await vi.importActual<Record<string, () => any>>('../src/helpers');
 
   return {
     ...utils,

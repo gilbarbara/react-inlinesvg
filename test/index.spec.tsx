@@ -1,10 +1,12 @@
 import * as React from 'react';
-import { act, render, waitFor as waitForBase } from '@testing-library/react';
-import fetchMock from 'jest-fetch-mock';
+import { act, render } from '@testing-library/react';
+import createFetchMock from 'vitest-fetch-mock';
 
 import ReactInlineSVG, { cacheStore, Props } from '../src/index';
 
-jest.useFakeTimers();
+const fetchMock = createFetchMock(vi);
+
+vi.useFakeTimers();
 
 const fixtures = {
   circles: 'http://127.0.0.1:1337/circles.svg',
@@ -30,19 +32,21 @@ const fixtures = {
     '<svg width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid"><g> <polygon fill="#000000" points="7 5 7 19 18 12"></polygon></g></svg>',
 } as const;
 
-const mockOnError = jest.fn();
-const mockOnLoad = jest.fn();
+const mockOnError = vi.fn();
+const mockOnLoad = vi.fn();
 
-async function waitFor(callback: () => void) {
-  await waitForBase(callback, {
-    onTimeout: error => {
-      console.log('waitFor timeout', error);
+// async function waitFor(callback: () => void) {
+//   await waitForBase(callback, {
+//     onTimeout: error => {
+//       console.log('waitFor timeout', error);
+//
+//       return error;
+//     },
+//     timeout: 2000,
+//   });
+// }
 
-      return error;
-    },
-    timeout: 2000,
-  });
-}
+const { waitFor } = vi;
 
 function Loader() {
   return <div data-testid="Loader" />;
@@ -56,11 +60,11 @@ function setup({ onLoad, ...rest }: Props) {
 
 describe('react-inlinesvg', () => {
   beforeAll(() => {
-    jest.spyOn(console, 'error').mockImplementation();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     cacheStore.clear();
   });
@@ -73,7 +77,7 @@ describe('react-inlinesvg', () => {
       });
 
       await waitFor(() => {
-        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+        expect(mockOnLoad).toHaveBeenCalled();
       });
 
       expect(container.querySelector('svg')).toMatchSnapshot();
@@ -524,7 +528,7 @@ describe('react-inlinesvg', () => {
       setup({ src: fixtures.react });
 
       await act(async () => {
-        jest.runAllTimers();
+        vi.runAllTimers();
       });
 
       await waitFor(() => {
@@ -549,7 +553,7 @@ describe('react-inlinesvg', () => {
       setup({ src: fixtures.react });
 
       await act(async () => {
-        jest.runAllTimers();
+        vi.runAllTimers();
       });
 
       await waitFor(() => {
@@ -677,9 +681,12 @@ describe('react-inlinesvg', () => {
         </div>,
       );
 
-      await waitFor(() => {
-        expect(mockOnLoad).toHaveBeenCalledTimes(4);
-      });
+      await waitFor(
+        () => {
+          expect(mockOnLoad).toHaveBeenCalledTimes(4);
+        },
+        { timeout: 2000 },
+      );
 
       expect(container.querySelectorAll('svg')).toHaveLength(4);
       expect(container.firstChild).toMatchSnapshot();

@@ -1,9 +1,13 @@
 import { waitFor } from '@testing-library/react';
 import CacheMock from 'browser-cache-mock';
-import fetchMock from 'jest-fetch-mock';
+import createFetchMock from 'vitest-fetch-mock';
 
 import CacheStore from '../src/cache';
 import { STATUS } from '../src/config';
+
+const fetchMock = createFetchMock(vi);
+
+fetchMock.enableMocks();
 
 const cacheMock = new CacheMock();
 
@@ -19,8 +23,6 @@ Object.defineProperty(window, 'caches', {
     ...cacheMock,
   },
 });
-
-fetchMock.enableMocks();
 
 const reactUrl = 'https://cdn.svgporn.com/logos/react.svg';
 const reactContent = '<svg><title>React</title><circle /></svg>';
@@ -136,7 +138,7 @@ describe('CacheStore (external)', () => {
   Object.defineProperty(window, 'REACT_INLINESVG_PERSISTENT_CACHE', {
     value: true,
   });
-  const mockReady = jest.fn();
+  const mockReady = vi.fn();
   const cacheStore = new CacheStore();
 
   // wait for the cache to be ready
