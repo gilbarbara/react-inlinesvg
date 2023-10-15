@@ -11,15 +11,16 @@ fetchMock.enableMocks();
 
 const cacheMock = new CacheMock();
 
+let cachesOpenPromise = new Promise(resolve => {
+  setTimeout(() => {
+    resolve(cacheMock);
+  }, 500);
+});
+
 Object.defineProperty(window, 'caches', {
   value: {
     ...window.caches,
-    open: async () =>
-      new Promise(resolve => {
-        setTimeout(() => {
-          resolve(cacheMock);
-        }, 500);
-      }),
+    open: async () => cachesOpenPromise,
     ...cacheMock,
   },
 });
@@ -233,5 +234,23 @@ describe('CacheStore (external)', () => {
     await expect(cacheStore.get(jsUrl)).rejects.toThrow('Failed to fetch');
     expect(cacheStore.isCached(jsUrl)).toBeFalse();
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('should handle caches.open errors', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    mockReady.mockClear();
+    cachesOpenPromise = Promise.reject(new Error('The operation is insecure.'));
+
+    const cacheStoreWithError = new CacheStore();
+
+    cacheStoreWithError.onReady(mockReady);
+
+    await waitFor(() => {
+      expect(consoleError).toHaveBeenCalledWith('Failed to open cache: The operation is insecure.');
+    });
+    expect(mockReady).not.toHaveBeenCalled();
+
+    consoleError.mockRestore();
   });
 });

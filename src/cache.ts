@@ -16,16 +16,24 @@ export default class CacheStore {
 
     if (canUseDOM()) {
       cacheName = window.REACT_INLINESVG_CACHE_NAME ?? CACHE_NAME;
-      usePersistentCache = !!window.REACT_INLINESVG_PERSISTENT_CACHE;
+      usePersistentCache = !!window.REACT_INLINESVG_PERSISTENT_CACHE && 'caches' in window;
     }
 
     if (usePersistentCache) {
-      caches.open(cacheName).then(cache => {
-        this.cacheApi = cache;
-        this.isReady = true;
+      caches
+        .open(cacheName)
+        .then(cache => {
+          this.cacheApi = cache;
+          this.isReady = true;
 
-        this.subscribers.forEach(callback => callback());
-      });
+          this.subscribers.forEach(callback => callback());
+        })
+        .catch(error => {
+          this.isReady = true;
+
+          // eslint-disable-next-line no-console
+          console.error(`Failed to open cache: ${error.message}`);
+        });
     } else {
       this.isReady = true;
     }
