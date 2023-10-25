@@ -2,8 +2,8 @@ import { waitFor } from '@testing-library/react';
 import CacheMock from 'browser-cache-mock';
 import createFetchMock from 'vitest-fetch-mock';
 
-import CacheStore from '../src/cache';
-import { STATUS } from '../src/config';
+import { STATUS } from '../../src/config';
+import CacheStore from '../../src/modules/cache';
 
 const fetchMock = createFetchMock(vi);
 
