@@ -1,6 +1,6 @@
 import { JSX } from 'react';
 
-import { canUseDOM } from './helpers';
+import { canUseDOM } from './modules/helpers';
 
 interface Props {
   children: JSX.Element;

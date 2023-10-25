@@ -1,4 +1,4 @@
-import type { PlainObject } from './types';
+import type { PlainObject } from '../types';
 
 export function canUseDOM(): boolean {
   return !!(typeof window !== 'undefined' && window.document && window.document.createElement);

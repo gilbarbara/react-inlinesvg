@@ -11,8 +11,8 @@ const mockOnLoad = vi.fn();
 let mockCanUseDOM = false;
 let mockIsSupportedEnvironment = true;
 
-vi.mock('../src/helpers', async () => {
-  const utils = await vi.importActual<Record<string, () => any>>('../src/helpers');
+vi.mock('../src/modules/helpers', async () => {
+  const utils = await vi.importActual<Record<string, () => any>>('../src/modules/helpers');
 
   return {
     ...utils,
