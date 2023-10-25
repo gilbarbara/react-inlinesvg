@@ -48,25 +48,22 @@
   "types": "dist/index.d.ts",
   "sideEffects": false,
   "peerDependencies": {
-    "react": "^16.8.0 || ^17.0.0 || ^18.0.0"
+    "react": "16.8 - 18"
   },
   "dependencies": {
     "react-from-dom": "^0.6.2"
   },
   "devDependencies": {
     "@gilbarbara/eslint-config": "^0.5.4",
-    "@gilbarbara/helpers": "^0.8.6",
     "@gilbarbara/prettier-config": "^1.0.0",
     "@gilbarbara/tsconfig": "^0.2.3",
-    "@size-limit/preset-small-lib": "^9.0.0",
+    "@size-limit/preset-small-lib": "^10.0.1",
     "@testing-library/jest-dom": "^6.1.4",
     "@testing-library/react": "^14.0.0",
-    "@types/exenv": "^1.2.0",
-    "@types/fetch-mock": "^7.3.6",
-    "@types/node": "^20.8.2",
-    "@types/node-fetch": "^2.6.6",
-    "@types/react": "^18.2.24",
-    "@types/react-dom": "^18.2.8",
+    "@types/node": "^20.8.8",
+    "@types/react": "^18.2.31",
+    "@types/react-dom": "^18.2.14",
+    "@vitejs/plugin-react": "^4.1.0",
     "@vitest/coverage-v8": "^0.34.6",
     "browser-cache-mock": "^0.1.7",
     "del-cli": "^5.1.0",
@@ -77,8 +74,8 @@
     "jsdom": "^22.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "repo-tools": "^0.2.2",
-    "size-limit": "^9.0.0",
+    "repo-tools": "^0.3.1",
+    "size-limit": "^10.0.1",
     "start-server-and-test": "^2.0.1",
     "ts-node": "^10.9.1",
     "tsup": "^7.2.0",
