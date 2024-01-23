@@ -134,7 +134,6 @@ export default class CacheStore {
   private async handleLoading(url: string, callback: () => Promise<void>) {
     let retryCount = 0;
 
-    // eslint-disable-next-line no-await-in-loop
     while (this.cacheStore.get(url)?.status === STATUS.LOADING && retryCount < CACHE_MAX_RETRIES) {
       // eslint-disable-next-line no-await-in-loop
       await sleep(0.1);
