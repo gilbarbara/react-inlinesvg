@@ -54,6 +54,7 @@
     "react-from-dom": "^0.7.1"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.15.0",
     "@gilbarbara/eslint-config": "^0.7.4",
     "@gilbarbara/prettier-config": "^1.0.0",
     "@gilbarbara/tsconfig": "^0.2.3",
@@ -93,8 +94,9 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest watch",
     "typecheck": "tsc -p test/tsconfig.json",
+    "typevalidation": "attw -P",
     "size": "size-limit",
-    "validate": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build && pnpm run size",
+    "validate": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build && pnpm run size && npm run typevalidation",
     "format": "prettier \"**/*.{js,jsx,json,yml,yaml,css,less,scss,ts,tsx,md,graphql,mdx}\" --write",
     "prepublishOnly": "pnpm run validate",
     "prepare": "husky"
