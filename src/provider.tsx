@@ -1,9 +1,9 @@
-import { JSX } from 'react';
+import { ReactNode } from 'react';
 
 import { canUseDOM } from './modules/helpers';
 
 interface Props {
-  children: JSX.Element;
+  children: ReactNode;
   name?: string;
 }
 

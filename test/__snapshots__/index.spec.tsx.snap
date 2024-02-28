@@ -425,9 +425,9 @@ exports[`react-inlinesvg > basic functionality > should render a svg url with ex
 exports[`react-inlinesvg > basic functionality > should render a svg url with inline styles 1`] = `
 <svg
   id="BACKGROUND-ELEMENTS"
+  style="--my-css-var: yellow;"
   viewBox="0 0 324 504"
   xmlns="http://www.w3.org/2000/svg"
-  xmlns:xlink="http://www.w3.org/1999/xlink"
 >
   <defs>
     <radialgradient
