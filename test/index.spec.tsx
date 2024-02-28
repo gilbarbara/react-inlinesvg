@@ -18,6 +18,7 @@ const fixtures = {
   tiger: 'http://127.0.0.1:1337/tiger.svg',
   datahref: 'http://127.0.0.1:1337/datahref.svg',
   styles: 'http://127.0.0.1:1337/styles.svg',
+  styles_with_css_variables: 'http://127.0.0.1:1337/styles_with_css_variables.svg',
   utf8: 'http://127.0.0.1:1337/utf8.svg',
   url: 'https://cdn.svgporn.com/logos/react.svg',
   url2: 'https://cdn.svgporn.com/logos/javascript.svg',
@@ -165,6 +166,20 @@ describe('react-inlinesvg', () => {
     it('should render a svg url with inline styles', async () => {
       const { container } = setup({
         src: fixtures.styles,
+        uniquifyIDs: true,
+        uniqueHash: 'test',
+      });
+
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(container.querySelector('svg')).toMatchSnapshot();
+    });
+
+    it('should render a svg with css variables', async () => {
+      const { container } = setup({
+        src: fixtures.styles_with_css_variables,
         uniquifyIDs: true,
         uniqueHash: 'test',
       });

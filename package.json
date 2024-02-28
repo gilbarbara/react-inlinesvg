@@ -51,7 +51,7 @@
     "react": "16.8 - 18"
   },
   "dependencies": {
-    "react-from-dom": "^0.7.1"
+    "react-from-dom": "^0.7.2"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.15.0",

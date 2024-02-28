@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   react-from-dom:
-    specifier: ^0.7.1
-    version: 0.7.1(react@18.2.0)
+    specifier: ^0.7.2
+    version: 0.7.2(react@18.2.0)
 
 devDependencies:
   '@arethetypeswrong/cli':
@@ -5191,8 +5191,8 @@ packages:
       scheduler: 0.23.0
     dev: true
 
-  /react-from-dom@0.7.1(react@18.2.0):
-    resolution: {integrity: sha512-nkcOum4D+C8fQcbv2HKeDAmWWfD5bj9JCrUvGj/zSdTZsvXjtqUw5PMAK/I9xsAcj3DVh3jx9LkbjDPu52ZjFg==}
+  /react-from-dom@0.7.2(react@18.2.0):
+    resolution: {integrity: sha512-mu7bTd7euJ5SUpfrtTIQMt9dMXNT5WUW3dWOzOQKI2xgLbtrPKmGH4/vJO72FY9BUYu55Rz3/OY/rADD65632Q==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
