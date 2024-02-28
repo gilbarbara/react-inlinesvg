@@ -1,4 +1,4 @@
-<svg id="BACKGROUND-ELEMENTS" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 324 504">
+<svg id="BACKGROUND-ELEMENTS" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 324 504" style="--my-css-var: yellow;">
   <defs>
     <radialGradient id="radial-gradient" cx="162" cy="252" r="211.83"
                     gradientUnits="userSpaceOnUse">
