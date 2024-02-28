@@ -7,11 +7,13 @@ export default defineConfig({
     coverage: {
       all: true,
       include: ['src/**/*.ts?(x)'],
-      statements: 90,
-      branches: 90,
-      functions: 90,
-      lines: 90,
       reporter: ['text', 'lcov'],
+      thresholds: {
+        statements: 90,
+        branches: 90,
+        functions: 90,
+        lines: 90,
+      },
     },
     environment: 'jsdom',
     globals: true,
