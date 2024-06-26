@@ -162,7 +162,7 @@ createRoot(document.getElementById('root')!).render(
 
 Any browsers that support inlining [SVGs](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) will work.
 
-If you need to support legacy browsers, include a polyfill for `fetch` and `Number.isNaN` in your app. Take a look at [react-app-polyfill](https://www.npmjs.com/package/react-app-polyfill) or [polyfill.io](https://polyfill.io/v3/).
+If you need to support legacy browsers, include a polyfill for `fetch` and `Number.isNaN` in your app.
 
 ## CORS
 
