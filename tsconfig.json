@@ -2,6 +2,7 @@
   "extends": "@gilbarbara/tsconfig",
   "compilerOptions": {
     "downlevelIteration": true,
+    "jsx": "react",
     "noEmit": true,
     "target": "ES2020"
   },
