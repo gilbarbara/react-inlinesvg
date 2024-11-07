@@ -31,6 +31,7 @@ export default class CacheStore {
         })
         .catch(error => {
           this.isReady = true;
+          this.subscribers.forEach(callback => callback());
 
           // eslint-disable-next-line no-console
           console.error(`Failed to open cache: ${error.message}`);
