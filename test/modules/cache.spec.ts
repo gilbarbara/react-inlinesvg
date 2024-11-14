@@ -249,7 +249,7 @@ describe('CacheStore (external)', () => {
     await waitFor(() => {
       expect(consoleError).toHaveBeenCalledWith('Failed to open cache: The operation is insecure.');
     });
-    expect(mockReady).not.toHaveBeenCalled();
+    expect(mockReady).toHaveBeenCalledTimes(1);
 
     consoleError.mockRestore();
   });

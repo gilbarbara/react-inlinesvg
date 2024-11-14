@@ -25,15 +25,14 @@ export default class CacheStore {
         .open(cacheName)
         .then(cache => {
           this.cacheApi = cache;
-          this.isReady = true;
-
-          this.subscribers.forEach(callback => callback());
         })
         .catch(error => {
-          this.isReady = true;
-
           // eslint-disable-next-line no-console
           console.error(`Failed to open cache: ${error.message}`);
+        })
+        .finally(() => {
+          this.isReady = true;
+          this.subscribers.forEach(callback => callback());
         });
     } else {
       this.isReady = true;
