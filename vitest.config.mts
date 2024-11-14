@@ -7,6 +7,7 @@ export default defineConfig({
     coverage: {
       all: true,
       include: ['src/**/*.ts?(x)'],
+      exclude: ['src/global.d.ts', 'src/types.ts'],
       reporter: ['text', 'lcov'],
       thresholds: {
         statements: 90,
