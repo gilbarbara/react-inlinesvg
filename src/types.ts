@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { ReactNode, RefObject, SVGProps } from 'react';
 
 import { STATUS } from './config';
 
@@ -8,14 +8,14 @@ export type PlainObject<T = unknown> = Record<string, T>;
 export type PreProcessorCallback = (code: string) => string;
 
 export type Props = Simplify<
-  Omit<React.SVGProps<SVGElement>, 'onLoad' | 'onError' | 'ref'> & {
+  Omit<SVGProps<SVGElement>, 'onLoad' | 'onError' | 'ref'> & {
     baseURL?: string;
     cacheRequests?: boolean;
-    children?: React.ReactNode;
+    children?: ReactNode;
     description?: string;
     fetchOptions?: RequestInit;
-    innerRef?: React.Ref<SVGElement>;
-    loader?: React.ReactNode;
+    innerRef?: RefObject<SVGElement | null>;
+    loader?: ReactNode;
     onError?: ErrorCallback;
     onLoad?: LoadCallback;
     preProcessor?: PreProcessorCallback;
@@ -26,12 +26,9 @@ export type Props = Simplify<
   }
 >;
 
-export interface State {
-  content: string;
-  element: React.ReactNode;
-  isCached: boolean;
-  status: Status;
-}
+export type Simplify<T> = { [KeyType in keyof T]: T[KeyType] } & {};
+
+export type Status = (typeof STATUS)[keyof typeof STATUS];
 
 export interface FetchError extends Error {
   code: string;
@@ -40,9 +37,12 @@ export interface FetchError extends Error {
   type: string;
 }
 
-export type Simplify<T> = { [KeyType in keyof T]: T[KeyType] } & {};
-
-export type Status = (typeof STATUS)[keyof typeof STATUS];
+export interface State {
+  content: string;
+  element: ReactNode;
+  isCached: boolean;
+  status: Status;
+}
 
 export interface StorageItem {
   content: string;

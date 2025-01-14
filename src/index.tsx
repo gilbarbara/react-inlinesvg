@@ -243,7 +243,10 @@ function ReactInlineSVG(props: Props) {
   }
 
   if (element) {
-    return cloneElement(element as ReactElement, { ref: innerRef, ...elementProps });
+    return cloneElement(element as ReactElement<any>, {
+      ref: innerRef,
+      ...elementProps,
+    });
   }
 
   if (([STATUS.UNSUPPORTED, STATUS.FAILED] as Status[]).includes(status)) {
