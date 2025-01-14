@@ -1,7 +1,7 @@
-import { canUseDOM, request, sleep } from './helpers';
-
 import { CACHE_MAX_RETRIES, CACHE_NAME, STATUS } from '../config';
 import { StorageItem } from '../types';
+
+import { canUseDOM, request, sleep } from './helpers';
 
 export default class CacheStore {
   private cacheApi: Cache | undefined;
