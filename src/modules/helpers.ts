@@ -5,7 +5,7 @@ function randomCharacter(character: string) {
 }
 
 export function canUseDOM(): boolean {
-  return !!window?.document?.createElement;
+  return !!(typeof window !== 'undefined' && window.document?.createElement);
 }
 
 export function isSupportedEnvironment(): boolean {
