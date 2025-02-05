@@ -192,7 +192,7 @@ But there's an alternative that sidesteps these issues: load the SVG with a GET 
 
 ### Note
 
-The SVG [`<use>`](http://css-tricks.com/svg-use-external-source) element can be used to achieve something similar to this component. See [this article](http://taye.me/blog/svg/a-guide-to-svg-use-elements/) for more information and [this table](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use#Browser_compatibility) for browser support and caveats.
+The SVG [`<use>`](http://css-tricks.com/svg-use-external-source) element can be used to achieve something similar to this component. See [this article](http://taye.me/blog/svg/a-guide-to-svg-use-elements) for more information and [this table](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use#Browser_compatibility) for browser support and caveats.
 
 ## Credits
 
