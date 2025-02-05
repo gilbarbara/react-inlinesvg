@@ -1,4 +1,4 @@
-import { ReactNode, RefObject, SVGProps } from 'react';
+import { ReactNode, Ref, SVGProps } from 'react';
 
 import { STATUS } from './config';
 
@@ -14,7 +14,7 @@ export type Props = Simplify<
     children?: ReactNode;
     description?: string;
     fetchOptions?: RequestInit;
-    innerRef?: RefObject<SVGElement | null>;
+    innerRef?: Ref<SVGElement | null>;
     loader?: ReactNode;
     onError?: ErrorCallback;
     onLoad?: LoadCallback;
