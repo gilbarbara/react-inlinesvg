@@ -29,10 +29,24 @@ export default class CacheStore {
         .catch(error => {
           // eslint-disable-next-line no-console
           console.error(`Failed to open cache: ${error.message}`);
+          this.cacheApi = undefined;
         })
         .finally(() => {
           this.isReady = true;
-          this.subscribers.forEach(callback => callback());
+          // Copy to avoid mutation issues
+          const callbacks = [...this.subscribers];
+
+          // Clear array efficiently
+          this.subscribers.length = 0;
+
+          callbacks.forEach(callback => {
+            try {
+              callback();
+            } catch (error: any) {
+              // eslint-disable-next-line no-console
+              console.error(`Error in CacheStore subscriber callback: ${error.message}`);
+            }
+          });
         });
     } else {
       this.isReady = true;
@@ -131,17 +145,16 @@ export default class CacheStore {
   }
 
   private async handleLoading(url: string, callback: () => Promise<void>) {
-    let retryCount = 0;
+    for (let retryCount = 0; retryCount < CACHE_MAX_RETRIES; retryCount++) {
+      if (this.cacheStore.get(url)?.status !== STATUS.LOADING) {
+        return;
+      }
 
-    while (this.cacheStore.get(url)?.status === STATUS.LOADING && retryCount < CACHE_MAX_RETRIES) {
       // eslint-disable-next-line no-await-in-loop
       await sleep(0.1);
-      retryCount += 1;
     }
 
-    if (retryCount >= CACHE_MAX_RETRIES) {
-      await callback();
-    }
+    await callback();
   }
 
   public keys(): Array<string> {
@@ -164,10 +177,7 @@ export default class CacheStore {
     if (this.cacheApi) {
       const keys = await this.cacheApi.keys();
 
-      for (const key of keys) {
-        // eslint-disable-next-line no-await-in-loop
-        await this.cacheApi.delete(key);
-      }
+      await Promise.allSettled(keys.map(key => this.cacheApi!.delete(key)));
     }
 
     this.cacheStore.clear();

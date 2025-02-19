@@ -99,7 +99,7 @@ function ReactInlineSVG(props: Props) {
         status: STATUS.READY,
       });
     } catch (error: any) {
-      handleError(new Error(error.message));
+      handleError(error);
     }
   }, [content, handleError, props]);
 
@@ -149,7 +149,7 @@ function ReactInlineSVG(props: Props) {
       isActive.current = true;
 
       if (!canUseDOM() || isInitialized.current) {
-        return () => undefined;
+        return undefined;
       }
 
       try {
@@ -178,13 +178,9 @@ function ReactInlineSVG(props: Props) {
     [],
   );
 
-  // Handle prop changes
+  // Handles `src` changes
   useEffect(() => {
-    if (!canUseDOM()) {
-      return;
-    }
-
-    if (!previousProps) {
+    if (!canUseDOM() || !previousProps) {
       return;
     }
 
@@ -196,10 +192,26 @@ function ReactInlineSVG(props: Props) {
       }
 
       load();
-    } else if (previousProps.title !== title || previousProps.description !== description) {
+    }
+  }, [handleError, load, previousProps, src]);
+
+  // Handles content loading
+  useEffect(() => {
+    if (status === STATUS.LOADED) {
       getElement();
     }
-  }, [description, getElement, handleError, load, previousProps, src, title]);
+  }, [status, getElement]);
+
+  // Handles `title` and `description` changes
+  useEffect(() => {
+    if (!canUseDOM() || !previousProps || previousProps.src !== src) {
+      return;
+    }
+
+    if (previousProps.title !== title || previousProps.description !== description) {
+      getElement();
+    }
+  }, [description, getElement, previousProps, src, title]);
 
   // handle state
   useEffect(() => {
@@ -207,16 +219,28 @@ function ReactInlineSVG(props: Props) {
       return;
     }
 
-    if (previousState.status !== STATUS.LOADING && status === STATUS.LOADING) {
-      getContent();
-    }
+    switch (status) {
+      case STATUS.LOADING: {
+        if (previousState.status !== STATUS.LOADING) {
+          getContent();
+        }
 
-    if (previousState.status !== STATUS.LOADED && status === STATUS.LOADED) {
-      getElement();
-    }
+        break;
+      }
+      case STATUS.LOADED: {
+        if (previousState.status !== STATUS.LOADED) {
+          getElement();
+        }
 
-    if (previousState.status !== STATUS.READY && status === STATUS.READY) {
-      onLoad?.(src, isCached);
+        break;
+      }
+      case STATUS.READY: {
+        if (previousState.status !== STATUS.READY) {
+          onLoad?.(src, isCached);
+        }
+
+        break;
+      }
     }
   }, [getContent, getElement, isCached, onLoad, previousState, src, status]);
 
@@ -243,7 +267,7 @@ function ReactInlineSVG(props: Props) {
   }
 
   if (element) {
-    return cloneElement(element as ReactElement<any>, {
+    return cloneElement(element as ReactElement, {
       ref: innerRef,
       ...elementProps,
     });
@@ -262,18 +286,17 @@ export default function InlineSVG(props: Props) {
   }
 
   const { loader } = props;
-  const hasCallback = useRef(false);
   const [isReady, setReady] = useState(cacheStore.isReady);
 
   useEffect(() => {
-    if (!hasCallback.current) {
-      cacheStore.onReady(() => {
-        setReady(true);
-      });
-
-      hasCallback.current = true;
+    if (isReady) {
+      return;
     }
-  }, []);
+
+    cacheStore.onReady(() => {
+      setReady(true);
+    });
+  }, [isReady]);
 
   if (!isReady) {
     return loader;
