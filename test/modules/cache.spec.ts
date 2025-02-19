@@ -140,10 +140,14 @@ describe('CacheStore (external)', () => {
     value: true,
   });
   const mockReady = vi.fn();
-  const cacheStore = new CacheStore();
+  let cacheStore: CacheStore;
 
-  // wait for the cache to be ready
-  cacheStore.onReady(mockReady);
+  beforeAll(async () => {
+    // wait for the cache to be ready
+    cacheStore = new CacheStore();
+    cacheStore.onReady(mockReady);
+    await waitFor(() => expect(mockReady).toHaveBeenCalledTimes(1));
+  });
 
   beforeEach(() => {
     fetchMock.mockResponse(() => Promise.resolve(reactContent));
@@ -196,6 +200,33 @@ describe('CacheStore (external)', () => {
 
     await expect(cacheStore.get(reactUrl)).resolves.toBe(reactContent);
     expect(fetchMock).toHaveBeenCalledTimes(0);
+  });
+
+  it('should correctly cache and return empty responses', async () => {
+    fetchMock.mockResponseOnce(() => Promise.resolve(''));
+
+    // First fetch: Expect it to store the empty response
+    await expect(cacheStore.get(jsUrl)).resolves.toBe('');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(cacheStore.isCached(jsUrl)).toBeTrue();
+
+    expect(cacheStore.data()).toEqual([{ [jsUrl]: { content: '', status: STATUS.LOADED } }]);
+
+    // Second fetch: Should return cached empty response without calling fetch
+    await expect(cacheStore.get(jsUrl)).resolves.toBe('');
+    expect(fetchMock).toHaveBeenCalledTimes(1); // Should still be 1 if properly cached
+
+    // Delete and refetch: Should trigger another fetch
+    await cacheStore.delete(jsUrl);
+
+    expect(cacheStore.isCached(jsUrl)).toBeFalse();
+    expect(cacheStore.keys()).toHaveLength(0);
+
+    fetchMock.mockResponseOnce(() => Promise.resolve(jsContent));
+
+    await expect(cacheStore.get(jsUrl)).resolves.toBe(jsContent);
+
+    expect(fetchMock).toHaveBeenCalledTimes(2); // Fetch count should increase
   });
 
   it('should handle delete', async () => {
