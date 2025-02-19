@@ -53,7 +53,7 @@ describe('unsupported environments', () => {
     const { container } = setup();
 
     await waitFor(() => {
-      expect(mockOnError).toHaveBeenCalledWith(new Error('fetch is not a function'));
+      expect(mockOnError).toHaveBeenCalledWith(new TypeError('fetch is not a function'));
     });
 
     expect(container.firstChild).toMatchSnapshot();
