@@ -104,7 +104,16 @@ function ReactInlineSVG(props: Props) {
   }, [content, handleError, props]);
 
   const getContent = useCallback(async () => {
-    const dataURI = /^data:image\/svg[^,]*?(;base64)?,(.*)/u.exec(src);
+    let dataURI: ReturnType<typeof RegExp.prototype.exec>;
+    const regexp = /^data:image\/svg[^,]*?(;base64)?,(.*)/;
+
+    try {
+      dataURI = new RegExp(regexp.source, 'u').exec(src);
+    } catch {
+      // Enables support of browsers not supporting /u
+      dataURI = regexp.exec(src);
+    }
+
     let inlineSrc;
 
     if (dataURI) {
