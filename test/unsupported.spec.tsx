@@ -25,6 +25,7 @@ function Loader() {
   return <div id="loader" />;
 }
 
+// eslint-disable-next-line unused-imports/no-unused-vars
 function setup({ onLoad, src = 'http://localhost:1337/play.svg', ...rest }: Partial<Props> = {}) {
   return render(
     <InlineSVG loader={<Loader />} onError={mockOnError} onLoad={mockOnLoad} src={src} {...rest} />,

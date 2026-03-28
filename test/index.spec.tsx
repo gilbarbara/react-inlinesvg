@@ -53,6 +53,7 @@ function Loader() {
   return <div data-testid="Loader" />;
 }
 
+// eslint-disable-next-line unused-imports/no-unused-vars
 function setup({ onLoad, ...rest }: Props) {
   return render(
     <ReactInlineSVG loader={<Loader />} onError={mockOnError} onLoad={mockOnLoad} {...rest} />,

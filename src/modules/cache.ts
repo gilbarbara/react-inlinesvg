@@ -150,7 +150,6 @@ export default class CacheStore {
         return;
       }
 
-      // eslint-disable-next-line no-await-in-loop
       await sleep(0.1);
     }
 

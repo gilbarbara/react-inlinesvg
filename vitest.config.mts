@@ -5,7 +5,6 @@ export default defineConfig({
   plugins: [react()],
   test: {
     coverage: {
-      all: true,
       include: ['src/**/*.ts?(x)'],
       exclude: ['src/global.d.ts', 'src/types.ts'],
       reporter: ['text', 'lcov'],

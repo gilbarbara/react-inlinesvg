@@ -1,4 +1,4 @@
-/* eslint-disable import/first */
+/* eslint-disable import-x/first */
 import * as React from 'react';
 import { render, waitFor } from '@testing-library/react';
 import CacheMock from 'browser-cache-mock';
@@ -42,6 +42,7 @@ fetchMock.mockResponse(() =>
   }),
 );
 
+// eslint-disable-next-line unused-imports/no-unused-vars
 function setup({ cacheName, onLoad, ...rest }: Props & { cacheName?: string }) {
   return render(
     <ReactInlineSVG loader={<Loader />} onError={mockOnError} onLoad={mockOnLoad} {...rest} />,
