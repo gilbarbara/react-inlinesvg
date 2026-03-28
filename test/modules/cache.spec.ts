@@ -146,7 +146,9 @@ describe('CacheStore (external)', () => {
     // wait for the cache to be ready
     cacheStore = new CacheStore();
     cacheStore.onReady(mockReady);
-    await waitFor(() => expect(mockReady).toHaveBeenCalledTimes(1));
+    await waitFor(() => {
+      expect(mockReady).toHaveBeenCalledTimes(1);
+    });
   });
 
   beforeEach(() => {

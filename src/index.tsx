@@ -2,6 +2,7 @@ import React, {
   cloneElement,
   isValidElement,
   ReactElement,
+  SVGProps,
   useCallback,
   useEffect,
   useReducer,
@@ -17,7 +18,7 @@ import { usePrevious } from './modules/hooks';
 import { getNode } from './modules/utils';
 import { FetchError, Props, State, Status } from './types';
 
-// eslint-disable-next-line import/no-mutable-exports
+// eslint-disable-next-line import-x/no-mutable-exports
 export let cacheStore: CacheStore;
 
 function ReactInlineSVG(props: Props) {
@@ -267,7 +268,7 @@ function ReactInlineSVG(props: Props) {
   }
 
   if (element) {
-    return cloneElement(element as ReactElement, {
+    return cloneElement(element as ReactElement<SVGProps<SVGElement>>, {
       ref: innerRef,
       ...elementProps,
     });

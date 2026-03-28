@@ -496,19 +496,19 @@ exports[`react-inlinesvg > basic functionality > should render a svg url with in
     height="504"
     rx="17"
     ry="17"
-    style="fill: url(#radial-gradient__test);"
+    style="fill: url("#radial-gradient__test");"
     width="324"
   />
   <rect
     height="92.91"
-    style="fill: url(#radial-gradient-2__test);"
+    style="fill: url("#radial-gradient-2__test");"
     width="240.8"
     x="41.6"
     y="45.5"
   />
   <rect
     height="92.91"
-    style="opacity: 0.30000000000000004; fill: url(#New_Pattern_Swatch_3__test);"
+    style="opacity: 0.30000000000000004; fill: url("#New_Pattern_Swatch_3__test");"
     width="240.8"
     x="41.6"
     y="45.5"

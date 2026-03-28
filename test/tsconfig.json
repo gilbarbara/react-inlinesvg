@@ -2,7 +2,8 @@
   "extends": "../tsconfig",
   "compilerOptions": {
     "noUnusedLocals": false,
-    "module": "esnext"
+    "module": "esnext",
+    "types": ["jest-extended", "vitest/globals"]
   },
   "include": ["**/*", "../src/**/*"]
 }
