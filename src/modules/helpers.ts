@@ -1,5 +1,3 @@
-import type { PlainObject } from '../types';
-
 function randomCharacter(character: string) {
   return character[Math.floor(Math.random() * character.length)];
 }
@@ -15,7 +13,7 @@ export function isSupportedEnvironment(): boolean {
 /**
  *  Remove properties from an object
  */
-export function omit<T extends PlainObject, K extends keyof T>(
+export function omit<T extends Record<string, unknown>, K extends keyof T>(
   input: T,
   ...filter: K[]
 ): Omit<T, K> {
