@@ -30,7 +30,7 @@ function Loader() {
 const mockOnError = vi.fn();
 const mockOnLoad = vi.fn();
 
-const url = 'https://cdn.svgporn.com/logos/react.svg';
+const url = 'https://cdn.svglogos.dev/logos/react.svg';
 
 fetchMock.enableMocks();
 

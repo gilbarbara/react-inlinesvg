@@ -21,8 +21,8 @@ const fixtures = {
   styles_with_css_variables: 'http://127.0.0.1:1337/styles_with_css_variables.svg',
   styles_with_ids: 'http://127.0.0.1:1337/styles_with_ids.svg',
   utf8: 'http://127.0.0.1:1337/utf8.svg',
-  url: 'https://cdn.svgporn.com/logos/react.svg',
-  url2: 'https://cdn.svgporn.com/logos/javascript.svg',
+  url: 'https://cdn.svglogos.dev/logos/react.svg',
+  url2: 'https://cdn.svglogos.dev/logos/javascript.svg',
   base64:
     'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxwYXRoIGQ9Ik04IDV2MTRsMTEtN3oiLz4KICAgIDxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4KPC9zdmc+Cg==',
   urlEncoded:
