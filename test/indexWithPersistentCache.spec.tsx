@@ -62,7 +62,7 @@ describe('react-inlinesvg (with persistent cache)', () => {
     );
 
     await waitFor(() => {
-      expect(mockOnLoad).toHaveBeenNthCalledWith(1, url, true);
+      expect(mockOnLoad).toHaveBeenNthCalledWith(1, url, false);
     });
 
     rerender(
@@ -110,7 +110,7 @@ describe('react-inlinesvg (with persistent cache)', () => {
     );
 
     await waitFor(() => {
-      expect(mockOnLoad).toHaveBeenNthCalledWith(3, url, true);
+      expect(mockOnLoad).toHaveBeenNthCalledWith(3, url, false);
     });
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });

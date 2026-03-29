@@ -97,22 +97,6 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
     [onError],
   );
 
-  const handleLoad = useCallback((loadedContent: string, hasCache = false) => {
-    if (isActive.current) {
-      setState({
-        content: loadedContent,
-        isCached: hasCache,
-        status: STATUS.LOADED,
-      });
-    }
-  }, []);
-
-  const fetchContent = useCallback(async () => {
-    const responseContent: string = await request(src, fetchOptions);
-
-    handleLoad(responseContent);
-  }, [fetchOptions, handleLoad, src]);
-
   const getElement = useCallback(() => {
     try {
       const node = getNode({ ...props, handleError, hash: hash.current, content }) as Node;
@@ -130,46 +114,6 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
       handleError(error);
     }
   }, [content, handleError, props]);
-
-  const getContent = useCallback(async () => {
-    const dataURI = /^data:image\/svg[^,]*?(;base64)?,(.*)/.exec(src);
-    let inlineSrc;
-
-    if (dataURI) {
-      inlineSrc = dataURI[1] ? window.atob(dataURI[2]) : decodeURIComponent(dataURI[2]);
-    } else if (src.includes('<svg')) {
-      inlineSrc = src;
-    }
-
-    if (inlineSrc) {
-      handleLoad(inlineSrc);
-
-      return;
-    }
-
-    try {
-      if (cacheRequests) {
-        const cachedContent = await cacheStore.get(src, fetchOptions);
-
-        handleLoad(cachedContent, true);
-      } else {
-        await fetchContent();
-      }
-    } catch (error: any) {
-      handleError(error);
-    }
-  }, [cacheRequests, cacheStore, fetchContent, fetchOptions, handleError, handleLoad, src]);
-
-  const load = useCallback(async () => {
-    if (isActive.current) {
-      setState({
-        content: '',
-        element: null,
-        isCached: false,
-        status: STATUS.LOADING,
-      });
-    }
-  }, []);
 
   // Mount
   useMount(() => {
@@ -191,7 +135,7 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
           throw new Error('Missing src');
         }
 
-        load();
+        setState({ content: '', element: null, isCached: false, status: STATUS.LOADING });
       }
     } catch (error: any) {
       handleError(error);
@@ -217,9 +161,72 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
         return;
       }
 
-      load();
+      setState({ content: '', element: null, isCached: false, status: STATUS.LOADING });
     }
-  }, [handleError, load, previousProps, src]);
+  }, [handleError, previousProps, src]);
+
+  // Fetch content when status is LOADING
+  useEffect(() => {
+    if (status !== STATUS.LOADING) {
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    let active = true;
+
+    (async () => {
+      try {
+        const dataURI = /^data:image\/svg[^,]*?(;base64)?,(.*)/.exec(src);
+        let inlineSrc;
+
+        if (dataURI) {
+          inlineSrc = dataURI[1] ? window.atob(dataURI[2]) : decodeURIComponent(dataURI[2]);
+        } else if (src.includes('<svg')) {
+          inlineSrc = src;
+        }
+
+        if (inlineSrc) {
+          if (active) {
+            setState({ content: inlineSrc, isCached: false, status: STATUS.LOADED });
+          }
+
+          return;
+        }
+
+        const fetchParameters = { ...fetchOptions, signal: controller.signal };
+        let loadedContent: string;
+        let hasCache = false;
+
+        if (cacheRequests) {
+          hasCache = cacheStore.isCached(src);
+          loadedContent = await cacheStore.get(src, fetchParameters);
+        } else {
+          loadedContent = await request(src, fetchParameters);
+        }
+
+        if (active) {
+          setState({ content: loadedContent, isCached: hasCache, status: STATUS.LOADED });
+        }
+      } catch (error: any) {
+        if (active && error.name !== 'AbortError') {
+          handleError(error);
+        }
+      }
+    })();
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [src, status]);
+
+  // LOADED -> READY
+  useEffect(() => {
+    if (status === STATUS.LOADED && content) {
+      getElement();
+    }
+  }, [content, getElement, status]);
 
   // Title and description changes
   useEffect(() => {
@@ -232,36 +239,16 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
     }
   }, [description, getElement, previousProps, src, title]);
 
-  // State transitions
+  // READY -> onLoad
   useEffect(() => {
     if (!previousState) {
       return;
     }
 
-    switch (status) {
-      case STATUS.LOADING: {
-        if (previousState.status !== STATUS.LOADING) {
-          getContent();
-        }
-
-        break;
-      }
-      case STATUS.LOADED: {
-        if (previousState.status !== STATUS.LOADED) {
-          getElement();
-        }
-
-        break;
-      }
-      case STATUS.READY: {
-        if (previousState.status !== STATUS.READY) {
-          onLoad?.(src, isCached);
-        }
-
-        break;
-      }
+    if (status === STATUS.READY && previousState.status !== STATUS.READY) {
+      onLoad?.(src, isCached);
     }
-  }, [getContent, getElement, isCached, onLoad, previousState, src, status]);
+  }, [isCached, onLoad, previousState, src, status]);
 
   return { element, status };
 }
