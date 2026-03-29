@@ -381,11 +381,14 @@ describe('react-inlinesvg', () => {
       });
 
       await waitFor(() => {
-        expect(fetchMock).toHaveBeenCalledWith('http://127.0.0.1:1337/react.svg', {
-          headers: {
-            Authorization: 'Bearer ad99d8d5-419d-434e-97c2-3ce52e116d52',
-          },
-        });
+        expect(fetchMock).toHaveBeenCalledWith(
+          'http://127.0.0.1:1337/react.svg',
+          expect.objectContaining({
+            headers: {
+              Authorization: 'Bearer ad99d8d5-419d-434e-97c2-3ce52e116d52',
+            },
+          }),
+        );
       });
 
       fetchMock.disableMocks();
@@ -471,7 +474,7 @@ describe('react-inlinesvg', () => {
       setup({ src: fixtures.url });
 
       await waitFor(() => {
-        expect(mockOnLoad).toHaveBeenNthCalledWith(1, fixtures.url, true);
+        expect(mockOnLoad).toHaveBeenNthCalledWith(1, fixtures.url, false);
       });
 
       setup({ src: fixtures.url });
@@ -480,7 +483,11 @@ describe('react-inlinesvg', () => {
         expect(mockOnLoad).toHaveBeenNthCalledWith(2, fixtures.url, true);
       });
 
-      expect(fetchMock).toHaveBeenNthCalledWith(1, fixtures.url, undefined);
+      expect(fetchMock).toHaveBeenNthCalledWith(
+        1,
+        fixtures.url,
+        expect.objectContaining({ signal: expect.any(AbortSignal) }),
+      );
 
       expect(cacheStore.isCached(fixtures.url)).toBeTrue();
     });
@@ -504,7 +511,7 @@ describe('react-inlinesvg', () => {
       expect(fetchMock).toHaveBeenCalledTimes(1);
 
       await waitFor(() => {
-        expect(mockOnLoad).toHaveBeenNthCalledWith(3, fixtures.url, true);
+        expect(mockOnLoad).toHaveBeenNthCalledWith(3, fixtures.url, false);
       });
     });
 
@@ -548,7 +555,7 @@ describe('react-inlinesvg', () => {
       });
 
       await waitFor(() => {
-        expect(mockOnLoad).toHaveBeenNthCalledWith(1, fixtures.react, true);
+        expect(mockOnLoad).toHaveBeenNthCalledWith(1, fixtures.react, false);
       });
 
       expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -609,6 +616,75 @@ describe('react-inlinesvg', () => {
 
     it('should handle race condition with fast src changes', async () => {
       fetchMock.enableMocks();
+
+      // URL A resolves slowly, URL B resolves fast
+      fetchMock
+        .mockResponseOnce(
+          () =>
+            new Promise(resolve => {
+              setTimeout(
+                () =>
+                  resolve({
+                    body: '<svg><title>Slow A</title><rect /></svg>',
+                    headers: { 'Content-Type': 'image/svg+xml' },
+                  }),
+                500,
+              );
+            }),
+        )
+        .mockResponseOnce(
+          () =>
+            new Promise(resolve => {
+              setTimeout(
+                () =>
+                  resolve({
+                    body: '<svg><title>Fast B</title><circle /></svg>',
+                    headers: { 'Content-Type': 'image/svg+xml' },
+                  }),
+                10,
+              );
+            }),
+        );
+
+      const { container, rerender } = render(
+        <ReactInlineSVG
+          cacheRequests={false}
+          onError={mockOnError}
+          onLoad={mockOnLoad}
+          src={fixtures.url}
+        />,
+      );
+
+      // Change src before first fetch resolves
+      rerender(
+        <ReactInlineSVG
+          cacheRequests={false}
+          onError={mockOnError}
+          onLoad={mockOnLoad}
+          src={fixtures.url2}
+        />,
+      );
+
+      await act(async () => {
+        vi.advanceTimersByTime(600);
+      });
+
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      expect(mockOnLoad).toHaveBeenCalledWith(fixtures.url2, false);
+
+      // Verify correct SVG content rendered (B, not A)
+      expect(container.querySelector('title')).toHaveTextContent('Fast B');
+      expect(container.querySelector('circle')).toBeInTheDocument();
+      expect(container.querySelector('rect')).not.toBeInTheDocument();
+
+      fetchMock.disableMocks();
+    });
+
+    it('should handle sequential src changes', async () => {
+      fetchMock.enableMocks();
       fetchMock
         .mockResponseOnce(
           () =>
@@ -640,11 +716,15 @@ describe('react-inlinesvg', () => {
       const { container, rerender } = setup({ src: fixtures.react, title: 'React' });
 
       await waitFor(() => {
-        expect(fetchMock).toHaveBeenNthCalledWith(1, fixtures.react, undefined);
+        expect(fetchMock).toHaveBeenNthCalledWith(
+          1,
+          fixtures.react,
+          expect.objectContaining({ signal: expect.any(AbortSignal) }),
+        );
       });
 
       await waitFor(() => {
-        expect(mockOnLoad).toHaveBeenNthCalledWith(1, fixtures.react, true);
+        expect(mockOnLoad).toHaveBeenNthCalledWith(1, fixtures.react, false);
       });
 
       rerender(
@@ -658,11 +738,15 @@ describe('react-inlinesvg', () => {
       );
 
       await waitFor(() => {
-        expect(fetchMock).toHaveBeenNthCalledWith(2, fixtures.url2, undefined);
+        expect(fetchMock).toHaveBeenNthCalledWith(
+          2,
+          fixtures.url2,
+          expect.objectContaining({ signal: expect.any(AbortSignal) }),
+        );
       });
 
       await waitFor(() => {
-        expect(mockOnLoad).toHaveBeenNthCalledWith(2, fixtures.url2, true);
+        expect(mockOnLoad).toHaveBeenNthCalledWith(2, fixtures.url2, false);
       });
 
       rerender(

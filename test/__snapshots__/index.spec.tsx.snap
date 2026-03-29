@@ -3155,14 +3155,14 @@ exports[`react-inlinesvg > integration > should handle pre-cached entries in the
 </svg>
 `;
 
-exports[`react-inlinesvg > integration > should handle race condition with fast src changes > cacheStore 1`] = `
+exports[`react-inlinesvg > integration > should handle sequential src changes > cacheStore 1`] = `
 [
   "http://127.0.0.1:1337/react.svg",
   "https://cdn.svgporn.com/logos/javascript.svg",
 ]
 `;
 
-exports[`react-inlinesvg > integration > should handle race condition with fast src changes > svg 1`] = `
+exports[`react-inlinesvg > integration > should handle sequential src changes > svg 1`] = `
 <svg>
   <title>
     React
