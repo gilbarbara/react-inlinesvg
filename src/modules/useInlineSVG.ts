@@ -11,6 +11,7 @@ import { getNode } from './utils';
 
 export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
   const {
+    baseURL,
     cacheRequests = true,
     description,
     fetchOptions,
@@ -20,6 +21,7 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
     src,
     title,
     uniqueHash,
+    uniquifyIDs,
   } = props;
 
   const hash = useRef(uniqueHash ?? randomString(8));
@@ -106,7 +108,17 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
 
   const getElement = useCallback(() => {
     try {
-      const node = getNode({ ...props, handleError, hash: hash.current, content }) as Node;
+      const node = getNode({
+        baseURL,
+        content,
+        description,
+        handleError,
+        hash: hash.current,
+        preProcessor: preProcessorRef.current,
+        src,
+        title,
+        uniquifyIDs,
+      }) as Node;
       const convertedElement = convert(node);
 
       if (!convertedElement || !isValidElement(convertedElement)) {
@@ -120,7 +132,7 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
     } catch (error: any) {
       handleError(error);
     }
-  }, [content, handleError, props]);
+  }, [baseURL, content, description, handleError, src, title, uniquifyIDs]);
 
   // Mount
   useMount(() => {
