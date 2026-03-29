@@ -25,9 +25,9 @@ Object.defineProperty(window, 'caches', {
   },
 });
 
-const reactUrl = 'https://cdn.svgporn.com/logos/react.svg';
+const reactUrl = 'https://cdn.svglogos.dev/logos/react.svg';
 const reactContent = '<svg><title>React</title><circle /></svg>';
-const jsUrl = 'https://cdn.svgporn.com/logos/javascript.svg';
+const jsUrl = 'https://cdn.svglogos.dev/logos/javascript.svg';
 const jsContent = '<svg><title>JS</title><circle /></svg>';
 
 describe('CacheStore (internal)', () => {
