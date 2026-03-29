@@ -62,12 +62,6 @@ export async function request(url: string, options?: RequestInit) {
   return response.text();
 }
 
-export function sleep(seconds = 1) {
-  return new Promise(resolve => {
-    setTimeout(resolve, seconds * 1000);
-  });
-}
-
 export function supportsInlineSVG(): boolean {
   /* c8 ignore next 3 */
   if (!document) {
