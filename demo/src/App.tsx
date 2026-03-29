@@ -21,7 +21,7 @@ export default function App() {
         <GridItem>
           <h4>Remote URL</h4>
           <div>
-            <SVG src="https://cdn.svgporn.com/logos/firefox.svg" />
+            <SVG src="https://cdn.svglogos.dev/logos/firefox.svg" />
           </div>
         </GridItem>
         <GridItem>
@@ -35,10 +35,10 @@ export default function App() {
           <h4>Fallback</h4>
           <div>
             {/* This file doesn't exist */}
-            <SVG loader="Loading..." src="https://cdn.svgporn.com/logos/react-rules.svg">
+            <SVG loader="Loading..." src="https://cdn.svglogos.dev/logos/react-rules.svg">
               <img
                 alt="Angular"
-                src="https://cdn.svgporn.com/logos/angular-icon.svg"
+                src="https://cdn.svglogos.dev/logos/angular-icon.svg"
                 width="100%"
               />
             </SVG>
