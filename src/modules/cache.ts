@@ -1,7 +1,12 @@
 import { CACHE_MAX_RETRIES, CACHE_NAME, STATUS } from '../config';
 import { StorageItem } from '../types';
 
-import { canUseDOM, request, sleep } from './helpers';
+import { canUseDOM, request } from './helpers';
+
+export interface CacheStoreOptions {
+  name?: string;
+  persistent?: boolean;
+}
 
 export default class CacheStore {
   private cacheApi: Cache | undefined;
@@ -9,20 +14,17 @@ export default class CacheStore {
   private readonly subscribers: Array<() => void> = [];
   public isReady = false;
 
-  constructor() {
+  constructor(options: CacheStoreOptions = {}) {
+    const { name = CACHE_NAME, persistent = false } = options;
+
     this.cacheStore = new Map<string, StorageItem>();
 
-    let cacheName = CACHE_NAME;
-    let usePersistentCache = false;
-
-    if (canUseDOM()) {
-      cacheName = window.REACT_INLINESVG_CACHE_NAME ?? CACHE_NAME;
-      usePersistentCache = !!window.REACT_INLINESVG_PERSISTENT_CACHE && 'caches' in window;
-    }
+    const usePersistentCache = persistent && canUseDOM() && 'caches' in window;
 
     if (usePersistentCache) {
+      // eslint-disable-next-line promise/catch-or-return
       caches
-        .open(cacheName)
+        .open(name)
         .then(cache => {
           this.cacheApi = cache;
         })
@@ -53,19 +55,41 @@ export default class CacheStore {
     }
   }
 
-  public onReady(callback: () => void) {
+  public onReady(callback: () => void): () => void {
     if (this.isReady) {
       callback();
-    } else {
-      this.subscribers.push(callback);
+
+      return () => {};
     }
+
+    this.subscribers.push(callback);
+
+    return () => {
+      const index = this.subscribers.indexOf(callback);
+
+      if (index >= 0) {
+        this.subscribers.splice(index, 1);
+      }
+    };
+  }
+
+  private waitForReady(): Promise<void> {
+    if (this.isReady) {
+      return Promise.resolve();
+    }
+
+    return new Promise(resolve => {
+      this.onReady(resolve);
+    });
   }
 
   public async get(url: string, fetchOptions?: RequestInit) {
-    await (this.cacheApi
-      ? this.fetchAndAddToPersistentCache(url, fetchOptions)
-      : this.fetchAndAddToInternalCache(url, fetchOptions));
+    await this.fetchAndCache(url, fetchOptions);
 
+    return this.cacheStore.get(url)?.content ?? '';
+  }
+
+  public getContent(url: string): string {
     return this.cacheStore.get(url)?.content ?? '';
   }
 
@@ -77,33 +101,11 @@ export default class CacheStore {
     return this.cacheStore.get(url)?.status === STATUS.LOADED;
   }
 
-  private async fetchAndAddToInternalCache(url: string, fetchOptions?: RequestInit) {
-    const cache = this.cacheStore.get(url);
-
-    if (cache?.status === STATUS.LOADING) {
-      await this.handleLoading(url, async () => {
-        this.cacheStore.set(url, { content: '', status: STATUS.IDLE });
-        await this.fetchAndAddToInternalCache(url, fetchOptions);
-      });
-
-      return;
+  private async fetchAndCache(url: string, fetchOptions?: RequestInit) {
+    if (!this.isReady) {
+      await this.waitForReady();
     }
 
-    if (!cache?.content) {
-      this.cacheStore.set(url, { content: '', status: STATUS.LOADING });
-
-      try {
-        const content = await request(url, fetchOptions);
-
-        this.cacheStore.set(url, { content, status: STATUS.LOADED });
-      } catch (error: any) {
-        this.cacheStore.set(url, { content: '', status: STATUS.FAILED });
-        throw error;
-      }
-    }
-  }
-
-  private async fetchAndAddToPersistentCache(url: string, fetchOptions?: RequestInit) {
     const cache = this.cacheStore.get(url);
 
     if (cache?.status === STATUS.LOADED) {
@@ -111,9 +113,9 @@ export default class CacheStore {
     }
 
     if (cache?.status === STATUS.LOADING) {
-      await this.handleLoading(url, async () => {
+      await this.handleLoading(url, fetchOptions?.signal || undefined, async () => {
         this.cacheStore.set(url, { content: '', status: STATUS.IDLE });
-        await this.fetchAndAddToPersistentCache(url, fetchOptions);
+        await this.fetchAndCache(url, fetchOptions);
       });
 
       return;
@@ -121,21 +123,10 @@ export default class CacheStore {
 
     this.cacheStore.set(url, { content: '', status: STATUS.LOADING });
 
-    const data = await this.cacheApi?.match(url);
-
-    if (data) {
-      const content = await data.text();
-
-      this.cacheStore.set(url, { content, status: STATUS.LOADED });
-
-      return;
-    }
-
     try {
-      await this.cacheApi?.add(new Request(url, fetchOptions));
-
-      const response = await this.cacheApi?.match(url);
-      const content = (await response?.text()) ?? '';
+      const content = this.cacheApi
+        ? await this.fetchFromPersistentCache(url, fetchOptions)
+        : await request(url, fetchOptions);
 
       this.cacheStore.set(url, { content, status: STATUS.LOADED });
     } catch (error: any) {
@@ -144,8 +135,32 @@ export default class CacheStore {
     }
   }
 
-  private async handleLoading(url: string, callback: () => Promise<void>) {
+  private async fetchFromPersistentCache(url: string, fetchOptions?: RequestInit): Promise<string> {
+    const data = await this.cacheApi?.match(url);
+
+    if (data) {
+      return data.text();
+    }
+
+    await this.cacheApi?.add(new Request(url, fetchOptions));
+
+    const response = await this.cacheApi?.match(url);
+
+    return (await response?.text()) ?? '';
+  }
+
+  private async handleLoading(
+    url: string,
+    signal: AbortSignal | undefined,
+    callback: () => Promise<void>,
+  ) {
     for (let retryCount = 0; retryCount < CACHE_MAX_RETRIES; retryCount++) {
+      if (signal?.aborted) {
+        throw signal.reason instanceof Error
+          ? signal.reason
+          : new DOMException('The operation was aborted.', 'AbortError');
+      }
+
       if (this.cacheStore.get(url)?.status !== STATUS.LOADING) {
         return;
       }
@@ -181,4 +196,10 @@ export default class CacheStore {
 
     this.cacheStore.clear();
   }
+}
+
+function sleep(seconds = 1) {
+  return new Promise(resolve => {
+    setTimeout(resolve, seconds * 1000);
+  });
 }

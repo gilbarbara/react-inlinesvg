@@ -716,7 +716,16 @@ describe('react-inlinesvg', () => {
         status: 'loaded',
       });
 
-      const { container } = render(<ReactInlineSVG onLoad={mockOnLoad} src={fixtures.react} />);
+      const { container } = render(
+        <ReactInlineSVG
+          loader={<div data-testid="loader" />}
+          onLoad={mockOnLoad}
+          src={fixtures.react}
+        />,
+      );
+
+      // Loader should never appear — cached content renders immediately (#240)
+      expect(container.querySelector('[data-testid="loader"]')).toBeNull();
 
       await waitFor(() => {
         expect(mockOnLoad).toHaveBeenCalledTimes(1);

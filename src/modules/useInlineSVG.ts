@@ -21,6 +21,8 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
     uniqueHash,
   } = props;
 
+  const hash = useRef(uniqueHash ?? randomString(8));
+
   const [state, setState] = useReducer(
     (previousState: State, nextState: Partial<State>) => ({
       ...previousState,
@@ -29,15 +31,55 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
     {
       content: '',
       element: null,
-      isCached: cacheRequests && cacheStore.isCached(props.src),
+      isCached: false,
       status: STATUS.IDLE,
+    },
+    (initial): State => {
+      const cached = cacheRequests && cacheStore.isCached(src);
+
+      if (!cached) {
+        return initial;
+      }
+
+      const cachedContent = cacheStore.getContent(src);
+
+      try {
+        const node = getNode({
+          ...props,
+          handleError: () => {},
+          hash: hash.current,
+          content: cachedContent,
+        });
+
+        if (!node) {
+          return { ...initial, content: cachedContent, isCached: true, status: STATUS.LOADED };
+        }
+
+        const convertedElement = convert(node as Node);
+
+        if (convertedElement && isValidElement(convertedElement)) {
+          return {
+            content: cachedContent,
+            element: convertedElement,
+            isCached: true,
+            status: STATUS.READY,
+          };
+        }
+      } catch {
+        // Fall through to effect-driven flow
+      }
+
+      return {
+        ...initial,
+        content: cachedContent,
+        isCached: true,
+        status: STATUS.LOADED,
+      };
     },
   );
   const { content, element, isCached, status } = state;
   const previousProps = usePrevious(props);
   const previousState = usePrevious(state);
-
-  const hash = useRef(uniqueHash ?? randomString(8));
   const isActive = useRef(false);
   const isInitialized = useRef(false);
 
@@ -138,7 +180,9 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
     }
 
     try {
-      if (status === STATUS.IDLE) {
+      if (status === STATUS.READY) {
+        onLoad?.(src, isCached);
+      } else if (status === STATUS.IDLE) {
         if (!isSupportedEnvironment()) {
           throw new Error('Browser does not support SVG');
         }

@@ -1,6 +1,8 @@
-import { ReactNode } from 'react';
+import React, { createContext, ReactNode, useContext, useState } from 'react';
 
-import { canUseDOM } from './modules/helpers';
+import CacheStore from './modules/cache';
+
+const CacheContext = createContext<CacheStore | null>(null);
 
 interface Props {
   children: ReactNode;
@@ -8,10 +10,11 @@ interface Props {
 }
 
 export default function CacheProvider({ children, name }: Props) {
-  if (canUseDOM()) {
-    window.REACT_INLINESVG_CACHE_NAME = name;
-    window.REACT_INLINESVG_PERSISTENT_CACHE = true;
-  }
+  const [store] = useState(() => new CacheStore({ name, persistent: true }));
 
-  return children;
+  return <CacheContext.Provider value={store}>{children}</CacheContext.Provider>;
+}
+
+export function useCacheStore(): CacheStore | null {
+  return useContext(CacheContext);
 }

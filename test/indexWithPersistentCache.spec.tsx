@@ -1,8 +1,10 @@
-/* eslint-disable import-x/first */
 import * as React from 'react';
 import { render, waitFor } from '@testing-library/react';
 import CacheMock from 'browser-cache-mock';
 import createFetchMock from 'vitest-fetch-mock';
+
+import ReactInlineSVG from '../src/index';
+import CacheProvider from '../src/provider';
 
 const fetchMock = createFetchMock(vi);
 
@@ -20,9 +22,6 @@ Object.defineProperty(window, 'caches', {
     ...cacheMock,
   },
 });
-
-import ReactInlineSVG, { cacheStore, Props } from '../src/index';
-import CacheProvider from '../src/provider';
 
 function Loader() {
   return <div data-testid="Loader" />;
@@ -42,68 +41,76 @@ fetchMock.mockResponse(() =>
   }),
 );
 
-// eslint-disable-next-line unused-imports/no-unused-vars
-function setup({ cacheName, onLoad, ...rest }: Props & { cacheName?: string }) {
-  return render(
-    <ReactInlineSVG loader={<Loader />} onError={mockOnError} onLoad={mockOnLoad} {...rest} />,
-    { wrapper: ({ children }) => <CacheProvider name={cacheName}>{children}</CacheProvider> },
-  );
-}
-
 describe('react-inlinesvg (with persistent cache)', () => {
   afterEach(async () => {
     fetchMock.mockClear();
-    await cacheStore.clear();
-  });
-
-  it('should set the default global variables', () => {
-    setup({ src: url });
-
-    expect(window.REACT_INLINESVG_PERSISTENT_CACHE).toBeTrue();
-    expect(window.REACT_INLINESVG_CACHE_NAME).toBeUndefined();
-  });
-
-  it('should set the cache name global variable', () => {
-    setup({ cacheName: 'test-cache', src: url });
-
-    expect(window.REACT_INLINESVG_CACHE_NAME).toBe('test-cache');
+    mockOnLoad.mockClear();
+    await cacheMock.keys().then(keys => Promise.all(keys.map(key => cacheMock.delete(key))));
   });
 
   it('should request an SVG only once', async () => {
-    setup({ src: url });
+    const { rerender } = render(
+      <CacheProvider>
+        <ReactInlineSVG
+          key="first"
+          loader={<Loader />}
+          onError={mockOnError}
+          onLoad={mockOnLoad}
+          src={url}
+        />
+      </CacheProvider>,
+    );
 
     await waitFor(() => {
       expect(mockOnLoad).toHaveBeenNthCalledWith(1, url, true);
     });
 
-    setup({ src: url });
+    rerender(
+      <CacheProvider>
+        <ReactInlineSVG
+          key="second"
+          loader={<Loader />}
+          onError={mockOnError}
+          onLoad={mockOnLoad}
+          src={url}
+        />
+      </CacheProvider>,
+    );
 
     await waitFor(() => {
       expect(mockOnLoad).toHaveBeenNthCalledWith(2, url, true);
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(cacheStore.isCached(url)).toBeTrue();
+  });
+
+  it('should persist SVG in the Cache API', async () => {
+    render(
+      <CacheProvider>
+        <ReactInlineSVG loader={<Loader />} onLoad={mockOnLoad} src={url} />
+      </CacheProvider>,
+    );
+
+    await waitFor(() => {
+      expect(mockOnLoad).toHaveBeenCalledTimes(1);
+    });
+
+    const cached = await cacheMock.match(url);
+
+    expect(cached).not.toBeUndefined();
   });
 
   it('should handle multiple simultaneous instances with the same url', async () => {
     render(
-      <>
+      <CacheProvider>
         <ReactInlineSVG onLoad={mockOnLoad} src={url} />
         <ReactInlineSVG onLoad={mockOnLoad} src={url} />
         <ReactInlineSVG onLoad={mockOnLoad} src={url} />
-      </>,
+      </CacheProvider>,
     );
 
     await waitFor(() => {
       expect(mockOnLoad).toHaveBeenNthCalledWith(3, url, true);
-    });
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-
-    setup({ src: url });
-
-    await waitFor(() => {
-      expect(mockOnLoad).toHaveBeenNthCalledWith(4, url, true);
     });
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });

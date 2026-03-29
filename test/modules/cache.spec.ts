@@ -136,18 +136,15 @@ describe('CacheStore (internal)', () => {
 });
 
 describe('CacheStore (external)', () => {
-  Object.defineProperty(window, 'REACT_INLINESVG_PERSISTENT_CACHE', {
-    value: true,
-  });
   const mockReady = vi.fn();
   let cacheStore: CacheStore;
 
   beforeAll(async () => {
-    // wait for the cache to be ready
-    cacheStore = new CacheStore();
-    cacheStore.onReady(mockReady);
-    await waitFor(() => {
-      expect(mockReady).toHaveBeenCalledTimes(1);
+    cacheStore = new CacheStore({ persistent: true });
+
+    // wait for the cache to be ready before running tests
+    await new Promise<void>(resolve => {
+      cacheStore.onReady(resolve);
     });
   });
 
@@ -162,11 +159,41 @@ describe('CacheStore (external)', () => {
 
   it('should handle initialization', async () => {
     await waitFor(() => {
-      expect(mockReady).toHaveBeenCalledTimes(1);
+      expect(mockReady).toHaveBeenCalledTimes(0);
     });
 
     cacheStore.onReady(mockReady);
-    expect(mockReady).toHaveBeenCalledTimes(2);
+    expect(mockReady).toHaveBeenCalledTimes(1);
+  });
+
+  it('should return an unsubscribe function from onReady', async () => {
+    const callback = vi.fn();
+
+    cachesOpenPromise = new Promise(resolve => {
+      setTimeout(() => resolve(cacheMock), 500);
+    });
+
+    const store = new CacheStore({ persistent: true });
+    const unsubscribe = store.onReady(callback);
+
+    unsubscribe();
+
+    await waitFor(() => {
+      expect(store.isReady).toBeTrue();
+    });
+
+    expect(callback).not.toHaveBeenCalled();
+  });
+
+  it('should return a noop unsubscribe when already ready', () => {
+    const callback = vi.fn();
+
+    const unsubscribe = cacheStore.onReady(callback);
+
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    unsubscribe();
+    expect(callback).toHaveBeenCalledTimes(1);
   });
 
   it('should fetch the remote url and add to the cache', async () => {
@@ -275,7 +302,7 @@ describe('CacheStore (external)', () => {
     mockReady.mockClear();
     cachesOpenPromise = Promise.reject(new Error('The operation is insecure.'));
 
-    const cacheStoreWithError = new CacheStore();
+    const cacheStoreWithError = new CacheStore({ persistent: true });
 
     cacheStoreWithError.onReady(mockReady);
 
@@ -283,6 +310,33 @@ describe('CacheStore (external)', () => {
       expect(consoleError).toHaveBeenCalledWith('Failed to open cache: The operation is insecure.');
     });
     expect(mockReady).toHaveBeenCalledTimes(1);
+
+    consoleError.mockRestore();
+  });
+
+  it('should handle errors in subscriber callbacks', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    cachesOpenPromise = new Promise(resolve => {
+      setTimeout(() => resolve(cacheMock), 500);
+    });
+
+    const store = new CacheStore({ persistent: true });
+    const good = vi.fn();
+
+    store.onReady(() => {
+      throw new Error('callback boom');
+    });
+    store.onReady(good);
+
+    await waitFor(() => {
+      expect(store.isReady).toBeTrue();
+    });
+
+    expect(consoleError).toHaveBeenCalledWith(
+      'Error in CacheStore subscriber callback: callback boom',
+    );
+    expect(good).toHaveBeenCalledTimes(1);
 
     consoleError.mockRestore();
   });
