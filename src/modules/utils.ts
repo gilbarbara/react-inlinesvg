@@ -11,6 +11,36 @@ interface UpdateSVGAttributesOptions extends Pick<Props, 'baseURL' | 'uniquifyID
   hash: string;
 }
 
+function uniquifyStyleIds(svgText: string, hash: string, baseURL: string): string {
+  const idMatches = svgText.matchAll(/\bid=(["'])([^"']+)\1/g);
+  const ids = [...new Set([...idMatches].map(m => m[2]))];
+
+  if (!ids.length) {
+    return svgText;
+  }
+
+  ids.sort((a, b) => b.length - a.length);
+
+  return svgText.replace(/<style[^>]*>([\S\s]*?)<\/style>/gi, (fullMatch, cssContent) => {
+    let modified = cssContent as string;
+
+    for (const id of ids) {
+      const escaped = id.replace(/[$()*+.?[\\\]^{|}]/g, '\\$&');
+
+      modified = modified.replace(
+        new RegExp(`url\\((['"]?)#${escaped}\\1\\)`, 'g'),
+        `url($1${baseURL}#${id}__${hash}$1)`,
+      );
+      modified = modified.replace(
+        new RegExp(`#${escaped}(?![a-zA-Z0-9_-])`, 'g'),
+        `#${id}__${hash}`,
+      );
+    }
+
+    return fullMatch.replace(cssContent, modified);
+  });
+}
+
 export function getNode(options: GetNodeOptions) {
   const {
     baseURL,
@@ -24,7 +54,12 @@ export function getNode(options: GetNodeOptions) {
   } = options;
 
   try {
-    const svgText = processSVG(content, preProcessor);
+    let svgText = processSVG(content, preProcessor);
+
+    if (uniquifyIDs) {
+      svgText = uniquifyStyleIds(svgText, hash, baseURL ?? '');
+    }
+
     const node = convert(svgText, { nodeOnly: true });
 
     if (!node || !(node instanceof SVGSVGElement)) {

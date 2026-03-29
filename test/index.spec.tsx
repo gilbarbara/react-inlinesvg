@@ -19,6 +19,7 @@ const fixtures = {
   datahref: 'http://127.0.0.1:1337/datahref.svg',
   styles: 'http://127.0.0.1:1337/styles.svg',
   styles_with_css_variables: 'http://127.0.0.1:1337/styles_with_css_variables.svg',
+  styles_with_ids: 'http://127.0.0.1:1337/styles_with_ids.svg',
   utf8: 'http://127.0.0.1:1337/utf8.svg',
   url: 'https://cdn.svgporn.com/logos/react.svg',
   url2: 'https://cdn.svgporn.com/logos/javascript.svg',
@@ -190,6 +191,30 @@ describe('react-inlinesvg', () => {
       });
 
       expect(container.querySelector('svg')).toMatchSnapshot();
+    });
+
+    it('should uniquify IDs inside style elements', async () => {
+      const { container } = setup({
+        src: fixtures.styles_with_ids,
+        uniquifyIDs: true,
+        uniqueHash: 'test',
+      });
+
+      await waitFor(() => {
+        expect(mockOnLoad).toHaveBeenCalledTimes(1);
+      });
+
+      const svg = container.querySelector('svg')!;
+      const style = svg.querySelector('style')!;
+
+      expect(style.textContent).toContain('#my-gradient__test');
+      expect(style.textContent).toContain('url(#my-gradient__test)');
+      expect(style.textContent).toContain('#my-clip__test');
+      expect(style.textContent).not.toContain('#my-gradient stop');
+      expect(style.textContent).not.toContain('#my-clip circle');
+
+      expect(svg.querySelector('#my-gradient__test')).toBeTruthy();
+      expect(svg.querySelector('#my-clip__test')).toBeTruthy();
     });
 
     it('should render a svg url with symbols', async () => {
