@@ -1,6 +1,6 @@
 {
   "name": "react-inlinesvg",
-  "version": "4.2.0",
+  "version": "4.3.0",
   "description": "An SVG loader for React",
   "author": "Gil Barbara <gilbarbara@gmail.com>",
   "contributors": [
@@ -119,7 +119,7 @@
     "sourcemap": true,
     "splitting": false
   },
-"prettier": "@gilbarbara/prettier-config",
+  "prettier": "@gilbarbara/prettier-config",
   "size-limit": [
     {
       "name": "commonjs",
