@@ -16,12 +16,22 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
     fetchOptions,
     onError,
     onLoad,
+    preProcessor,
     src,
     title,
     uniqueHash,
   } = props;
 
   const hash = useRef(uniqueHash ?? randomString(8));
+  const fetchOptionsRef = useRef(fetchOptions);
+  const onErrorRef = useRef(onError);
+  const onLoadRef = useRef(onLoad);
+  const preProcessorRef = useRef(preProcessor);
+
+  fetchOptionsRef.current = fetchOptions;
+  onErrorRef.current = onError;
+  onLoadRef.current = onLoad;
+  preProcessorRef.current = preProcessor;
 
   const [state, setState] = useReducer(
     (previousState: State, nextState: Partial<State>) => ({
@@ -83,19 +93,16 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
   const isActive = useRef(false);
   const isInitialized = useRef(false);
 
-  const handleError = useCallback(
-    (error: Error | FetchError) => {
-      if (isActive.current) {
-        setState({
-          status:
-            error.message === 'Browser does not support SVG' ? STATUS.UNSUPPORTED : STATUS.FAILED,
-        });
+  const handleError = useCallback((error: Error | FetchError) => {
+    if (isActive.current) {
+      setState({
+        status:
+          error.message === 'Browser does not support SVG' ? STATUS.UNSUPPORTED : STATUS.FAILED,
+      });
 
-        onError?.(error);
-      }
-    },
-    [onError],
-  );
+      onErrorRef.current?.(error);
+    }
+  }, []);
 
   const getElement = useCallback(() => {
     try {
@@ -125,7 +132,7 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
 
     try {
       if (status === STATUS.READY) {
-        onLoad?.(src, isCached);
+        onLoadRef.current?.(src, isCached);
       } else if (status === STATUS.IDLE) {
         if (!isSupportedEnvironment()) {
           throw new Error('Browser does not support SVG');
@@ -193,7 +200,7 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
           return;
         }
 
-        const fetchParameters = { ...fetchOptions, signal: controller.signal };
+        const fetchParameters = { ...fetchOptionsRef.current, signal: controller.signal };
         let loadedContent: string;
         let hasCache = false;
 
@@ -218,8 +225,7 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
       active = false;
       controller.abort();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [src, status]);
+  }, [cacheRequests, cacheStore, handleError, src, status]);
 
   // LOADED -> READY
   useEffect(() => {
@@ -246,9 +252,9 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
     }
 
     if (status === STATUS.READY && previousState.status !== STATUS.READY) {
-      onLoad?.(src, isCached);
+      onLoadRef.current?.(src, isCached);
     }
-  }, [isCached, onLoad, previousState, src, status]);
+  }, [isCached, previousState, src, status]);
 
   return { element, status };
 }
