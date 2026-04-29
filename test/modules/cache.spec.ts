@@ -98,6 +98,43 @@ describe('CacheStore (internal)', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
+  it('should reject concurrent get() when the in-flight request fails', async () => {
+    fetchMock.mockResponseOnce(
+      () => new Promise((_resolve, reject) => setTimeout(() => reject(new Error('500')), 50)),
+    );
+
+    const first = cacheStore.get(reactUrl);
+    const second = cacheStore.get(reactUrl);
+
+    await expect(first).rejects.toThrow('500');
+    await expect(second).rejects.toThrow('500');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('should not propagate AbortError from the in-flight caller to waiters', async () => {
+    const controller = new AbortController();
+
+    fetchMock
+      .mockResponseOnce(
+        () =>
+          new Promise((_resolve, reject) => {
+            controller.signal.addEventListener('abort', () => {
+              reject(new DOMException('Aborted', 'AbortError'));
+            });
+          }),
+      )
+      .mockResponseOnce(() => Promise.resolve(reactContent));
+
+    const first = cacheStore.get(reactUrl, { signal: controller.signal });
+    const second = cacheStore.get(reactUrl);
+
+    controller.abort();
+
+    await expect(first).rejects.toMatchObject({ name: 'AbortError' });
+    await expect(second).resolves.toBe(reactContent);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
   it('should return the cached keys', async () => {
     fetchMock.mockResponseOnce(() => Promise.resolve(reactContent));
 

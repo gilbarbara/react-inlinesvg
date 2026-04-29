@@ -112,5 +112,6 @@ export interface State {
 
 export interface StorageItem {
   content: string;
+  error?: Error;
   status: Status;
 }

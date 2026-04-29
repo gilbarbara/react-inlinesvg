@@ -118,6 +118,17 @@ export default class CacheStore {
         await this.fetchAndCache(url, fetchOptions);
       });
 
+      const failed = this.cacheStore.get(url);
+
+      if (failed?.status === STATUS.FAILED) {
+        if (failed.error) {
+          throw failed.error;
+        }
+
+        this.cacheStore.delete(url);
+        await this.fetchAndCache(url, fetchOptions);
+      }
+
       return;
     }
 
@@ -130,7 +141,13 @@ export default class CacheStore {
 
       this.cacheStore.set(url, { content, status: STATUS.LOADED });
     } catch (error: any) {
-      this.cacheStore.set(url, { content: '', status: STATUS.FAILED });
+      const isAbort = error?.name === 'AbortError';
+
+      this.cacheStore.set(url, {
+        content: '',
+        error: isAbort ? undefined : error,
+        status: STATUS.FAILED,
+      });
       throw error;
     }
   }

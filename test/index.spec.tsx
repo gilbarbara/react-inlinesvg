@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { act, render } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import createFetchMock from 'vitest-fetch-mock';
 
 import ReactInlineSVG, { cacheStore, Props } from '../src/index';
@@ -558,6 +558,32 @@ describe('react-inlinesvg', () => {
       await waitFor(() => {
         expect(mockOnError).toHaveBeenCalledTimes(2);
       });
+    });
+
+    it('should render fallback for all concurrent instances when request fails', async () => {
+      fetchMock.mockRejectOnce(new Error('500'));
+
+      render(
+        <>
+          <ReactInlineSVG loader={<Loader />} onError={mockOnError} src={fixtures.url2}>
+            <span data-testid="fallback">x</span>
+          </ReactInlineSVG>
+          <ReactInlineSVG loader={<Loader />} onError={mockOnError} src={fixtures.url2}>
+            <span data-testid="fallback">x</span>
+          </ReactInlineSVG>
+        </>,
+      );
+
+      await act(async () => {
+        vi.runAllTimers();
+      });
+
+      await waitFor(() => {
+        expect(mockOnError).toHaveBeenCalledTimes(2);
+      });
+
+      expect(screen.getAllByTestId('fallback')).toHaveLength(2);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
     });
 
     it('should handle cached entries with loading status', async () => {
