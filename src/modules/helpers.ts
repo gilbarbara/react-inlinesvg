@@ -20,10 +20,8 @@ export function omit<T extends Record<string, unknown>, K extends keyof T>(
   const output: any = {};
 
   for (const key in input) {
-    if ({}.hasOwnProperty.call(input, key)) {
-      if (!filter.includes(key as unknown as K)) {
-        output[key] = input[key];
-      }
+    if ({}.hasOwnProperty.call(input, key) && !filter.includes(key as unknown as K)) {
+      output[key] = input[key];
     }
   }
 
