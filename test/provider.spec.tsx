@@ -3,23 +3,33 @@ import { render, waitFor } from '@testing-library/react';
 import CacheMock from 'browser-cache-mock';
 import createFetchMock from 'vitest-fetch-mock';
 
-import ReactInlineSVG from '../src/index';
+import { CACHE_NAME } from '../src/config';
+import ReactInlineSVG, { cacheStore as singletonCache } from '../src/index';
 import CacheProvider from '../src/provider';
 
 const fetchMock = createFetchMock(vi);
 
-const cacheMock = new CacheMock();
+const cacheMocks = new Map<string, CacheMock>();
+
+function getCacheMock(name: string): CacheMock {
+  let cache = cacheMocks.get(name);
+
+  if (!cache) {
+    cache = new CacheMock();
+    cacheMocks.set(name, cache);
+  }
+
+  return cache;
+}
 
 Object.defineProperty(window, 'caches', {
   value: {
-    ...window.caches,
-    open: async () =>
+    open: async (name: string) =>
       new Promise(resolve => {
         setTimeout(() => {
-          resolve(cacheMock);
+          resolve(getCacheMock(name));
         }, 500);
       }),
-    ...cacheMock,
   },
 });
 
@@ -45,7 +55,17 @@ describe('react-inlinesvg (with persistent cache)', () => {
   afterEach(async () => {
     fetchMock.mockClear();
     mockOnLoad.mockClear();
-    await cacheMock.keys().then(keys => Promise.all(keys.map(key => cacheMock.delete(key))));
+    mockOnError.mockClear();
+
+    await Promise.all(
+      [...cacheMocks.values()].map(async cache => {
+        const keys = await cache.keys();
+
+        await Promise.all(keys.map(key => cache.delete(key)));
+      }),
+    );
+
+    await singletonCache.clear();
   });
 
   it('should request an SVG only once', async () => {
@@ -95,7 +115,7 @@ describe('react-inlinesvg (with persistent cache)', () => {
       expect(mockOnLoad).toHaveBeenCalledTimes(1);
     });
 
-    const cached = await cacheMock.match(url);
+    const cached = await getCacheMock(CACHE_NAME).match(url);
 
     expect(cached).not.toBeUndefined();
   });
@@ -113,5 +133,53 @@ describe('react-inlinesvg (with persistent cache)', () => {
       expect(mockOnLoad).toHaveBeenNthCalledWith(3, url, false);
     });
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('should isolate provider cache from singleton cache', async () => {
+    const onLoadProvider = vi.fn();
+    const onLoadSingleton = vi.fn();
+
+    render(
+      <>
+        <CacheProvider>
+          <ReactInlineSVG loader={<Loader />} onLoad={onLoadProvider} src={url} />
+        </CacheProvider>
+        <ReactInlineSVG loader={<Loader />} onLoad={onLoadSingleton} src={url} />
+      </>,
+    );
+
+    await waitFor(() => {
+      expect(onLoadProvider).toHaveBeenCalledTimes(1);
+      expect(onLoadSingleton).toHaveBeenCalledTimes(1);
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    await expect(getCacheMock(CACHE_NAME).match(url)).resolves.not.toBeUndefined();
+    expect(singletonCache.isCached(url)).toBe(true);
+  });
+
+  it('should isolate caches between providers with different names', async () => {
+    const onLoadA = vi.fn();
+    const onLoadB = vi.fn();
+
+    render(
+      <>
+        <CacheProvider name="bucket-a">
+          <ReactInlineSVG loader={<Loader />} onLoad={onLoadA} src={url} />
+        </CacheProvider>
+        <CacheProvider name="bucket-b">
+          <ReactInlineSVG loader={<Loader />} onLoad={onLoadB} src={url} />
+        </CacheProvider>
+      </>,
+    );
+
+    await waitFor(() => {
+      expect(onLoadA).toHaveBeenCalledTimes(1);
+      expect(onLoadB).toHaveBeenCalledTimes(1);
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    await expect(getCacheMock('bucket-a').match(url)).resolves.not.toBeUndefined();
+    await expect(getCacheMock('bucket-b').match(url)).resolves.not.toBeUndefined();
   });
 });

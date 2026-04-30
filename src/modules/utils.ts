@@ -54,7 +54,7 @@ export function getNode(options: GetNodeOptions) {
   } = options;
 
   try {
-    let svgText = processSVG(content, preProcessor);
+    let svgText = preProcessor ? preProcessor(content) : content;
 
     if (uniquifyIDs) {
       svgText = uniquifyStyleIds(svgText, hash, baseURL ?? '');
@@ -100,14 +100,6 @@ export function getNode(options: GetNodeOptions) {
   } catch (error: any) {
     return handleError(error);
   }
-}
-
-export function processSVG(content: string, preProcessor?: Props['preProcessor']) {
-  if (preProcessor) {
-    return preProcessor(content);
-  }
-
-  return content;
 }
 
 export function updateSVGAttributes(
