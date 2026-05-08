@@ -1,4 +1,4 @@
-import { cloneElement, ReactElement, SVGProps } from 'react';
+import { cloneElement, ReactElement, ReactNode, SVGProps } from 'react';
 
 import { STATUS } from './config';
 import CacheStore from './modules/cache';
@@ -9,7 +9,7 @@ import { Props, Status } from './types';
 
 export const cacheStore = new CacheStore();
 
-export default function InlineSVG(props: Props) {
+export default function InlineSVG(props: Props): ReactNode {
   const { children = null, innerRef, loader = null } = props;
   const contextStore = useCacheStore();
   const store = contextStore ?? cacheStore;
