@@ -16,7 +16,7 @@ React component library (`react-inlinesvg`) that loads inline, local, or remote 
 ## Commands
 
 ```bash
-pnpm run build          # Clean + tsup build + fix CJS
+pnpm run build          # tsdown build (cleans dist by default)
 pnpm run lint           # ESLint with --fix on src/ and test/
 pnpm run typecheck      # tsc on test/tsconfig.json
 pnpm run test           # Starts fixture server on :1337, runs vitest with coverage
@@ -58,6 +58,6 @@ Optional context provider that creates a persistent `CacheStore` using the Cache
 
 ## Build
 
-- **Bundler:** tsup → CJS + ESM with `"use client"` banner
+- **Bundler:** tsdown → CJS + ESM with `"use client"` banner
 - **Size limit:** 10 KB per format
 - **Type validation:** `@arethetypeswrong/cli` via `pnpm run typevalidation`
