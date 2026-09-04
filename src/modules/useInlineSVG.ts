@@ -24,7 +24,7 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
     uniquifyIDs,
   } = props;
 
-  const hash = useRef(uniqueHash ?? randomString(8));
+  const hashRef = useRef(uniqueHash);
   const fetchOptionsRef = useRef(fetchOptions);
   const onErrorRef = useRef(onError);
   const onLoadRef = useRef(onLoad);
@@ -34,6 +34,14 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
   onErrorRef.current = onError;
   onLoadRef.current = onLoad;
   preProcessorRef.current = preProcessor;
+
+  const getHash = useCallback(() => {
+    const hash = hashRef.current ?? randomString(8);
+
+    hashRef.current = hash;
+
+    return hash;
+  }, []);
 
   const [state, setState] = useReducer(
     (previousState: State, nextState: Partial<State>) => ({
@@ -59,7 +67,7 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
         const node = getNode({
           ...props,
           handleError: () => {},
-          hash: hash.current,
+          hash: getHash(),
           content: cachedContent,
         });
 
@@ -113,7 +121,7 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
         content,
         description,
         handleError,
-        hash: hash.current,
+        hash: getHash(),
         preProcessor: preProcessorRef.current,
         src,
         title,
@@ -132,7 +140,7 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
     } catch (error: any) {
       handleError(error);
     }
-  }, [baseURL, content, description, handleError, src, title, uniquifyIDs]);
+  }, [baseURL, content, description, getHash, handleError, src, title, uniquifyIDs]);
 
   // Mount
   useMount(() => {
