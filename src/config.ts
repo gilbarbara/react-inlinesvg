@@ -1,5 +1,6 @@
 export const CACHE_NAME = 'react-inlinesvg';
 export const CACHE_MAX_RETRIES = 10;
+export const ELEMENT_CACHE_MAX_SIZE = 100;
 
 export const STATUS = {
   IDLE: 'idle',

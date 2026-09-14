@@ -26,6 +26,15 @@ export type Props = Simplify<
      */
     baseURL?: string;
     /**
+     * Reuse the converted React element for SVGs that produce identical markup, instead of
+     * parsing and converting the content on every mount.
+     *
+     * Entries are keyed by the content and by every prop that shapes the output, so `title`,
+     * `description`, `preProcessor` and `uniquifyIDs` keep working as they do without it.
+     * @default false
+     */
+    cacheElements?: boolean;
+    /**
      * Cache remote SVGs in memory.
      *
      * When used with the CacheProvider, requests are also persisted in the browser cache.

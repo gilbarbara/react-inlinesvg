@@ -1,6 +1,9 @@
+import { isValidElement, ReactElement } from 'react';
 import convert from 'react-from-dom';
 
 import { Props, State } from '../types';
+
+import { getCachedElement, getElementCacheKey, setCachedElement } from './elementCache';
 
 interface GetNodeOptions extends Props, Pick<State, 'content'> {
   handleError: (error: Error) => void;
@@ -39,6 +42,48 @@ function uniquifyStyleIds(svgText: string, hash: string, baseURL: string): strin
 
     return fullMatch.replace(cssContent, modified);
   });
+}
+
+export function convertToElement(options: GetNodeOptions): ReactElement | null {
+  const { baseURL, cacheElements, content, description, hash, preProcessor, title, uniquifyIDs } =
+    options;
+  const svgText = preProcessor ? preProcessor(content) : content;
+
+  // Everything that shapes the markup has to be part of the key. `uniquifyIDs` bakes the hash (and
+  // the baseURL it is combined with) into the output, so those instances only share an entry when
+  // they also share a `uniqueHash`.
+  // `title` is three-way — undefined keeps an existing `<title>`, null removes it — and
+  // JSON.stringify flattens undefined to null, so it is mapped to a value that can't collide.
+  const key = cacheElements
+    ? getElementCacheKey([
+        svgText,
+        title === undefined ? false : title,
+        description,
+        uniquifyIDs ? `${hash}|${baseURL ?? ''}` : null,
+      ])
+    : null;
+
+  if (key) {
+    const cached = getCachedElement(key);
+
+    if (cached) {
+      return cached;
+    }
+  }
+
+  // The pre-processed content is passed on so it isn't processed twice.
+  const node = getNode({ ...options, content: svgText, preProcessor: undefined });
+  const element = convert(node as Node);
+
+  if (!isValidElement(element)) {
+    return null;
+  }
+
+  if (key) {
+    setCachedElement(key, element);
+  }
+
+  return element;
 }
 
 export function getNode(options: GetNodeOptions) {
