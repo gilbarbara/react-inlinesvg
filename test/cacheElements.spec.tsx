@@ -281,5 +281,33 @@ describe('cacheElements', () => {
         'url(/about#grad__a1f8d1b2)',
       );
     });
+
+    it('should keep the hash and the baseURL from running into each other', async () => {
+      // Two instances whose hash and baseURL only differ in where the boundary between them falls.
+      const hashHasSeparator = await setup({
+        baseURL: 'c',
+        cacheElements: true,
+        src: svgs.withIDs,
+        uniqueHash: 'a|b',
+        uniquifyIDs: true,
+      });
+      const baseURLHasSeparator = await setup({
+        baseURL: 'b|c',
+        cacheElements: true,
+        src: svgs.withIDs,
+        uniqueHash: 'a',
+        uniquifyIDs: true,
+      });
+
+      expect(parse).toHaveBeenCalledTimes(2);
+      expect(hashHasSeparator.container.querySelector('rect')).toHaveAttribute(
+        'fill',
+        'url(c#grad__a|b)',
+      );
+      expect(baseURLHasSeparator.container.querySelector('rect')).toHaveAttribute(
+        'fill',
+        'url(b|c#grad__a)',
+      );
+    });
   });
 });

@@ -49,9 +49,9 @@ export function convertToElement(options: GetNodeOptions): ReactElement | null {
     options;
   const svgText = preProcessor ? preProcessor(content) : content;
 
-  // Everything that shapes the markup has to be part of the key. `uniquifyIDs` bakes the hash (and
-  // the baseURL it is combined with) into the output, so those instances only share an entry when
-  // they also share a `uniqueHash`.
+  // Everything that shapes the markup has to be part of the key. `uniquifyIDs` bakes the hash and
+  // the baseURL into the output, so those instances only share an entry when they also share a
+  // `uniqueHash`. Both go in as their own part, so no value of one can look like the other.
   // `title` is three-way — undefined keeps an existing `<title>`, null removes it — and
   // JSON.stringify flattens undefined to null, so it is mapped to a value that can't collide.
   const key = cacheElements
