@@ -59,7 +59,8 @@ export function convertToElement(options: GetNodeOptions): ReactElement | null {
         svgText,
         title === undefined ? false : title,
         description,
-        uniquifyIDs ? `${hash}|${baseURL ?? ''}` : null,
+        uniquifyIDs ? hash : null,
+        uniquifyIDs ? baseURL ?? '' : null,
       ])
     : null;
 
