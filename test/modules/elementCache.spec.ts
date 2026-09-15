@@ -4,7 +4,6 @@ import { ELEMENT_CACHE_MAX_SIZE } from '../../src/config';
 import {
   clearElementCache,
   getCachedElement,
-  getElementCacheKey,
   getElementCacheSize,
   setCachedElement,
 } from '../../src/modules/elementCache';
@@ -22,27 +21,6 @@ function fill(count: number, prefix = 'key') {
 describe('elementCache', () => {
   beforeEach(() => {
     clearElementCache();
-  });
-
-  describe('getElementCacheKey', () => {
-    it('should return the same key for the same parts', () => {
-      expect(getElementCacheKey(['<svg />', 'title', undefined, null])).toBe(
-        getElementCacheKey(['<svg />', 'title', undefined, null]),
-      );
-    });
-
-    it('should return a different key for each distinct part', () => {
-      const keys = [
-        getElementCacheKey(['<svg />']),
-        getElementCacheKey(['<svg/>']),
-        getElementCacheKey(['<svg />', 'title']),
-        getElementCacheKey(['<svg />', false]),
-        getElementCacheKey(['<svg />', null]),
-        getElementCacheKey(['<svg />', 'title', 'description']),
-      ];
-
-      expect(new Set(keys).size).toBe(keys.length);
-    });
   });
 
   describe('get/set', () => {

@@ -20,10 +20,6 @@ export function getCachedElement(key: string): ReactElement | undefined {
   return element;
 }
 
-export function getElementCacheKey(parts: Array<boolean | string | null | undefined>): string {
-  return JSON.stringify(parts);
-}
-
 export function getElementCacheSize(): number {
   return store.size;
 }

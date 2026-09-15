@@ -3,7 +3,7 @@ import convert from 'react-from-dom';
 
 import { Props, State } from '../types';
 
-import { getCachedElement, getElementCacheKey, setCachedElement } from './elementCache';
+import { getCachedElement, setCachedElement } from './elementCache';
 
 interface GetNodeOptions extends Props, Pick<State, 'content'> {
   handleError: (error: Error) => void;
@@ -12,6 +12,27 @@ interface GetNodeOptions extends Props, Pick<State, 'content'> {
 
 interface UpdateSVGAttributesOptions extends Pick<Props, 'baseURL' | 'uniquifyIDs'> {
   hash: string;
+}
+
+function getElementCacheKey(
+  content: string,
+  title: string | null | undefined,
+  description: string | undefined,
+  uniquifyIDs: boolean | undefined,
+  hash: string,
+  baseURL: string | undefined,
+): string {
+  return JSON.stringify([
+    content,
+    // `title` is three-way — undefined keeps an existing `<title>`, null removes it — and
+    // JSON.stringify flattens undefined to null, so it becomes a value that can't collide.
+    title === undefined ? false : title,
+    description,
+    // `uniquifyIDs` bakes both of these into the output, so those instances only share an entry
+    // when they also share a `uniqueHash`. Each is its own part, so neither can look like the other.
+    uniquifyIDs ? hash : null,
+    uniquifyIDs ? (baseURL ?? '') : null,
+  ]);
 }
 
 function uniquifyStyleIds(svgText: string, hash: string, baseURL: string): string {
@@ -49,19 +70,9 @@ export function convertToElement(options: GetNodeOptions): ReactElement | null {
     options;
   const svgText = preProcessor ? preProcessor(content) : content;
 
-  // Everything that shapes the markup has to be part of the key. `uniquifyIDs` bakes the hash and
-  // the baseURL into the output, so those instances only share an entry when they also share a
-  // `uniqueHash`. Both go in as their own part, so no value of one can look like the other.
-  // `title` is three-way — undefined keeps an existing `<title>`, null removes it — and
-  // JSON.stringify flattens undefined to null, so it is mapped to a value that can't collide.
+  // Keyed by the pre-processed content and by every prop that shapes the markup.
   const key = cacheElements
-    ? getElementCacheKey([
-        svgText,
-        title === undefined ? false : title,
-        description,
-        uniquifyIDs ? hash : null,
-        uniquifyIDs ? baseURL ?? '' : null,
-      ])
+    ? getElementCacheKey(svgText, title, description, uniquifyIDs, hash, baseURL)
     : null;
 
   if (key) {
