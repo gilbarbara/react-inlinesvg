@@ -3,7 +3,7 @@
   "compilerOptions": {
     "noUnusedLocals": false,
     "module": "esnext",
-    "types": ["jest-extended", "vitest/globals"]
+    "types": ["node", "@testing-library/jest-dom", "jest-extended", "vitest/globals"]
   },
   "include": ["**/*", "../src/**/*"]
 }

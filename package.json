@@ -66,34 +66,34 @@
     "react-from-dom": "^0.7.5"
   },
   "devDependencies": {
-    "@arethetypeswrong/cli": "^0.18.4",
-    "@gilbarbara/eslint-config": "^1.2.3",
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@gilbarbara/eslint-config": "^2.0.3",
     "@gilbarbara/prettier-config": "^1.0.0",
     "@gilbarbara/tsconfig": "^1.0.0",
-    "@size-limit/preset-small-lib": "^12.1.0",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.2",
-    "@types/node": "^24.13.2",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.3",
-    "@vitest/coverage-v8": "^4.1.9",
+    "@size-limit/preset-small-lib": "^14.3.0",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "@vitest/coverage-v8": "^5.0.5",
     "browser-cache-mock": "^0.1.7",
-    "eslint": "^9.39.4",
+    "eslint": "^10.14.0",
     "http-server": "^14.1.1",
     "husky": "^9.1.7",
     "jest-extended": "^7.0.0",
-    "jsdom": "^29.1.1",
-    "prettier": "^3.9.3",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
+    "jsdom": "^30.1.3",
+    "prettier": "^3.9.10",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "repo-tools": "^0.3.1",
-    "size-limit": "^12.1.0",
-    "start-server-and-test": "^3.0.11",
+    "size-limit": "^14.3.0",
+    "start-server-and-test": "^3.0.13",
     "ts-node": "^10.9.2",
-    "tsdown": "^0.22.3",
+    "tsdown": "^0.23.4",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9",
+    "vitest": "^5.0.5",
     "vitest-fetch-mock": "^0.4.5"
   },
   "scripts": {
@@ -107,9 +107,9 @@
     "typecheck": "tsc -p test/tsconfig.json",
     "typevalidation": "attw -P",
     "size": "size-limit",
-    "validate": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build && pnpm run size && npm run typevalidation",
-    "format": "prettier \"**/*.{js,jsx,json,yml,yaml,css,less,scss,ts,tsx,md,graphql,mdx}\" --write",
-    "prepublishOnly": "pnpm run validate",
+    "format": "prettier --write --log-level=warn \"**/*.{yml,json,md,css}\"",
+    "validate": "pnpm lint && pnpm typecheck && pnpm test && pnpm format && pnpm build && pnpm size && pnpm typevalidation",
+    "prepublishOnly": "pnpm validate",
     "prepare": "husky"
   },
   "tsdown": {
@@ -143,5 +143,5 @@
       "limit": "10 KB"
     }
   ],
-  "packageManager": "pnpm@11.9.0+sha512.bd682d5d03fe525ef7c9fd6780c6884d1e756ac4c9c9fe00c538782824310dcf90e3ddc4f53835f06dfaebd5085e41855e0bcbb3b60de2ac5bbab89e5036f03b"
+  "packageManager": "pnpm@12.16.1+sha512.091d1dee7927575661b25dab3c2ae31cafc1c54d6b71ed6a6600cf0c1cb10434a447eae14015f1b23e2e6bedeed79df94a932e2164d2832280dce3fb32f656d1"
 }

@@ -3,4 +3,6 @@ allowBuilds:
   unrs-resolver: true
 overrides:
   esbuild: 0.28.1
-  vite: 8.0.16
+  vite: 8.3.5
+minimumReleaseAgeExclude:
+  - '@gilbarbara/*'
