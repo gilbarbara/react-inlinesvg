@@ -8,20 +8,21 @@ React component library (`react-inlinesvg`) that loads inline, local, or remote 
 
 - **Package manager:** pnpm
 - **React:** supports 16.8–19 (peer dep), dev/tests use React 19
-- **TypeScript:** 5.9+, target ES2020
-- **Vitest:** 4.x with globals enabled (no need to import `describe`/`it`/`expect`)
-- **ESLint:** 9.x (flat config) via `@gilbarbara/eslint-config`
+- **TypeScript:** 6.x, target ES2020
+- **Vitest:** 5.x with globals enabled (no need to import `describe`/`it`/`expect`)
+- **ESLint:** 10.x (flat config) via `@gilbarbara/eslint-config`
 - **Vite plugin:** `@vitejs/plugin-react` 6.x
 
 ## Commands
 
 ```bash
-pnpm run build          # tsdown build (cleans dist by default)
-pnpm run lint           # ESLint with --fix on src/ and test/
-pnpm run typecheck      # tsc on test/tsconfig.json
-pnpm run test           # Starts fixture server on :1337, runs vitest with coverage
-pnpm run test:watch     # Vitest watch mode (requires fixture server: pnpm run start)
-pnpm run validate       # Full pipeline: lint → typecheck → test → build → size → typevalidation
+pnpm build          # tsdown build (cleans dist by default)
+pnpm lint           # ESLint with --fix on src/ and test/
+pnpm typecheck      # tsc on test/tsconfig.json
+pnpm test           # Starts fixture server on :1337, runs vitest with coverage
+pnpm test:watch     # Vitest watch mode (requires fixture server: pnpm start)
+pnpm format         # Prettier --write on yml, json, md, css
+pnpm validate       # Full pipeline: lint → typecheck → test → format → build → size → typevalidation
 ```
 
 Run a single test file: `npx vitest run test/modules/cache.spec.ts` (needs fixture server for integration tests).

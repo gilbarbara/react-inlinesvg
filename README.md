@@ -27,12 +27,7 @@ import SVG from 'react-inlinesvg';
 export default function App() {
   return (
     <main>
-      <SVG
-        src="https://cdn.svglogos.dev/logos/react.svg"
-        width={128}
-        height="auto"
-        title="React"
-      />
+      <SVG src="https://cdn.svglogos.dev/logos/react.svg" width={128} height="auto" title="React" />
     </main>
   );
 }
@@ -40,14 +35,14 @@ export default function App() {
 
 ## Props
 
-**src** {string} - **required**.
+**src** {string} - **required**.  
 The SVG to load. It accepts:
 
 - A URL or path to an SVG file (absolute or relative, including from a bundler import)
 - A data URI (base64 or URL-encoded)
 - A raw SVG string
 
-**baseURL** {string}
+**baseURL** {string}  
 A URL to prepend to `url()` references inside the SVG when using `uniquifyIDs`. Required if your page uses an HTML `<base>` tag.
 
 **children** {ReactNode}  
@@ -63,7 +58,7 @@ The fallback content in case of a fetch error or unsupported browser.
 Reuse the converted React element across mounts of the same SVG instead of parsing it every time. Use it for SVGs that mount often, like icons in virtualized lists. With `uniquifyIDs`, only instances that have a `uniqueHash` when they mount are cached.  
 The cache is shared by all instances (independent of the `CacheProvider`) and holds the 100 most recently used elements. Call `clearElementCache()` (exported from `react-inlinesvg`) to empty it, for example between tests.
 
-**cacheRequests** {boolean} ▶︎ `true`
+**cacheRequests** {boolean} ▶︎ `true`  
 Cache remote SVGs in memory. When used with the [CacheProvider](#caching), requests are also persisted in the browser cache.
 
 **description** {string}  
@@ -72,11 +67,11 @@ A description for your SVG. It will override an existing `<desc>` tag.
 **fetchOptions** {RequestInit}  
 Custom options for the [request](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request).
 
-**innerRef** {React.Ref\<SVGElement | null>}
-Set a ref on the SVG element.  
+**innerRef** {React.Ref\<SVGElement | null>}  
+Set a ref on the SVG element.
 
->The SVG is processed and parsed so the ref won't be set on the initial render.
-You can use the `onLoad` callback to get and use the ref instead.
+> The SVG is processed and parsed so the ref won't be set on the initial render.  
+> You can use the `onLoad` callback to get and use the ref instead.
 
 **loader** {node}  
 A component to be shown while the SVG is loading.
@@ -98,11 +93,11 @@ This will receive a single argument with:
 
 - or an `Error` for issues like missing `src`, unsupported browser, or invalid SVG content.
 
-**onLoad** {function}.  
+**onLoad** {function}  
 A callback to be invoked upon successful load.  
 This will receive 2 arguments: the `src` prop and an `isCached` boolean
 
-**preProcessor** {function}
+**preProcessor** {function}  
 A function to pre-process the SVG string before parsing. Receives the SVG string and must return a string.
 
 **title** {string | null}  
@@ -126,9 +121,9 @@ Create unique IDs for each icon.
   cacheRequests={true}
   description="The React logo"
   loader={<span>Loading...</span>}
-  onError={(error) => console.log(error.message)}
+  onError={error => console.log(error.message)}
   onLoad={(src, isCached) => console.log(src, isCached)}
-  preProcessor={(code) => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
+  preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
   src="https://cdn.svglogos.dev/logos/react.svg"
   title="React"
   uniqueHash="a1f8d1"
@@ -149,7 +144,7 @@ import App from './App';
 createRoot(document.getElementById('root')!).render(
   <CacheProvider>
     <App />
-  </CacheProvider>
+  </CacheProvider>,
 );
 ```
 
@@ -169,7 +164,7 @@ If you are loading remote SVGs, you must ensure they have [CORS](https://develop
 
 ## Why do you need this package?
 
-One reason SVGs are awesome is that you can style them with CSS.
+One reason SVGs are awesome is that you can style them with CSS.  
 Unfortunately, this is not useful in practice because the style element has to be in the same document. This leaves you with three bad options:
 
 1. Embed the CSS in the SVG document
@@ -178,8 +173,7 @@ Unfortunately, this is not useful in practice because the style element has to b
    - Makes maintenance difficult
 2. Link to a CSS file in your SVG document
    - Sharing styles with your HTML means duplicating paths across your project, making maintenance a pain
-   - Not sharing styles with your HTML means extra HTTP requests (and likely
-     duplicating paths between different SVGs)
+   - Not sharing styles with your HTML means extra HTTP requests (and likely duplicating paths between different SVGs)
    - Still can't target parent elements
    - Your SVG becomes coupled to your external stylesheet, complicating reuse.
 3. Embed the SVG in your HTML
@@ -195,5 +189,5 @@ The SVG [`<use>`](https://css-tricks.com/svg-use-external-source/) element can b
 
 ## Credits
 
-Thanks to [@matthewwithanm](https://github.com/matthewwithanm) for creating this component and so kindly transferring it to me.
+Thanks to [@matthewwithanm](https://github.com/matthewwithanm) for creating this component and so kindly transferring it to me.  
 I'll definitely keep up the good work! ❤️

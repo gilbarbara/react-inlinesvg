@@ -14,7 +14,7 @@ body:
          - [Discussions tab](https://github.com/gilbarbara/react-inlinesvg/discussions)
          - [Open Issues](https://github.com/gilbarbara/react-inlinesvg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc)
          - [Closed Issues](https://github.com/gilbarbara/react-inlinesvg/issues?q=is%3Aissue+sort%3Aupdated-desc+is%3Aclosed)
-        
+
         > If you have Typescript errors try upgrading (or maybe downgrading) your version of Typescript and @types/react. This package doesn't have any control over the typescript errors you may be seeing.
 
         The more information you fill in, the better the community can help you.
