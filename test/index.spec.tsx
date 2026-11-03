@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { act, render, screen } from '@testing-library/react';
 import createFetchMock from 'vitest-fetch-mock';
 
@@ -872,6 +873,19 @@ describe('react-inlinesvg', () => {
 
       // clean up
       fetchMock.disableMocks();
+    });
+  });
+
+  describe('server rendering', () => {
+    // Next.js `cacheComponents` aborts the prerender when Math.random runs during a render.
+    it('should not call Math.random', () => {
+      const randomSpy = vi.spyOn(Math, 'random');
+
+      renderToStaticMarkup(<ReactInlineSVG src={fixtures.play} uniquifyIDs />);
+
+      expect(randomSpy).not.toHaveBeenCalled();
+
+      randomSpy.mockRestore();
     });
   });
 
