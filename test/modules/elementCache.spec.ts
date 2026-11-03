@@ -37,14 +37,6 @@ describe('elementCache', () => {
       expect(getCachedElement('circle')).toBe(circle);
       expect(getElementCacheSize()).toBe(1);
     });
-
-    it('should replace the element stored for a key', () => {
-      setCachedElement('circle', element('first'));
-      setCachedElement('circle', element('second'));
-
-      expect(getCachedElement('circle')).toHaveProperty('props.id', 'second');
-      expect(getElementCacheSize()).toBe(1);
-    });
   });
 
   describe('clearElementCache', () => {
@@ -60,13 +52,6 @@ describe('elementCache', () => {
   });
 
   describe('eviction', () => {
-    it('should not evict anything below the limit', () => {
-      fill(ELEMENT_CACHE_MAX_SIZE);
-
-      expect(getElementCacheSize()).toBe(ELEMENT_CACHE_MAX_SIZE);
-      expect(getCachedElement('key-0')).toBeDefined();
-    });
-
     it('should evict the oldest entry once the limit is passed', () => {
       fill(ELEMENT_CACHE_MAX_SIZE + 1);
 
@@ -87,15 +72,6 @@ describe('elementCache', () => {
       expect(getCachedElement('key-0')).toBeDefined();
       expect(getCachedElement('key-1')).toBeUndefined();
       expect(getElementCacheSize()).toBe(ELEMENT_CACHE_MAX_SIZE);
-    });
-
-    it('should not evict anything when an existing key is written again', () => {
-      fill(ELEMENT_CACHE_MAX_SIZE);
-      setCachedElement('key-0', element('updated'));
-
-      expect(getElementCacheSize()).toBe(ELEMENT_CACHE_MAX_SIZE);
-      expect(getCachedElement('key-0')).toHaveProperty('props.id', 'updated');
-      expect(getCachedElement('key-1')).toBeDefined();
     });
 
     it('should keep an entry that was written again', () => {

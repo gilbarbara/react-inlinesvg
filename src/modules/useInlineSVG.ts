@@ -25,6 +25,8 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
   } = props;
 
   const hashRef = useRef(uniqueHash);
+  // A random hash makes the key unique to this instance, so the entry could never be reused.
+  const shouldCacheElement = cacheElements && !(uniquifyIDs && uniqueHash === undefined);
   const fetchOptionsRef = useRef(fetchOptions);
   const onErrorRef = useRef(onError);
   const onLoadRef = useRef(onLoad);
@@ -66,6 +68,7 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
       try {
         const convertedElement = convertToElement({
           ...props,
+          cacheElements: shouldCacheElement,
           handleError: () => {},
           hash: getHash(),
           content: cachedContent,
@@ -112,7 +115,7 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
     try {
       const convertedElement = convertToElement({
         baseURL,
-        cacheElements,
+        cacheElements: shouldCacheElement,
         content,
         description,
         handleError,
@@ -134,7 +137,17 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
     } catch (error: any) {
       handleError(error);
     }
-  }, [baseURL, cacheElements, content, description, getHash, handleError, src, title, uniquifyIDs]);
+  }, [
+    baseURL,
+    content,
+    description,
+    getHash,
+    handleError,
+    shouldCacheElement,
+    src,
+    title,
+    uniquifyIDs,
+  ]);
 
   // Mount
   useMount(() => {

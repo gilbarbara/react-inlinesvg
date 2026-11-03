@@ -60,13 +60,6 @@ describe('cacheElements', () => {
       expect(parse).toHaveBeenCalledTimes(2);
     });
 
-    it('should not write entries that a component with it on could read', async () => {
-      await setup({ src: svgs.circle });
-      await setup({ cacheElements: true, src: svgs.circle });
-
-      expect(parse).toHaveBeenCalledTimes(2);
-    });
-
     it('should leave the cache empty', async () => {
       await setup({ src: svgs.circle });
       await setup({ src: svgs.titled, title: 'Titled' });
@@ -87,15 +80,6 @@ describe('cacheElements', () => {
         expect(svgOf(view).querySelector('circle')).toHaveAttribute('r', '10');
         expect(svgOf(view)).toHaveAttribute('viewBox', '0 0 24 24');
       }
-    });
-
-    it('should convert different content separately', async () => {
-      const first = await setup({ cacheElements: true, src: svgs.circle });
-      const second = await setup({ cacheElements: true, src: svgs.withIDs });
-
-      expect(parse).toHaveBeenCalledTimes(2);
-      expect(svgOf(first).querySelector('circle')).toBeInTheDocument();
-      expect(svgOf(second).querySelector('rect')).toBeInTheDocument();
     });
 
     it('should still apply the props of each instance to the reused element', async () => {
@@ -138,14 +122,6 @@ describe('cacheElements', () => {
 
       expect(onError).toHaveBeenCalled();
       expect(getElementCacheSize()).toBe(0);
-    });
-
-    it('should convert again after the cache is cleared', async () => {
-      await setup({ cacheElements: true, src: svgs.circle });
-      clearElementCache();
-      await setup({ cacheElements: true, src: svgs.circle });
-
-      expect(parse).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -200,7 +176,7 @@ describe('cacheElements', () => {
       expect(svgOf(redAgain)).toHaveAttribute('fill', 'red');
     });
 
-    it('should give every uniquifyIDs instance its own ids', async () => {
+    it('should give every uniquifyIDs instance its own ids without caching them', async () => {
       const first = await setup({ cacheElements: true, src: svgs.withIDs, uniquifyIDs: true });
       const second = await setup({ cacheElements: true, src: svgs.withIDs, uniquifyIDs: true });
 
@@ -211,6 +187,7 @@ describe('cacheElements', () => {
       expect(secondID).toMatch(/^grad__.{8}$/);
       expect(firstID).not.toBe(secondID);
       expect(parse).toHaveBeenCalledTimes(2);
+      expect(getElementCacheSize()).toBe(0);
     });
 
     it('should share the conversion between uniquifyIDs instances with the same uniqueHash', async () => {

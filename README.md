@@ -60,7 +60,7 @@ The fallback content in case of a fetch error or unsupported browser.
 ```
 
 **cacheElements** {boolean} ▶︎ `false`
-Reuse the converted React element for SVGs that produce identical markup, instead of parsing and converting the content on every mount. See [Caching the converted elements](#caching-the-converted-elements).
+Reuse the converted React element across mounts of the same SVG instead of parsing it every time. Use it for SVGs that mount often, like icons in virtualized lists. With `uniquifyIDs`, only instances that share a `uniqueHash` are cached.
 
 **cacheRequests** {boolean} ▶︎ `true`
 Cache remote SVGs in memory. When used with the [CacheProvider](#caching), requests are also persisted in the browser cache.
@@ -156,25 +156,7 @@ The `CacheProvider` accepts an optional `name` prop to customize the cache stora
 
 > Be aware of the limitations of the [Cache API](https://developer.mozilla.org/en-US/docs/Web/API/Cache).
 
-### Caching the converted elements
-
-`cacheRequests` caches the SVG text, but the content is still parsed into a DOM node and converted into a React element on every mount. For an app that mounts the same handful of SVGs over and over — icons in a virtualized list or table, for example — that cost scales with the number of mounts instead of with the number of distinct SVGs.
-
-The `cacheElements` prop keeps the converted element around and reuses it:
-
-```tsx
-<SVG cacheElements src="https://cdn.svglogos.dev/logos/react.svg" />
-```
-
-Entries are keyed by the content and by every prop that shapes the output, so `title`, `description`, `preProcessor` and `uniquifyIDs` keep working as they do without it. Instances using `uniquifyIDs` only share an entry when they also share a `uniqueHash`, since the hash ends up in the markup.
-
-The cache holds the 100 most recently used elements. You can empty it yourself:
-
-```tsx
-import { clearElementCache } from 'react-inlinesvg';
-
-clearElementCache();
-```
+The `cacheElements` cache holds the 100 most recently used elements. Call `clearElementCache()` (exported from `react-inlinesvg`) to empty it, for example between tests.
 
 ## Browser Support
 
