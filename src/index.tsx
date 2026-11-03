@@ -9,6 +9,8 @@ import { Props, Status } from './types';
 
 export const cacheStore = new CacheStore();
 
+export { clearElementCache } from './modules/elementCache';
+
 export default function InlineSVG(props: Props): ReactNode {
   const { children = null, innerRef, loader = null } = props;
   const contextStore = useCacheStore();
@@ -26,6 +28,7 @@ export default function InlineSVG(props: Props): ReactNode {
       ...omit(
         props,
         'baseURL',
+        'cacheElements',
         'cacheRequests',
         'children',
         'description',

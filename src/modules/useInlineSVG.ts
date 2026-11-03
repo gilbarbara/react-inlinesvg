@@ -1,5 +1,4 @@
-import { isValidElement, useCallback, useEffect, useReducer, useRef } from 'react';
-import convert from 'react-from-dom';
+import { useCallback, useEffect, useReducer, useRef } from 'react';
 
 import { STATUS } from '../config';
 import type { FetchError, Props, State } from '../types';
@@ -7,11 +6,12 @@ import type { FetchError, Props, State } from '../types';
 import type CacheStore from './cache';
 import { canUseDOM, isSupportedEnvironment, randomString, request } from './helpers';
 import { useMount, usePrevious } from './hooks';
-import { getNode } from './utils';
+import { convertToElement } from './utils';
 
 export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
   const {
     baseURL,
+    cacheElements = false,
     cacheRequests = true,
     description,
     fetchOptions,
@@ -25,6 +25,8 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
   } = props;
 
   const hashRef = useRef(uniqueHash);
+  // A random hash makes the key unique to this instance, so the entry could never be reused.
+  const shouldCacheElement = cacheElements && !(uniquifyIDs && uniqueHash === undefined);
   const fetchOptionsRef = useRef(fetchOptions);
   const onErrorRef = useRef(onError);
   const onLoadRef = useRef(onLoad);
@@ -64,20 +66,15 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
       const cachedContent = cacheStore.getContent(src);
 
       try {
-        const node = getNode({
+        const convertedElement = convertToElement({
           ...props,
+          cacheElements: shouldCacheElement,
           handleError: () => {},
           hash: getHash(),
           content: cachedContent,
         });
 
-        if (!node) {
-          return { ...initial, content: cachedContent, isCached: true, status: STATUS.LOADED };
-        }
-
-        const convertedElement = convert(node as Node);
-
-        if (convertedElement && isValidElement(convertedElement)) {
+        if (convertedElement) {
           return {
             content: cachedContent,
             element: convertedElement,
@@ -116,8 +113,9 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
 
   const getElement = useCallback(() => {
     try {
-      const node = getNode({
+      const convertedElement = convertToElement({
         baseURL,
+        cacheElements: shouldCacheElement,
         content,
         description,
         handleError,
@@ -126,10 +124,9 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
         src,
         title,
         uniquifyIDs,
-      }) as Node;
-      const convertedElement = convert(node);
+      });
 
-      if (!convertedElement || !isValidElement(convertedElement)) {
+      if (!convertedElement) {
         throw new Error('Could not convert the src to a React element');
       }
 
@@ -140,7 +137,17 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
     } catch (error: any) {
       handleError(error);
     }
-  }, [baseURL, content, description, getHash, handleError, src, title, uniquifyIDs]);
+  }, [
+    baseURL,
+    content,
+    description,
+    getHash,
+    handleError,
+    shouldCacheElement,
+    src,
+    title,
+    uniquifyIDs,
+  ]);
 
   // Mount
   useMount(() => {

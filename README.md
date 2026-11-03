@@ -59,6 +59,9 @@ The fallback content in case of a fetch error or unsupported browser.
 </SVG>
 ```
 
+**cacheElements** {boolean} ▶︎ `false`
+Reuse the converted React element across mounts of the same SVG instead of parsing it every time. Use it for SVGs that mount often, like icons in virtualized lists. With `uniquifyIDs`, only instances that share a `uniqueHash` are cached.
+
 **cacheRequests** {boolean} ▶︎ `true`
 Cache remote SVGs in memory. When used with the [CacheProvider](#caching), requests are also persisted in the browser cache.
 
@@ -118,6 +121,7 @@ Create unique IDs for each icon.
 ```tsx
 <SVG
   baseURL="/home"
+  cacheElements={false}
   cacheRequests={true}
   description="The React logo"
   loader={<span>Loading...</span>}
@@ -151,6 +155,8 @@ createRoot(document.getElementById('root')!).render(
 The `CacheProvider` accepts an optional `name` prop to customize the cache storage name.
 
 > Be aware of the limitations of the [Cache API](https://developer.mozilla.org/en-US/docs/Web/API/Cache).
+
+The `cacheElements` cache holds the 100 most recently used elements. Call `clearElementCache()` (exported from `react-inlinesvg`) to empty it, for example between tests.
 
 ## Browser Support
 
