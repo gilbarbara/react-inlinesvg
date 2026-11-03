@@ -32,7 +32,7 @@ Two entry points: `src/index.tsx` (main component) and `src/provider.tsx` (Cache
 
 ### Core flow
 
-`InlineSVG` component → `useInlineSVG` hook (state machine via `useReducer`) → `CacheStore` for caching → `react-from-dom` for SVG string → React element conversion.
+`InlineSVG` component → `useInlineSVG` hook (state machine via `useReducer`) → `CacheStore` for request caching → `convertToElement` (element cache lookup when `cacheElements` is on) → `getNode` for SVG processing → `react-from-dom` for React element conversion.
 
 **State machine:** `IDLE` → `LOADING` → `LOADED` → `READY` (or `FAILED`/`UNSUPPORTED`). States defined in `src/config.ts`.
 
@@ -40,7 +40,8 @@ Two entry points: `src/index.tsx` (main component) and `src/provider.tsx` (Cache
 
 - **useInlineSVG.ts** — Main hook. Handles fetching, inline SVG detection, caching, and lifecycle. Dispatches state transitions.
 - **cache.ts** — `CacheStore` class with dual-layer caching: in-memory `Map` + Browser Cache API (persistent). Handles concurrent request deduplication.
-- **utils.ts** — SVG DOM processing: parsing, ID uniquification, title/description manipulation, baseURL handling.
+- **elementCache.ts** — Module-level LRU (`ELEMENT_CACHE_MAX_SIZE` = 100) of converted React elements, used when `cacheElements` is on. Independent of `CacheProvider`; cleared via the exported `clearElementCache()`.
+- **utils.ts** — `convertToElement` (element cache key + `getNode` + `convert`) and SVG DOM processing: parsing, ID uniquification, title/description manipulation, baseURL handling.
 - **helpers.ts** — DOM detection, fetch wrapper, SVG support checks.
 - **hooks.tsx** — `useMount()` and `usePrevious()` hooks.
 
@@ -55,6 +56,7 @@ Optional context provider that creates a persistent `CacheStore` using the Cache
 - **Fixtures:** SVG files served by `http-server` on port 1337 from `test/__fixtures__/`
 - **Coverage thresholds:** 90% (statements, branches, functions, lines)
 - Tests import `cacheStore` directly to clear between tests via `cacheStore.clear()`
+- Specs that use `cacheElements` call `clearElementCache()` in `beforeEach`, since the element cache is module-level
 
 ## Build
 

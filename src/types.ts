@@ -31,6 +31,7 @@ export type Props = Simplify<
      *
      * Entries are keyed by the content and by every prop that shapes the output, so `title`,
      * `description`, `preProcessor` and `uniquifyIDs` keep working as they do without it.
+     * With `uniquifyIDs`, only instances that have a `uniqueHash` when they mount are cached.
      * @default false
      */
     cacheElements?: boolean;

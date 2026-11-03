@@ -25,8 +25,10 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
   } = props;
 
   const hashRef = useRef(uniqueHash);
+  // Read once, like `hashRef`: a later `uniqueHash` doesn't replace a random hash already in use.
+  const hasStableHash = useRef(uniqueHash !== undefined).current;
   // A random hash makes the key unique to this instance, so the entry could never be reused.
-  const shouldCacheElement = cacheElements && !(uniquifyIDs && uniqueHash === undefined);
+  const shouldCacheElement = cacheElements && !(uniquifyIDs && !hasStableHash);
   const fetchOptionsRef = useRef(fetchOptions);
   const onErrorRef = useRef(onError);
   const onLoadRef = useRef(onLoad);
@@ -70,7 +72,7 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
           ...props,
           cacheElements: shouldCacheElement,
           handleError: () => {},
-          hash: getHash(),
+          hash: uniquifyIDs ? getHash() : '',
           content: cachedContent,
         });
 
@@ -119,7 +121,7 @@ export default function useInlineSVG(props: Props, cacheStore: CacheStore) {
         content,
         description,
         handleError,
-        hash: getHash(),
+        hash: uniquifyIDs ? getHash() : '',
         preProcessor: preProcessorRef.current,
         src,
         title,
