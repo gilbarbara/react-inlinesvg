@@ -215,6 +215,19 @@ describe('cacheElements', () => {
       );
     });
 
+    it('should not cache a uniquifyIDs instance that gets a uniqueHash after mount', async () => {
+      const props: Props = { cacheElements: true, src: svgs.withIDs, uniquifyIDs: true };
+      const view = await setup(props);
+
+      view.rerender(<ReactInlineSVG {...props} title="Updated" uniqueHash="a1f8d1b2" />);
+
+      await waitFor(() => {
+        expect(screen.getByTitle('Updated')).toBeInTheDocument();
+      });
+
+      expect(getElementCacheSize()).toBe(0);
+    });
+
     it('should not reuse a uniquifyIDs conversion for an instance without it', async () => {
       const unique = await setup({
         cacheElements: true,
